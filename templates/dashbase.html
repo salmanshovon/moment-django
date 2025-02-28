@@ -616,67 +616,6 @@ body.dark-theme .spinner {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            // Toggle sidebar visibility when clicking the hamburger icon
-            $(".navbar-toggler").click(function () {
-                $("#sidebar").toggleClass("show");
-            });
-    
-            // Close sidebar when clicking outside the sidebar and toggler button
-            $(document).click(function (e) {
-                if (!$(e.target).closest("#sidebar, .navbar-toggler").length) {
-                    $("#sidebar").removeClass("show");
-                }
-            });
-
-            // Script for drop down menu of the profile button on navbar
-            document.addEventListener("DOMContentLoaded", function() {
-                const profilePic = document.getElementById("profile-pic");
-                const profileDropdown = document.getElementById("profileDropdown");
-            
-                profilePic.addEventListener("click", function(event) {
-                    event.stopPropagation(); // Prevent click from bubbling up to document
-            
-                    profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
-                });
-            
-                // Close the dropdown if the user clicks anywhere else on the document
-                document.addEventListener("click", function(event) {
-                    if (!profileDropdown.contains(event.target)) { // Check if click is outside the dropdown
-                        profileDropdown.style.display = "none";
-                    }
-                });
-            });
-    
-            // Prevent closing the sidebar when clicking inside it
-            $("#sidebar").click(function (e) {
-                e.stopPropagation();
-            });
-    
-            // Handle sidebar link clicks
-            $("#sidebar").on('click', '.nav-link', function (e) {
-                const url = $(this).attr("href"); // Get the href of the clicked link
-    
-                // If the link has a valid URL, collapse the sidebar on mobile
-                if (url && url !== "#" && $(window).width() <= 768) {
-                    $("#sidebar").removeClass("show");
-                }
-    
-                // Prevent the default link behavior if the link is for expanding/collapsing
-                if (!url || url === "#") {
-                    e.preventDefault();
-                }
-    
-                // Trigger content update for valid URLs
-                if (url && url !== "#") {
-                    e.preventDefault(); // Prevent default navigation
-                    $(document).trigger("contentUpdated", [url, "#new-content", true]);
-                }
-            });
-        });
-    </script>
-
 <!-- Script to show and update notification -->
     <script>
         function updateNotificationCount(count) {
@@ -755,7 +694,6 @@ body.dark-theme .spinner {
 
         // Fetch content if #new-content is empty on page load
         if ($("#new-content").html() === "") {
-            console.log("Loading Elements Due to emtpy DIV")
             fetchContent(window.location.href, "#new-content"); // Fetch current URL content
         }
 
@@ -774,21 +712,69 @@ body.dark-theme .spinner {
             fetchContent(url, div, history); // Trigger content update
         });
 
-        // Handle sidebar link clicks
-        $("#sidebar").off('click', '.nav-link').on('click', '.nav-link', function(e) {
-            e.preventDefault(); // Prevent the default link behavior
-            const url = $(this).attr("href"); // Get the href of the clicked link
-
-            // Trigger content update
-            if (url) {
-                $(document).trigger("contentUpdated", [url, "#new-content", true]);
-            }
-        });
-
         // Prevent the parent link click behavior
         $("#sidebar").off('click', '.parent-link').on('click', '.parent-link', function(e) {
             e.stopPropagation(); // Prevent event bubbling
         });
+
+            // Toggle sidebar visibility when clicking the hamburger icon
+            $(".navbar-toggler").click(function () {
+                $("#sidebar").toggleClass("show");
+            });
+    
+            // Close sidebar when clicking outside the sidebar and toggler button
+            $(document).click(function (e) {
+                if (!$(e.target).closest("#sidebar, .navbar-toggler").length) {
+                    $("#sidebar").removeClass("show");
+                }
+            });
+
+            // Script for drop down menu of the profile button on navbar
+            document.addEventListener("DOMContentLoaded", function() {
+                const profilePic = document.getElementById("profile-pic");
+                const profileDropdown = document.getElementById("profileDropdown");
+            
+                profilePic.addEventListener("click", function(event) {
+                    event.stopPropagation(); // Prevent click from bubbling up to document
+            
+                    profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+                });
+            
+                // Close the dropdown if the user clicks anywhere else on the document
+                document.addEventListener("click", function(event) {
+                    if (!profileDropdown.contains(event.target)) { // Check if click is outside the dropdown
+                        profileDropdown.style.display = "none";
+                    }
+                });
+            });
+    
+            // Prevent closing the sidebar when clicking inside it
+            $("#sidebar").click(function (e) {
+                e.stopPropagation();
+            });
+    
+            // Handle sidebar link clicks
+            $("#sidebar").off('click', '.nav-link').on('click', '.nav-link', function(e) {
+                e.preventDefault(); // Prevent the default link behavior
+                const url = $(this).attr("href"); // Get the href of the clicked link
+    
+                // If the link has a valid URL, collapse the sidebar on mobile
+                if (url && url !== "#" && $(window).width() <= 768) {
+                    $("#sidebar").removeClass("show");
+                }
+    
+                // Prevent the default link behavior if the link is for expanding/collapsing
+                if (!url || url === "#") {
+                    e.preventDefault();
+                }
+    
+                // Trigger content update for valid URLs
+                if (url && url !== "#") {
+                    e.preventDefault(); // Prevent default navigation
+                    $(document).trigger("contentUpdated", [url, "#new-content", true]);
+                }
+            });
+
     });
 
     // Toggle dark theme

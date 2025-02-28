@@ -20,6 +20,9 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
+
+def str_to_bool(value):
+    return str(value).lower() in ['true', '1', 'yes']
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -184,8 +187,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(',')
 
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT')
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE')
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE')
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', default=False)
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', default=False)
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', default=False)
