@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'img/logo.jpg' %}" type="image/x-icon">
+    <title>M O M E N T</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Spinning Animation */
+        .spinner-container {
+            display: flex;
+            justify-content: center; /* Horizontally center */
+            align-items: center;     /* Vertically center */
+            height: 100%;           /* Take up the full height of its parent */
+            width: 100%;            /* Take up the full width of its parent */
+            position: relative;     /* Ensure it stays within the bounds of its parent */
+            margin-top: 3rem;
+        }
+        .spinner {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-top: 8px solid #0077ff;
+            box-shadow: 0 0 15px #0077ff;
+            animation: spin 3s linear infinite, glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 15px #0077ff; }
+            100% { box-shadow: 0 0 30px #0077ff; }
+        }
+
+        /* Color Palette */
+        :root {
+            --primary-color: #4e73df;
+            --sidebar-bg: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --navbar-bg: #ffffff;
+            --navbar-text: #2c3e50;
+            --hover-bg: #34495e;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            padding-top: 60px;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* Standard syntax */
+        }
+
+        /* for the background image */
+        .img-background {
+            position: fixed; /* Stays in place as the user scrolls */
+            top: 0;
+            left: 0;
+            width: 100dvw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            background-size: contain; /* Ensures the whole image fits inside the div */
+            background-position: center; /* Centers the image */
+            background-repeat: no-repeat; /* Prevents the image from repeating */
+            z-index: -1; /* Places it behind all content */
+            margin-left: 145px;
+        }
+
+
+        .img-background::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.3); /* Black overlay with 50% opacity */
+        }
+
+        /* Warning Display */
+        .warningdiv {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            font-size: 0.975rem;
+            width: 80vw; /* Set width to 80% of the viewport width */
+            max-width: 500px; /* Optional: set a maximum width */
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: calc(100dvh - 69px);
+            width: 230px;
+            position: fixed;
+            top: 69px;
+            left: 0;
+            background-color: var(--sidebar-bg);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+        }
+
+        .sidebar .nav-link {
+            padding: 10px 15px;
+            color: var(--sidebar-text);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 230px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--navbar-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar .notification-btn {
+            background: none;
+            border: none;
+            color: var(--navbar-text);
+            font-size: 1.2rem;
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .navbar .notification-btn .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            padding: 3px 6px;
+            display: inline-block; /* Make sure the default display is inline-block */
+        }
+
+        .parent-link {
+            display: block;  /* Makes it behave like a full-width link */
+            padding: 10px 15px;  /* Adds spacing for a larger click area */
+            cursor: pointer;  /* Makes it look clickable */
+            color: #ffffff; /* Adjust color as needed */
+            text-decoration: none;  /* Removes default underline */
+            width: 100%;  /* Ensures full width */
+        }
+
+        /* CSS for expanding child list */
+        .child-list {
+            display: none; /* Initially hide the children */
+            padding-left: 20px; /* Indent the children */
+            transition: all 0.3s ease; /* Optional: Smooth transition */
+        }
+
+        .has-children > a::after { /* Down arrow icon */
+            content: "\f107";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            margin-left: 5px;
+            transition: transform 0.3s ease; /* Smooth rotation */
+        }
+
+        .has-children > a.active::after { /* Rotate icon when active */
+            transform: rotate(180deg);
+        }
+
+
+        /* Profile Picture Styling */
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+
+        .profile-pic-lg {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 3px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        /* Dropdown Styling */
+        .dropdown-menu {
+            min-width: 200px;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Soft shadow */
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dropdown-item i {
+            font-size: 16px;
+        }
+
+
+    /* Floating Message Container */
+    .floating-messages-container {
+        position: fixed;
+        top: 80px; /* 70px navbar + 10px margin */
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Space between messages */
+    }
+
+    /* Floating Message */
+    .floating-message {
+        position: relative;
+        background-color: #ffffff;
+        color: #333333;
+        padding: 15px 20px 15px 16px;
+        border-radius: 10px;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+        font-size: 15px;
+        opacity: 1;
+        transition: opacity 0.4s ease, transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 320px;
+    }
+
+    /* Close Button */
+    .floating-message .close-btn {
+        background: none;
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        color: #888888;
+        cursor: pointer;
+        padding: 2px 6px;
+        line-height: 1;
+        border-radius: 50%;
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+
+    .floating-message .close-btn:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: #333333;
+        transform: scale(1.15);
+    }
+
+    /* Smooth fade-out animation */
+    .floating-message.fade-out {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+        /* Success Message */
+    .floating-message.success {
+        background-color: #ffffff;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    /* Error Message */
+    .floating-message.error {
+        background-color: #ffffff;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    /* Info Message */
+    .floating-message.info {
+        background-color: #ffffff;
+        color: #0c5460;
+        border-left: 4px solid #17a2b8;
+    }
+
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+                left: -250px;
+                position: fixed;
+                top: 67px;
+                height: calc(100dvh-67px);
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+            .img-background{
+                margin-left: 0px;
+            }
+        }
+    </style>
+
+
+<!-- Dark Theme Styles -->
+<style>
+
+    /* Dark Theme Styles */
+body.dark-theme {
+    background-color: #121212; /* Dark background */
+    color: #ffffff; /* Light text */
+}
+
+/* Dark Theme for Sidebar */
+body.dark-theme .sidebar {
+    background-color: #1e1e1e; /* Dark sidebar background */
+}
+
+body.dark-theme .sidebar .nav-link {
+    color: #ffffff; /* Light text for sidebar links */
+}
+
+body.dark-theme .sidebar .nav-link:hover {
+    background-color: #333333; /* Dark hover background */
+}
+
+/* Dark Theme for Navbar */
+body.dark-theme .navbar {
+    background-color: #1e1e1e; /* Dark navbar background */
+    color: #ffffff; /* Light text */
+}
+
+/* Dark Theme for Dropdown Divider */
+body.dark-theme .dropdown-divider {
+    border-color: #444444; /* Or a lighter color, like #666666, #888888, or a semi-transparent white */
+}
+
+/* Dark Theme for Navbar Toggler Icon */
+body.dark-theme .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+body.dark-theme .navbar .notification-btn {
+    color: #ffffff; /* Light text for notification button */
+}
+
+/* Dark Theme for Navbar Brand Text */
+body.dark-theme .navbar-brand span {
+    color: #e0e0e0; /* Light text color for dark theme */
+}
+
+body.dark-them .profile-dropdown-container{
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); /* Light shadow */
+}
+
+/* Dark Theme for Dropdowns */
+body.dark-theme .dropdown-menu {
+    background-color: #1e1e1e; /* Dark dropdown background */
+    border-color: #333333; /* Dark border */
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); /* Light shadow */
+}
+
+body.dark-theme .dropdown-item {
+    color: #ffffff; /* Light text for dropdown items */
+}
+
+body.dark-theme .dropdown-item:hover {
+    background-color: #333333; /* Dark hover background */
+}
+
+/* Dark Theme for Warning Display */
+body.dark-theme .warningdiv {
+    background-color: #1e1e1e; /* Dark background for warning dialog */
+    color: #ffffff; /* Light text */
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1); /* Light shadow */
+}
+
+/* Dark Theme for Text and Icons */
+body.dark-theme .warningdiv .text-muted {
+    color: #aaa !important; /* Lighter text for muted elements */
+}
+
+/* Dark Theme for Floating Messages */
+body.dark-theme .floating-message {
+    background-color: #1e1e1e; /* Dark background for floating messages */
+    color: #ffffff; /* Light text */
+    box-shadow: 0px 6px 12px rgba(255, 255, 255, 0.15); /* Light shadow */
+}
+
+body.dark-theme .floating-message .close-btn {
+    color: #888888; /* Light gray close button */
+}
+
+body.dark-theme .floating-message .close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05); /* Light hover background */
+    color: #ffffff; /* Light text */
+}
+
+/* Dark Theme for Success, Error, and Info Messages */
+body.dark-theme .floating-message.success {
+    background-color: #1e1e1e; /* Dark background */
+    color: #28a745; /* Green text for success */
+    border-left: 4px solid #28a745; /* Green border */
+}
+
+body.dark-theme .floating-message.error {
+    background-color: #1e1e1e; /* Dark background */
+    color: #dc3545; /* Red text for error */
+    border-left: 4px solid #dc3545; /* Red border */
+}
+
+body.dark-theme .floating-message.info {
+    background-color: #1e1e1e; /* Dark background */
+    color: #17a2b8; /* Blue text for info */
+    border-left: 4px solid #17a2b8; /* Blue border */
+}
+
+/* Dark Theme for Profile Dropdown */
+body.dark-theme .profile-dropdown-container .dropdown-menu {
+    background-color: #1e1e1e; /* Dark background */
+    color: #ffffff; /* Light text */
+}
+
+body.dark-theme .profile-dropdown-container .dropdown-item {
+    color: #ffffff; /* Light text */
+}
+
+body.dark-theme .profile-dropdown-container .dropdown-item:hover {
+    background-color: #333333; /* Dark hover background */
+}
+
+/* Dark Theme for Background Image Overlay */
+body.dark-theme .img-background::before {
+    background-color: rgba(0, 0, 0, 0.7); /* Darker overlay for dark theme */
+}
+
+/* Dark Theme for Spinner */
+body.dark-theme .spinner {
+    border: 8px solid rgba(255, 255, 255, 0.1); /* Light border for spinner */
+    border-top: 8px solid #0077ff; /* Keep the blue color for spinner */
+    box-shadow: 0 0 15px #0077ff; /* Keep the glow effect */
+}
+
+</style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid d-flex align-items-center">
+            
+            <!-- Navbar Toggler (Hamburger Menu) - Positioned on the Left -->
+            <button class="navbar-toggler me-auto" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Centered Brand Logo -->
+            <div class="d-flex justify-content-center flex-grow-1">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="{% static 'img/logo.jpg' %}" alt="Logo" width="40" height="40" class="me-2">
+                    <span>M O M E N T</span>
+                </a>
+            </div>
+
+            <!-- Profile & Notifications (Right) -->
+            <div class="d-flex align-items-center">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="notificationBadge">0</span>
+                </button>
+                <!-- Profile Dropdown Container -->
+                <div class="dropdown profile-dropdown-container">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ user.profile.picture|default:'/static/img/default.png' }}" alt="Profile Picture" class="profile-pic rounded-circle">
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <!-- Profile Info -->
+                        <li class="text-center px-3 py-2">
+                            <img src="{{ user.profile.picture|default:'/static/img/default.png' }}" alt="Profile Picture" class="profile-pic-lg rounded-circle">
+                            <p class="fw-bold mb-0">{{ user.username }}</p>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+
+                        <!-- View Profile -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="{% url 'profile' %}" onclick="$(document).trigger('contentUpdated', [this.href, '#new-content',true]); return false;">
+                                <i class="fas fa-user-circle me-2"></i> View Profile
+                            </a>
+                        </li>
+
+                        <!-- Settings -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" onclick="$(document).trigger('contentUpdated', [this.href, '#new-content',true]); return false;">
+                                <i class="fas fa-cog me-2"></i> Settings
+                            </a>
+                        </li>
+
+                        <!-- Theme Toggle -->
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" id="theme-toggle" style="cursor: pointer;">
+                                <i class="fas fa-moon me-2"></i> Dark Theme
+                                <div class="form-check form-switch ms-auto">
+                                    <input class="form-check-input" type="checkbox" id="theme-switch">
+                                </div>
+                            </a>
+                        </li>
+
+                        <!-- Logout -->
+                        <li>
+                            <a class="dropdown-item text-danger d-flex align-items-center" href="#" onclick="document.getElementById('logout-form').submit();">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Hidden Logout Form -->
+                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                </div>
+
+            </div>
+        </div>                        
+            
+    </nav>
+
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column" id="sidebar">
+        <ul class="nav flex-column flex-grow-1" style="margin-left: 1rem;">
+            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-calendar-alt"></i> Routine</a></li>
+            <li class="nav-item has-children">
+                <a class="nav-link parent-link"><i class="fas fa-user"></i>Task</a>
+                <ul class="nav flex-column child-list">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Add a Task</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'view_task' %}">View Tasks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'security' %}">Manage Tasks</a></li>
+                </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-archive"></i> Archive</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-trophy"></i> Achievements</a></li>
+            <li class="nav-item has-children">
+                <a class="nav-link parent-link"><i class="fas fa-user"></i> Profile</a>
+                <ul class="nav flex-column child-list">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">View Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile_edit' %}">Edit Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'security' %}">Security</a></li>
+                </ul>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-cog"></i> Settings</a></li>
+
+            <!-- Bottom Links -->
+            <div class="mt-auto">
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-info-circle"></i> About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-question-circle"></i> Help</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-crown"></i> Buy Premium</a></li>
+            </div>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="new-content""></div>
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Toggle sidebar visibility when clicking the hamburger icon
+            $(".navbar-toggler").click(function () {
+                $("#sidebar").toggleClass("show");
+            });
+    
+            // Close sidebar when clicking outside the sidebar and toggler button
+            $(document).click(function (e) {
+                if (!$(e.target).closest("#sidebar, .navbar-toggler").length) {
+                    $("#sidebar").removeClass("show");
+                }
+            });
+
+            // Script for drop down menu of the profile button on navbar
+            document.addEventListener("DOMContentLoaded", function() {
+                const profilePic = document.getElementById("profile-pic");
+                const profileDropdown = document.getElementById("profileDropdown");
+            
+                profilePic.addEventListener("click", function(event) {
+                    event.stopPropagation(); // Prevent click from bubbling up to document
+            
+                    profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+                });
+            
+                // Close the dropdown if the user clicks anywhere else on the document
+                document.addEventListener("click", function(event) {
+                    if (!profileDropdown.contains(event.target)) { // Check if click is outside the dropdown
+                        profileDropdown.style.display = "none";
+                    }
+                });
+            });
+    
+            // Prevent closing the sidebar when clicking inside it
+            $("#sidebar").click(function (e) {
+                e.stopPropagation();
+            });
+    
+            // Handle sidebar link clicks
+            $("#sidebar").on('click', '.nav-link', function (e) {
+                const url = $(this).attr("href"); // Get the href of the clicked link
+    
+                // If the link has a valid URL, collapse the sidebar on mobile
+                if (url && url !== "#" && $(window).width() <= 768) {
+                    $("#sidebar").removeClass("show");
+                }
+    
+                // Prevent the default link behavior if the link is for expanding/collapsing
+                if (!url || url === "#") {
+                    e.preventDefault();
+                }
+    
+                // Trigger content update for valid URLs
+                if (url && url !== "#") {
+                    e.preventDefault(); // Prevent default navigation
+                    $(document).trigger("contentUpdated", [url, "#new-content", true]);
+                }
+            });
+        });
+    </script>
+
+<!-- Script to show and update notification -->
+    <script>
+        function updateNotificationCount(count) {
+        const badge = document.getElementById('notificationBadge');
+        badge.textContent = count; // Update the number
+    
+        if (count === 0) {
+            badge.style.display = 'none'; // Hide if count is 0
+        } else {
+            badge.style.display = 'inline-block'; // Show otherwise
+        }
+        }
+    
+        // Example usage:
+        updateNotificationCount(0); // Hide the badge
+        //updateNotificationCount(3); // Show the badge with count 3
+    
+        // You would typically call this function whenever the notification count changes.
+    </script>
+
+
+    <!-- 
+        This script is for parent and child elements
+    -->
+    <script>
+        const parentLinks = document.querySelectorAll('.parent-link');
+    
+        parentLinks.forEach(parentLink => {
+            const parent = parentLink.parentElement; // Get the parent <li>
+            const childList = parent.querySelector('.child-list');
+    
+            parentLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                childList.style.display = (childList.style.display === 'block') ? 'none' : 'block';
+    
+                // Toggle the active class for the parent link
+                 parentLink.classList.toggle('active');
+    
+            });
+        });
+    </script>
+
+
+<!-- Script for auto load page with empty new-content and update page -->
+    <script>
+    $(document).ready(function() {
+        // Fetch content from URL
+        function fetchContent(url, targetDivId, updateHistory = false) {
+            // Show the loading spinner
+            $(targetDivId).fadeOut(200, function() {
+                $(targetDivId).html('<div class="spinner-container"><div class="spinner"></div></div>').fadeIn(200);
+            });
+        
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "html",
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                success: function(response) {
+                    $(targetDivId).fadeOut(200, function() {
+                        $(this).html(response).css("display", "none"); // Insert content but keep it hidden
+                        setTimeout(function() {
+                            $(this).fadeIn(200); // Delay fadeIn for the same duration as fadeOut
+                        }.bind(this), 50); // Delay equal to fadeOut time-- add this between } and ) --> .bind(this), 200
+
+                        if (updateHistory) {
+                            history.pushState(null, '', url); // Update browser history
+                        }
+                    });
+                },
+                error: function() {
+                    alert("Error loading content. Please try again.");
+                }
+            });
+        }
+
+        // Fetch content if #new-content is empty on page load
+        if ($("#new-content").html() === "") {
+            console.log("Loading Elements Due to emtpy DIV")
+            fetchContent(window.location.href, "#new-content"); // Fetch current URL content
+        }
+
+        // Handle browser back/forward navigation
+        let isPopState = false;
+        window.onpopstate = function() {
+            if (!isPopState) {
+                isPopState = true;
+                fetchContent(window.location.href, "#new-content", false);
+            }
+            isPopState = false;
+        };
+
+        // Listen for content update trigger and load content
+        $(document).off("contentUpdated").on("contentUpdated", function(event, url, div, history) {
+            fetchContent(url, div, history); // Trigger content update
+        });
+
+        // Handle sidebar link clicks
+        $("#sidebar").off('click', '.nav-link').on('click', '.nav-link', function(e) {
+            e.preventDefault(); // Prevent the default link behavior
+            const url = $(this).attr("href"); // Get the href of the clicked link
+
+            // Trigger content update
+            if (url) {
+                $(document).trigger("contentUpdated", [url, "#new-content", true]);
+            }
+        });
+
+        // Prevent the parent link click behavior
+        $("#sidebar").off('click', '.parent-link').on('click', '.parent-link', function(e) {
+            e.stopPropagation(); // Prevent event bubbling
+        });
+    });
+
+    // Toggle dark theme
+    // Elements
+    const themeSwitch = document.getElementById('theme-switch');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    // Function to toggle theme and save preference
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        themeSwitch.checked = isDark;
+    }
+
+    // Click on the entire item triggers theme toggle (excluding direct clicks on the input)
+    themeToggle.addEventListener('click', (e) => {
+        if (e.target !== themeSwitch) toggleTheme();
+    });
+
+    // Clicking the switch itself should also toggle theme
+    themeSwitch.addEventListener('change', toggleTheme);
+
+    // Load saved theme on page load
+    window.addEventListener('load', () => {
+        const savedTheme = localStorage.getItem('theme') === 'dark';
+        document.body.classList.toggle('dark-theme', savedTheme);
+        themeSwitch.checked = savedTheme;
+    });
+
+
+    </script>
+    <script src="{% static 'js/messages.js' %}"></script>
+
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                showMessage("{{ message }}");
+            {% endfor %}
+        </script>
+    {% endif %}
+
+</body>
+</html>
+

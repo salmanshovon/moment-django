@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<h2>Sign In</h2>
+<form id="signin-form" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="username">Username or Email</label>
+        <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-container">
+            <input type="password" id="password" name="password" required>
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</button>
+        </div>
+    </div>
+    <div id="error-message" style="color: red; display: none;"></div>
+    <p class="forgot-text">
+        Forgot your password? <a href="{% url 'passreset' %}">Reset it</a>
+    </p>
+    {% if messages %}
+    <div id="success-message" style="color: green;">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    <script>
+        // Hide message after a few seconds
+        setTimeout(function() {
+            document.getElementById("success-message").style.display = "none";
+        }, 10000);
+    </script>
+{% endif %}
+
+    <button type="submit" id="signin-btn">Sign In</button>
+</form>
+
+<p class="signin-text">
+    Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+    <!-- Google Sign-In Button with Logo -->
+<div class="google-signin-container">
+    {% load socialaccount %}
+    <a href="{% provider_login_url 'google' %}" class="google-signin-button">
+        <span>Sign in with Google</span>
+    </a>
+</div>
+
+</p>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("signin-form");
+    const errorMessage = document.getElementById("error-message");
+    const signInButton = document.querySelector("#signin-form button[type='submit']"); // Select the submit button
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        // Start animation
+        signInButton.classList.add("glowing-button"); // Add a CSS class for glowing
+
+        const formData = new FormData(form);
+
+        fetch("{% url 'signin' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Stop animation *after* receiving the response (success or error)
+            signInButton.classList.remove("glowing-button");
+
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                errorMessage.textContent = data.error;
+                errorMessage.style.display = "block";
+            }
+        })
+        .catch(error => {
+            // Stop animation even if there's a network error
+            signInButton.classList.remove("glowing-button");
+
+            console.error("Error:", error);
+            errorMessage.textContent = "An unexpected error occurred. Please try again.";
+            errorMessage.style.display = "block";
+        });
+    });
+
+    function togglePasswordVisibility(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    }
+});
+</script>
+
+<style>
+/* Glowing button animation */
+.glowing-button {
+    animation: glow 1.8s ease-in-out infinite alternate, gradientShift 6s ease-in-out infinite;
+    background: linear-gradient(135deg, #4a90e2, white);
+    background-size: 300% 300%;
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 8px;
+
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.2s ease, box-shadow 0.3s ease-in-out;
+}
+
+/* Glow effect */
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 10px rgba(0, 194, 228, 0.6), 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(0, 82, 130, 0.8), 0 0 30px rgba(255, 255, 255, 0.7);
+    }
+}
+
+/* Soft gradient shift effect */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Hover effect for a more interactive feel */
+.glowing-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(75, 0, 130, 0.9), 0 0 35px rgba(255, 255, 255, 0.9);
+}
+
+/* Active click effect */
+.glowing-button:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 15px rgba(255, 217, 4, 0.459), 0 0 25px rgba(255, 255, 255, 0.6);
+}
+
+
+</style>
+
+{% endblock %}

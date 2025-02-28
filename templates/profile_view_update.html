@@ -1,0 +1,246 @@
+<div>
+    {% load static %}
+<div class="img-background" style="background: url('{% static "img/profile-background.jpg" %}') no-repeat center center;">
+</div>
+    <form method="post" id="profile-update-form" class="needs-validation" novalidate>
+        <div style="text-align: center;"> <h1 class="fs-5">Profile Information</h1>
+        </div>
+        {% csrf_token %}
+        <!-- Full Name Field -->
+        <div class="mb-3">
+            <label for="id_full_name" class="form-label">Full Name</label>
+            {{ form.full_name }}
+            <div class="invalid-feedback">
+                Please provide a valid full name.
+            </div>
+        </div>
+    
+        <!-- Date of Birth Field -->
+        <div class="mb-3">
+            <label for="id_date_of_birth" class="form-label">Date of Birth</label>
+            {{ form.date_of_birth }}
+            <div class="invalid-feedback">
+                Please provide a valid date of birth.
+            </div>
+        </div>
+    
+        <!-- Gender Field -->
+        <div class="mb-3">
+            <label for="id_gender" class="form-label">Gender</label>
+            {{ form.gender }}
+            <div class="invalid-feedback">
+                Please select a valid gender.
+            </div>
+        </div>
+    
+        <!-- Occupation Field -->
+        <div class="mb-3">
+            <label for="id_occupation" class="form-label">Occupation</label>
+            {{ form.occupation }}
+            <div class="invalid-feedback">
+                Please provide a valid occupation.
+            </div>
+        </div>
+    
+        <!-- Buttons -->
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="{% url 'profile' %}" class="btn btn-outline-secondary ajax-nav" style="text-decoration: none;"
+                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
+                Later
+            </a>
+        </div>
+
+                <!-- Additional Text and Link -->
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-0">Want to change Email or Password? <a href="#" class="text-decoration-none">Click here</a>.</p>
+        </div>
+    </form>
+</div>
+
+<div id="profile-update-message" class="profile-update-floating-message" style="display: none;">
+    <p></p>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#profile-update-form').off('submit').on('submit', function(e) {
+            e.preventDefault();  // Prevent default form submission
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "profile_edit" %}',
+                data: $(this).serialize(),
+                success: function(response) {
+                    showMessage(response.message, 'success')
+
+                    // Trigger event to call fetchContent() from global script
+                    $(document).trigger("contentUpdated", ["{% url 'profile' %}", "#new-content", true]);
+                },
+                error: function(xhr) {
+                    $('#profile-form-message p').text(xhr.responseJSON.error || 'An error occurred.');
+                    $('#profile-form-message').css({'background-color': 'white', 'color': '#721c24', 'display': 'block'});
+
+                    setTimeout(function() {
+                        $('#profile-form-message').fadeOut(500);
+                    }, 5000);
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+
+
+/* Form container */
+#profile-update-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+/* Form labels */
+.form-label {
+    font-weight: 500;
+    color: #333333;
+    margin-bottom: 0.5rem;
+}
+
+/* Form inputs */
+#profile-update-form input,
+#profile-update-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #495057;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#profile-update-form input:focus,
+#profile-update-form select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+/* Invalid feedback */
+.invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.25rem;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-outline-secondary {
+    border: 1px solid #6c757d;
+    color: #6c757d;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Additional text and link */
+.text-muted {
+    font-size: 0.9rem;
+    color: #6c757d; /* Muted text color */
+}
+
+.text-muted a {
+    color: #007bff; /* Bootstrap primary color */
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.text-muted a:hover {
+    color: #0056b3; /* Darker shade on hover */
+    text-decoration: underline;
+}
+
+
+/* Dark Theme Styles */
+
+body.dark-theme #profile-update-form {
+    background-color: #1e1e1e; /* Dark background */
+    border: 1px solid #333333; /* Darker border */
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); /* Light shadow */
+    color: #ffffff; /* Light text */
+}
+
+body.dark-theme .form-label {
+    color: #e0e0e0; /* Light label text */
+}
+
+body.dark-theme #profile-update-form input,
+body.dark-theme #profile-update-form select {
+    background-color: #333333; /* Dark input background */
+    border: 1px solid #444444; /* Darker input border */
+    color: #ffffff; /* Light input text */
+}
+
+body.dark-theme #profile-update-form input:focus,
+body.dark-theme #profile-update-form select:focus {
+    border-color: #66a3ff; /* Lighter blue focus border */
+    box-shadow: 0 0 0 4px rgba(102, 163, 255, 0.25); /* Lighter blue focus shadow */
+}
+
+body.dark-theme .invalid-feedback {
+    color: #f88791; /* Light red for invalid feedback */
+}
+
+body.dark-theme .btn-primary {
+    background-color: #0056b3; /* Darker primary button */
+    color: #ffffff;
+}
+
+body.dark-theme .btn-primary:hover {
+    background-color: #004085; /* Even darker on hover */
+}
+
+body.dark-theme .btn-outline-secondary {
+    border: 1px solid #888888; /* Light gray border */
+    color: #888888; /* Light gray text */
+}
+
+body.dark-theme .btn-outline-secondary:hover {
+    background-color: #888888; /* Light gray hover background */
+    color: #1e1e1e; /* Dark text on hover */
+}
+
+/* Dark Theme for Text and Icons */
+body.dark-theme .text-muted {
+    color: #aaa !important; /* Lighter text for muted elements */
+}
+body.dark-theme .text-muted a {
+    color: #66a3ff; /* Lighter blue link */
+}
+
+body.dark-theme .text-muted a:hover {
+    color: #4d86d1; /* Darker blue link on hover */
+}
+</style>

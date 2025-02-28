@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Test Base{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+
+<div id="content">
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".nav-link").click(function(e){
+            e.preventDefault();  // Prevent full page reload
+
+            var url = $(this).attr("href");
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "html",
+                headers: { "X-Requested-With": "XMLHttpRequest" },  // Identify as AJAX request
+                success: function(response) {
+                    $("#content").html(response);  // Load the entire HTML response
+                    history.pushState(null, '', url);  // Update browser history
+                },
+                error: function() {
+                    alert("Error loading content. Please try again.");
+                }
+            });
+        });
+
+        // Handle browser back/forward navigation
+        window.onpopstate = function(){
+            location.reload();
+        };
+    });
+</script>

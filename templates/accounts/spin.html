@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowing Spinning Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0a0a0a;
+            margin: 0;
+        }
+        
+        .spinner {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 8px solid rgba(255, 255, 255, 0.2);
+            border-top: 8px solid #00ffcc;
+            box-shadow: 0 0 15px #00ffcc;
+            animation: spin 3s linear infinite, glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 15px #00ffcc; }
+            100% { box-shadow: 0 0 30px #00ffcc; }
+        }
+    </style>
+</head>
+<body>
+    <div class="spinner"></div>
+</body>
+</html>

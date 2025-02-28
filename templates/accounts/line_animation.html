@@ -1,0 +1,109 @@
+<style>
+    .loading-line {
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(
+        90deg,
+        hsl(200, 100%, 45%),
+        hsl(210, 100%, 55%),
+        hsl(230, 100%, 60%),
+        hsl(250, 100%, 50%)
+      );
+      border-radius: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+      box-shadow: 0 0 10px hsla(220, 100%, 55%, 0.4);
+    }
+  
+    .loading-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        hsl(200, 100%, 60%),
+        hsl(220, 100%, 65%),
+        hsl(240, 100%, 70%),
+        hsl(260, 100%, 60%)
+      );
+      animation: load 2.5s linear infinite;
+      box-shadow: 0 0 15px hsla(220, 100%, 65%, 0.6);
+    }
+  
+    @keyframes load {
+      0% {
+        left: -100%;
+      }
+      100% {
+        left: 100%;
+      }
+    }
+  
+    .loading-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        hsl(200, 100%, 50%),
+        hsl(220, 100%, 60%),
+        hsl(240, 100%, 65%),
+        hsl(260, 100%, 55%)
+      );
+      opacity: 0;
+      animation: hueShift 4s ease-in-out infinite;
+    }
+  
+    @keyframes hueShift {
+      0% {
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+        background: linear-gradient(
+          90deg,
+          hsl(210, 100%, 60%),
+          hsl(230, 100%, 70%),
+          hsl(250, 100%, 60%),
+          hsl(270, 100%, 55%)
+        );
+      }
+      50% {
+        opacity: 1;
+        background: linear-gradient(
+          90deg,
+          hsl(220, 100%, 65%),
+          hsl(240, 100%, 75%),
+          hsl(260, 100%, 65%),
+          hsl(280, 100%, 60%)
+        );
+      }
+      80% {
+        opacity: 1;
+        background: linear-gradient(
+          90deg,
+          hsl(200, 100%, 55%),
+          hsl(220, 100%, 60%),
+          hsl(240, 100%, 65%),
+          hsl(260, 100%, 55%)
+        );
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+  </style>
+  
+  
+  
+  <!-- <div class="loading-line"></div>  --This is how this animation needs to be called!-->

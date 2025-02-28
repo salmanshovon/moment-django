@@ -1,0 +1,773 @@
+<style>
+    /* Custom CSS for two-column layout on desktop */
+    @media (min-width: 768px) {
+        .two-column-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            /* Reduced gap */
+        }
+
+        .two-column-form .form-group.full-width {
+            grid-column: span 2;
+        }
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+
+    /* Custom CSS for inline fields */
+    .inline-fields {
+        display: flex;
+        gap: 0.375rem;
+        /* Reduced gap */
+        align-items: flex-end;
+    }
+
+    .inline-fields .form-group {
+        margin-bottom: 0;
+        flex: 1;
+    }
+
+    /* Form container */
+    .card {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 10px;
+        /* Slightly smaller radius */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Softer shadow */
+        border: 1px solid #e0e0e0;
+    }
+
+    /* Form labels */
+    .form-group label {
+        font-weight: 500;
+        color: #333333;
+        margin-bottom: 0.375rem;
+        /* Reduced margin */
+        font-size: 0.875rem;
+        /* Smaller font size */
+    }
+
+    /* Form inputs */
+    .form-control {
+        width: 100%;
+        padding: 0.625rem;
+        /* Smaller padding */
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        /* Smaller radius */
+        font-size: 0.875rem;
+        /* Smaller font size */
+        color: #495057;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+        /* Smaller focus shadow */
+        outline: none;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 0.625rem 1.25rem;
+        /* Smaller padding */
+        font-size: 0.875rem;
+        /* Smaller font size */
+        border-radius: 6px;
+        /* Smaller radius */
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #6c757d;
+        padding: 0.625rem 1.25rem;
+        /* Smaller padding */
+        font-size: 0.875rem;
+        /* Smaller font size */
+        border-radius: 6px;
+        /* Smaller radius */
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: #ffffff;
+    }
+
+    /* Error messages */
+    .alert-danger {
+        font-size: 0.75rem;
+        /* Smaller font size */
+        color: #dc3545;
+        margin-top: 0.25rem;
+        border-radius: 6px;
+        /* Smaller radius */
+        padding: 0.5rem 1rem;
+        /* Smaller padding */
+    }
+
+    /* Form group spacing */
+    .form-group {
+        margin-bottom: 1rem;
+        /* Reduced margin */
+    }
+
+    /* Inline fields spacing */
+    .inline-fields .form-control {
+        margin-bottom: 0;
+    }
+</style>
+
+<!-- Dark theme CSS -->
+<style>
+    /* Dark Theme Styles */
+    body.dark-theme {
+        background-color: #121212;
+        /* Dark background */
+        color: #ffffff;
+        /* Light text */
+    }
+
+    /* Dark Theme for Form Container */
+    body.dark-theme .card {
+        background-color: #1e1e1e;
+        /* Dark background for form container */
+        border-color: #333333;
+        /* Dark border */
+        box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+        /* Light shadow */
+    }
+
+    /* Dark Theme for h1 elements within card-body */
+    body.dark-theme .card-body h1 {
+        color: #e0e0e0;
+        /* Or #ffffff for pure white */
+    }
+
+    /* Dark Theme for Form Labels */
+    body.dark-theme .form-group label {
+        color: #ffffff;
+        /* Light text for labels */
+    }
+
+    /* Dark Theme for Form Inputs */
+    body.dark-theme .form-control {
+        background-color: #2c2c2c;
+        /* Dark background for inputs */
+        border-color: #444444;
+        /* Dark border */
+        color: #ffffff;
+        /* Light text */
+    }
+
+    body.dark-theme .form-control:focus {
+        border-color: #86b7fe;
+        /* Keep focus border color */
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+        /* Keep focus shadow */
+    }
+
+    /* Dark Theme for Buttons */
+    body.dark-theme .btn-primary {
+        background-color: #007bff;
+        /* Keep primary button color */
+        color: #ffffff;
+        /* Light text */
+    }
+
+    body.dark-theme .btn-primary:hover {
+        background-color: #0056b3;
+        /* Darker hover color */
+    }
+
+    body.dark-theme .btn-outline-secondary {
+        border-color: #6c757d;
+        /* Keep border color */
+        color: #6c757d;
+        /* Keep text color */
+    }
+
+    body.dark-theme .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        /* Keep hover background color */
+        color: #ffffff;
+        /* Light text */
+    }
+
+    /* Dark Theme for Error Messages */
+    body.dark-theme .alert-danger {
+        background-color: #2c2c2c;
+        /* Dark background for error messages */
+        border-color: #dc3545;
+        /* Keep border color */
+        color: #dc3545;
+        /* Keep text color */
+    }
+
+    /* Dark Theme for Overlay */
+    body.dark-theme .overlay {
+        background: rgba(0, 0, 0, 0.7);
+        /* Darker overlay */
+    }
+
+    /* Dark Theme for Inline Fields */
+    body.dark-theme .inline-fields .form-control {
+        background-color: #2c2c2c;
+        /* Dark background for inline inputs */
+        border-color: #444444;
+        /* Dark border */
+        color: #ffffff;
+        /* Light text */
+    }
+</style>
+{% load static %}
+<div class="img-background" style="background: url('{% static "img/profile-background.jpg" %}') no-repeat center center;"></div>
+<div class="overlay" id="overlay" style="display: none;"></div>
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div style="text-align: center;">
+                        <h1 class="fs-5">Edit Task</h1>
+                    </div>
+                    <form id="taskForm" method="post" action="{% url 'edit_task' task.id %}">
+                        {% csrf_token %}
+                        <!-- Task Type Selection -->
+                        <div class="form-group">
+                            <label>Task Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="task_type" id="oneTime"
+                                    value="One-Time" {% if not task.is_repetitive %}checked{% endif %}>
+                                <label class="form-check-label" for="oneTime">One-Time</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="task_type" id="repetitive"
+                                    value="Repetitive" {% if task.is_repetitive %}checked{% endif %}>
+                                <label class="form-check-label" for="repetitive">Repetitive</label>
+                            </div>
+                        </div>
+
+                        <!-- One-Time Task Fields -->
+                        <div id="oneTimeFields" class="two-column-form" {% if task.is_repetitive%}style="display: none;" {% endif %}>
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <input type="text" name="title" id="title" class="form-control"
+                                    placeholder="Enter task name" value="{{ task.title }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea name="description" id="description" class="form-control" rows="2"
+                                    placeholder="Enter task description or add a note">{{ task.description }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="due_date">Date</label>
+                                <input type="date" name="due_date" id="due_date" class="form-control"
+                                    placeholder="Task Due Date" value="{{ task.due_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="one_time_time">Time</label>
+                                <div class="inline-fields">
+                                    <input type="number" name="one_time_hour" id="one_time_hour"
+                                        class="form-control text-center" placeholder="HH" min="1" max="12"
+                                        value="{{ task.due_time|time:'h' }}">
+                                    <input type="number" name="one_time_minute" id="one_time_minute"
+                                        class="form-control text-center" placeholder="MM" min="0" max="59"
+                                        value="{{ task.due_time|time:'i' }}">
+                                    <select name="time_period" id="time_period" class="form-control">
+                                        <option value="AM" {% if task.due_time|time:'A' == "AM" %}selected{% endif %}>AM</option>
+                                        <option value="AM" {% if task.due_time|time:'A' == "AM" %}selected{% endif %}>AM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="duration">Duration</label>
+                                <div class="inline-fields">
+                                    <input type="number" name="duration_hr" id="duration_hr"
+                                        class="form-control text-center" placeholder="Hours" min="0"
+                                        value="{{ duration_hours|floatformat:0 }}">
+                                    <input type="number" name="duration_min" id="duration_min"
+                                        class="form-control text-center" placeholder="Minutes" min="0" max="59"
+                                        value="{{ duration_minutes|floatformat:0 }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="notification_days">Notification Days</label>
+                                <input type="number" name="notification_days" id="notification_days"
+                                    class="form-control" min="1" placeholder="How many days before to notify?"
+                                    value="{{ task.notification_days }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select name="priority" id="priority" class="form-control">
+                                    <option value="1" {% if task.priority == 1 %}selected{% endif %}>Low</option>
+                                    <option value="2" {% if task.priority == 2 %}selected{% endif %}>Medium</option>
+                                    <option value="3" {% if task.priority == 3 %}selected{% endif %}>High</option>
+                                    <option value="4" {% if task.priority == 4 %}selected{% endif %}>Urgent</option>
+                                    <option value="5" {% if task.priority == 5 %}selected{% endif %}>Critical</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select name="category" id="category" class="form-control">
+                                    <option value="">Select a category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if task.category_id == category.id %}selected{%endif %}>{{ category.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="task_merit">Task Merit</label>
+                                <span data-toggle="tooltip" data-placement="top"
+                                    title="Rate the task's value to you on a scale of 1 to 100. Higher numbers indicate greater importance">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <input type="number" name="task_merit" id="task_merit" class="form-control text-center"
+                                    value="{{ task.task_merit }}">
+                            </div>
+                        </div>
+
+                        <!-- Repetitive Task Fields -->
+                        <div id="repetitiveFields" class="two-column-form" {% if not task.is_repetitive%}style="display: none;" {% endif %}>
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <input type="text" name="title" id="title" class="form-control"
+                                    placeholder="Enter task name" value="{{ task.title }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea name="description" id="description" class="form-control" rows="2"
+                                    placeholder="Enter task description or add a note">{{ task.description }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="frequency_interval">Frequency</label>
+                                <select name="frequency_interval" id="frequency_interval" class="form-control">
+                                    <option value="1" {% if task.frequency_interval == 1 %}selected{% endif %}>Daily
+                                    </option>
+                                    <option value="7" {% if task.frequency_interval == 7 %}selected{% endif %}>Weekly
+                                    </option>
+                                    <option value="30" {% if task.frequency_interval == 30 %}selected{% endif %}>Monthly
+                                    </option>
+                                    <option value="365" {% if task.frequency_interval == 365 %}selected{% endif %}>Yearly
+                                    </option>
+                                    <option value="custom" {% if task.frequency_interval != 1 and task.frequency_interval != 7 and task.frequency_interval != 30 and task.frequency_interval != 365 %}selected{% endif %}>Custom</option>
+                                </select>
+                            </div>
+                            <div id="customIntervalFields" style="display: none;">
+                                <div class="form-group">
+                                    <label for="custom_interval_number">Repeat every</label>
+                                    <input type="number" name="custom_interval_number" id="custom_interval_number"
+                                        class="form-control" min="1" placeholder="Days in Number"
+                                        value="{{ task.frequency_interval }}">
+                                </div>
+                                <!-- <div class="form-group">
+                                    <label for="custom_interval_unit">Interval Unit</label>
+                                    <select name="custom_interval_unit" id="custom_interval_unit" class="form-control">
+                                        <option value="Days">Days</option>
+                                        <option value="Weeks">Weeks</option>
+                                        <option value="Months">Months</option>
+                                        <option value="Years">Years</option>
+                                    </select>
+                                </div> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="duration">Duration</label>
+                                <span data-toggle="tooltip" data-placement="top"
+                                    title="Task duration in hours & minutes">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <div class="inline-fields">
+                                    <input type="number" name="duration_hr2" id="duration_hr2"
+                                        class="form-control text-center" placeholder="Hours" min="0"
+                                        value="{{ duration_hours|floatformat:0 }}">
+                                    <input type="number" name="duration_min2" id="duration_min2"
+                                        class="form-control text-center" placeholder="Minutes" min="0" max="59"
+                                        value="{{ duration_minutes|floatformat:0 }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="due_date">Next Due Date</label>
+                                <span data-toggle="tooltip" data-placement="top" title="Default due date is Tomorrow!">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <input type="date" name="due_date2" id="due_date2" class="form-control"
+                                    placeholder="Task Next Due Date" value="{{ task.due_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="notification_days">Notification Days</label>
+                                <input type="number" name="notification_days" id="notification_days"
+                                    class="form-control" min="1" placeholder="How many days before to notify?"
+                                    value="{{ task.notification_days }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select name="priority" id="priority" class="form-control">
+                                    <option value="1" {% if task.priority == 1 %}selected{% endif %}>Low</option>
+                                    <option value="2" {% if task.priority == 2 %}selected{% endif %}>Medium</option>
+                                    <option value="3" {% if task.priority == 3 %}selected{% endif %}>High</option>
+                                    <option value="4" {% if task.priority == 4 %}selected{% endif %}>Urgent</option>
+                                    <option value="5" {% if task.priority == 5 %}selected{% endif %}>Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category" name="category" class="form-control">
+                                    {% if categories %}
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}" {% if task.category_id == category.id %}selected{% endif %}>
+                                                {{ category.title }}
+                                            </option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="task_merit">Task Merit</label>
+                                <span data-toggle="tooltip" data-placement="top"
+                                    title="Rate the task's value to you on a scale of 1 to 100. Higher numbers indicate greater importance">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                                <input type="number" name="task_merit" id="task_merit" class="form-control text-center"
+                                    placeholder="Enter value (1-100)" value="{{ task.task_merit }}">
+                            </div>
+                        </div>
+
+                        <!-- Submit and Cancel Buttons -->
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary btn-block">Update</button>
+                            <a href="{% url 'view_task' %}" class="btn btn-outline-secondary btn-block"
+                                style="text-decoration: none;"
+                                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Cancel</a>
+                            <button class="btn btn-danger ms-auto" id="delete-task-btn" data-task-id="{{ task.id }}"
+                                data-task-title="{{task.title}}" type="button">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </div>
+                    </form>
+                    <div id="errorMessages" class="alert alert-danger" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        $(document).ready(function () {
+
+            // Show tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Show/hide fields based on task type
+            $('input[name="task_type"]').change(function () {
+                if ($(this).val() === "One-Time") {
+                    $('#oneTimeFields').show();
+                    $('#repetitiveFields').hide();
+                } else {
+                    $('#oneTimeFields').hide();
+                    $('#repetitiveFields').show();
+                }
+            });
+
+
+
+            // Show/hide custom interval fields
+            $('#frequency_interval').change(function () {
+                if ($(this).val() === "custom") {
+                    $('#customIntervalFields').show();
+                } else {
+                    $('#customIntervalFields').hide();
+                }
+            });
+
+            // Handle form submission
+            $('#taskForm').off('submit').on('submit', function (e) {
+                e.preventDefault();
+
+                // Validate duration fields
+                const durationHr = $('input[name="duration_hr"]').val();
+                const durationMin = $('input[name="duration_min"]').val();
+                const durationHr2 = $('input[name="duration_hr2"]').val();
+                const durationMin2 = $('input[name="duration_min2"]').val();
+
+                const dueDate = $('input[name="due_date2"]').val();
+                const formInterval = $('#frequency_interval').val();
+
+                // Disable fields of the non-selected task type
+                if ($('input[name="task_type"]:checked').val() === "One-Time") {
+                    $('#repetitiveFields :input').prop('disabled', true); // Disable repetitive fields
+                    if (durationHr === "" && durationMin === "") {
+                        $('#errorMessages').html('<ul><li>Duration fields (hours and minutes) are required.</li></ul>').show();
+                        return; // Stop form submission if duration fields are empty
+                    }
+                } else {
+                    $('#oneTimeFields :input').prop('disabled', true); // Disable one-time fields
+                    if (durationHr2 === "" && durationMin2 === "") {
+                        $('#errorMessages').html('<ul><li>Duration fields (hours and minutes) are required.</li></ul>').show();
+                        return; // Stop form submission if duration fields are empty
+                    }
+                }
+
+                // Convert duration to total minutes
+                let totalDurationMinutes;
+                let x = null;
+                let oneTime24HrString = null;
+
+                // Convert one-time task time to 24-hour format
+                if ($('input[name="task_type"]:checked').val() === "One-Time") {
+                    totalDurationMinutes = (parseInt(durationHr) * 60) + parseInt(durationMin);
+                    const oneTimeHour = parseInt($('input[name="one_time_hour"]').val());
+                    const oneTimeMinute = parseInt($('input[name="one_time_minute"]').val());
+                    const timePeriod = $('select[name="time_period"]').val();
+
+                    let oneTime24Hour = oneTimeHour;
+
+                    if (timePeriod === "PM" && oneTimeHour !== 12) {
+                        oneTime24Hour += 12; // Convert PM to 24-hour format (except 12 PM)
+                    } else if (timePeriod === "AM" && oneTimeHour === 12) {
+                        oneTime24Hour = 0; // Convert 12 AM to 0 hours
+                    }
+
+                    // Combine hour and minute into a 24-hour time string (e.g., "14:30")
+                    oneTime24HrString = `${String(oneTime24Hour).padStart(2, '0')}:${String(oneTimeMinute).padStart(2, '0')}`;
+
+                    x = 30; // Set x to 30
+                } else {
+                    totalDurationMinutes = (parseInt(durationHr2) * 60) + parseInt(durationMin2);
+                }
+
+                // Get the form data and remove unnecessary fields
+                let formData = $(this).serializeArray().filter(item => {
+                    // Remove fields we don't want to submit
+                    return !['duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2'].includes(item.name);
+                });
+
+                // Add the calculated duration in minutes
+                formData.push({ name: 'duration', value: totalDurationMinutes });
+
+                // Check if x is 30 and add due_time to formData
+                if (x === 30) {
+                    formData.push({ name: 'due_time', value: oneTime24HrString });
+                } else if (dueDate === "") {
+                    // Push tomorrows's date as 'due_date' in YYYY-MM-DD format
+                    formData.push({
+                        name: 'due_date',
+                        value: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
+                    });
+                } else {
+                    formData.push({
+                        name: 'due_date', value: dueDate
+                    })
+                }
+
+                // Check if task repeptitive and frequency Interval custom
+                if (x !== 30 && formInterval === 'custom') {
+                    formData = formData.filter(item => item.name !== 'frequency_interval');
+                    formData.push({
+                        name: 'frequency_interval',
+                        value: $('input[name="custom_interval_number"]').val()
+                    });
+                }
+
+                // Submit the form via AJAX
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $.param(formData), // Convert the array to a URL-encoded string
+                    success: function (response) {
+                        if (response.success) {
+                            showMessage(response.message)
+                            $(document).trigger('contentUpdated', ["{% url 'view_task' %}", '#new-content', true]);
+                        }
+                    },
+                    error: function (xhr) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorHtml = '<ul>';
+                        showMessage('Error Editing Task!', 'error')
+
+                        for (const field in errors) {
+                            errorHtml += `<li><strong>${field.replace('_', ' ')}:</strong><ul>`;  // Show field name
+
+                            errors[field].forEach(msg => {
+                                if (typeof msg === 'object') {
+                                    // If the error message is an object (nested list), loop through it
+                                    for (const subMsg of msg) {
+                                        errorHtml += `<li>${subMsg}</li>`;
+                                    }
+                                } else {
+                                    errorHtml += `<li>${msg}</li>`;
+                                }
+                            });
+
+                            errorHtml += '</ul></li>';
+                        }
+
+                        errorHtml += '</ul>';
+                        $('#errorMessages').html(errorHtml).show();
+                    },
+                    complete: function () {
+                        // Re-enable all fields after submission
+                        $('#oneTimeFields :input').prop('disabled', false);
+                        $('#repetitiveFields :input').prop('disabled', false);
+                    }
+                });
+            });
+        });
+    })();
+
+
+
+    (function () {
+        // Input handling for time and duration fields
+        const hrInput = document.getElementById('one_time_hour'); // Hour field for time
+        const minInput = document.getElementById('one_time_minute'); // Minute field for time
+        const hr2Input = document.getElementById('duration_hr');
+        const min2Input = document.getElementById('duration_min'); // Minute field for duration
+        const hr2Input2 = document.getElementById('duration_hr2');
+        const min2Input2 = document.getElementById('duration_min2'); // Minute field for duration
+
+        function handleInput(event) {
+            const inputValue = event.target.value;
+            const numericValue = inputValue.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+
+            let value = parseInt(numericValue, 10);
+
+            if (isNaN(value)) {
+                value = ''; // Clear the field if input is not a number
+            } else {
+                // Apply constraints based on the field
+                if (event.target.id === 'one_time_hour') {
+                    // Hour field for time (1-12)
+                    if (value < 1) value = 1;
+                    if (value > 12) value = 12;
+                } else if (event.target.id === 'one_time_minute' || event.target.id === 'duration_min' || event.target.id === 'duration_min2') {
+                    // Minute fields for time and duration (0-59)
+                    if (value < 0) value = 0;
+                    if (value > 59) value = 59;
+                    value = value.toString().padStart(2, '0'); // Ensure two digits (e.g., "05")
+                } else if (event.target.id === 'duration_hr' || event.target.id === 'duration_hr2') {
+                    // Hour field for duration (0-23)
+                    if (value < 0) value = 0;
+                    if (value > 23) value = 23;
+                }
+            }
+
+            // Update the input value
+            event.target.value = value;
+        }
+
+        // Attach event listeners to the input fields
+        hrInput.addEventListener('input', handleInput);
+        minInput.addEventListener('input', handleInput);
+        hr2Input.addEventListener('input', handleInput);
+        min2Input.addEventListener('input', handleInput);
+        hr2Input2.addEventListener('input', handleInput);
+        min2Input2.addEventListener('input', handleInput);
+    })();
+
+
+    (function () {
+        function getCSRFToken() {
+            return document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+        }
+
+        // Function to delete task
+        async function delTask(taskId) {
+            const csrftoken = getCSRFToken();
+            try {
+                const response = await fetch(`/api/task-delete/${taskId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken, // Add CSRF token header
+                        // Add authentication token if required
+                        // 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete!');
+                }
+
+                const res = await response.json();
+                showMessage(res.message, 'success');
+                const wardiv = document.querySelector('.warningdiv');
+                if (wardiv) {
+                    wardiv.remove(); // Completely deletes the element
+                }
+                $(document).trigger('contentUpdated', ['/task/view_task/', '#new-content', true]);
+            } catch (error) {
+                showMessage(error, 'error');
+            }
+        }
+
+        // Get the trash icon button
+        const deleteButton = document.getElementById('delete-task-btn');
+
+        // Add click event listener to the trash icon
+        if (deleteButton) {
+            deleteButton.addEventListener('click', function () {
+                const taskId = deleteButton.getAttribute('data-task-id');
+                const taskTitle = deleteButton.getAttribute('data-task-title');
+                const overlay = document.getElementById('overlay');
+                const warningDiv = document.createElement('div');
+                const bdy = document.getElementById('new-content');
+                warningDiv.className = 'warningdiv';
+                warningDiv.innerHTML = `
+                    <div class="text-center">
+                        <h5 class="mb-3">Deleting Task: <strong>${taskTitle}</strong></h5>
+                        <p class="mb-2">Are you sure you want to delete this task?</p>
+                        <p class="text-muted small mb-4">*This action can't be undone.</p>
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-danger yes-button me-3">Delete</button>
+                            <button class="btn btn-outline-secondary no-button">Cancel</button>
+                        </div>
+                    </div>
+                `;
+
+                //show the warning dialog
+                bdy.appendChild(warningDiv);
+                overlay.style.display = 'block';
+
+
+                // Handle "Cancel" button click
+                const noButton = warningDiv.querySelector('.no-button');
+                noButton.addEventListener('click', function () {
+                    warningDiv.style.display = 'none';
+                    overlay.style.display = 'none';
+                    warningDiv.remove();
+                });
+
+                // Handle "Delete" button click
+                const yesButton = warningDiv.querySelector('.yes-button');
+                yesButton.addEventListener('click', function () {
+                    warningDiv.remove(); // Remove the warning dialog
+                    delTask(taskId); // Call the delete function
+                });
+            });
+        }
+    })();
+</script>

@@ -1,0 +1,55 @@
+<div class="form-container">
+    <h2 class="fs-5 mb-4">Change Email or Password</h2>
+    <form id="password-verification-form" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <!-- Password Verification Field -->
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Enter Current Password</label>
+            <input type="password" class="form-control" id="id_password" name="password" required>
+            <div class="invalid-feedback">
+                Please provide your current password.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Verify Password</button>
+    </form>
+
+    <!-- Email and Password Change Fields (Initially Hidden) -->
+    <form id="email-password-change-form" class="needs-validation mt-4" novalidate style="display: none;">
+        {% csrf_token %}
+        <!-- Email Field -->
+        <div class="mb-3">
+            <label for="id_new_email" class="form-label">New Email</label>
+            <div class="input-group">
+                <input type="email" class="form-control" id="id_new_email" name="new_email" required>
+                <button type="button" class="btn btn-outline-secondary" id="submit-email-btn">Submit Email</button>
+            </div>
+            <div class="invalid-feedback">
+                Please provide a valid email address.
+            </div>
+        </div>
+
+        <!-- New Password Field -->
+        <div class="mb-3">
+            <label for="id_new_password" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="id_new_password" name="new_password" required>
+            <div class="invalid-feedback">
+                Please provide a new password.
+            </div>
+        </div>
+
+        <!-- Confirm New Password Field -->
+        <div class="mb-3">
+            <label for="id_confirm_password" class="form-label">Confirm New Password</label>
+            <input type="password" class="form-control" id="id_confirm_password" name="confirm_password" required>
+            <div class="invalid-feedback">
+                Please confirm your new password.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Password</button>
+    </form>
+
+    <!-- Success/Error Message -->
+    <div id="message" class="mt-3"></div>
+</div>
+

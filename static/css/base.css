@@ -1,0 +1,320 @@
+/* General Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    width: 80%;
+    max-width: 1200px;
+    height: 900px; /* Fixed height */
+    background-color: #e1f1f8;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Left Section (Logo and Text) */
+.left-section {
+    flex: 1;
+    background-color: #4a90e2;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.left-section img {
+    max-width: 80%;
+    height: auto;
+}
+
+.left-section h1 {
+    margin-top: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+/* Right Section (Form) */
+.right-section {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-container {
+    width: 100%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #b4b4b4 /* Adds a subtle shadow for better appearance */;
+    overflow-y: auto; /* Enables scrolling for small screens */
+    max-height: 100%;
+}
+
+.form-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.form-container .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-container .form-group label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.form-container .form-group input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4a90e2;
+    font-size: 18px;
+}
+
+.form-container button {
+    padding: 10px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #357abd;
+}
+
+.help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.password-requirements {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    padding-left: 15px;
+}
+
+.password-requirements li {
+    margin-bottom: 5px;
+}
+
+#username-feedback {
+    font-size: 1.2em;
+    padding: 0 10px;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px; /* Default position */
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6; /* Lower opacity */
+    background: white; /* Ensures default background is white */
+    border: 1px solid #ddd; /* Adds a subtle border for visibility */
+    padding: 5px; /* Adjust padding for better clickability */
+    border-radius: 4px; /* Rounded corners for better appearance */
+    transition: opacity 0.2s ease, right 0.2s ease, background-color 0.2s ease;
+}
+
+.toggle-password:hover {
+    opacity: 1; /* Increase opacity on hover */
+    background-color: white; /* Keeps background white */
+}
+
+/* Adjust position when input is invalid */
+.is-invalid + .toggle-password {
+    right: 35px; /* Move button left when there's an error */
+}
+
+/* Style for the "Already have an account? Sign In" text */
+.signin-text {
+    margin-top: 15px; /* Adds spacing from the button */
+    font-size: 14px; /* Adjusts text size */
+    color: #666; /* Subtle gray color */
+    text-align: center; /* Centers the text */
+}
+
+/* Style for the "Sign In" link */
+.signin-text a {
+    color: #4a90e2; /* Matches your theme */
+    text-decoration: none; /* Removes underline */
+    font-weight: bold; /* Makes the link stand out */
+    transition: color 0.2s ease-in-out;
+}
+
+.signin-text a:hover {
+    color: #357abd; /* Darker blue on hover for a nice effect */
+    text-decoration: underline; /* Adds an underline for better UX */
+}
+
+.forgot-text {
+    margin-top: 15px; /* Adds spacing from the button */
+    font-size: 14px; /* Adjusts text size */
+    color: #666; /* Subtle gray color */
+    text-align: left; /* Centers the text */
+}
+
+.forgot-text a {
+    color: #4a90e2; /* Matches your theme */
+    text-decoration: none; /* Removes underline */
+    font-weight: bold; /* Makes the link stand out */
+    transition: color 0.2s ease-in-out;
+}
+
+.forgot-text a:hover {
+    color: #357abd; /* Darker blue on hover for a nice effect */
+    text-decoration: underline; /* Adds an underline for better UX */
+}
+
+.social-login-confirm {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.social-login-confirm h2 {
+    color: #333;
+}
+
+.social-login-confirm .btn {
+    padding: 10px 20px;
+    margin: 10px;
+}
+
+
+    /* Custom CSS for Google Sign-In Button */
+    .google-signin-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .google-signin-button {
+        display: inline-flex;
+        align-items: center;
+        background-color: #4a90e2;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .google-signin-button:hover {
+        background-color: #357ABD;
+        text-decoration: none;
+    }
+
+    .google-logo {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
+    /* Footer Styles */
+    .footer {
+        position: fixed; /* Fixed position to keep it at the bottom */
+        bottom: 10px; /* Distance from the bottom */
+        right: 10px; /* Distance from the right */
+        font-size: 10px; /* Adjust font size */
+        color: #666; /* Subtle gray color */
+        background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+        padding: 5px 10px; /* Padding for better appearance */
+        border-radius: 4px; /* Rounded corners */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        z-index: 1000; /* Ensure it stays above other content */
+    }
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        flex-direction: column;
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    /* Adjust left section for banner-style layout */
+    .left-section {
+        
+        flex-direction: row; /* Make items align in a row */
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        background-color: #4a90e2;
+        text-align: center;
+        max-height: 80px;
+    }
+
+    .left-section img {
+        max-width: 40px; /* Reduce logo size */
+        height: auto;
+        margin-right: 10px; /* Space between logo and text */
+    }
+
+    .left-section h1 {
+        font-size: 18px; /* Reduce text size */
+        margin: 0;
+        text-align: left;
+    }
+
+    /* Ensure right section displays form below the banner */
+    .right-section {
+        padding: 20px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .form-container {
+        box-shadow: #666;
+    }
+}

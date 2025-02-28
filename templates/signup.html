@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<h2>Sign Up</h2>
+<form method="post" class="needs-validation" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {% if field.name == "password1" or field.name == "password2" %}
+        <div class="password-container">
+            <input type="password" id="{{ field.id_for_label }}" name="{{ field.name }}" class="form-control {% if field.errors %}is-invalid{% endif %}" placeholder="{% if field.name == 'password1' %}Enter Password{% else %}Re-enter Password{% endif %}" required>
+            <button type="button" class="toggle-password btn btn-outline-secondary" onclick="togglePasswordVisibility('{{ field.id_for_label }}')">👁️</button>
+        </div>
+        {% if field.errors %}
+<div class="invalid-feedback d-block">
+    {% for error in field.errors %}
+        {{ error }}
+    {% endfor %}
+</div>
+{% endif %}
+        {% elif field.name == "username" %}
+        <input type="text" id="{{ field.id_for_label }}" name="{{ field.name }}" class="form-control {% if field.errors %}is-invalid{% endif %}" required>
+        <div class="invalid-feedback">
+            {% for error in field.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        <div class="valid-feedback">
+            Looks good!
+        </div>
+        {% else %}
+        <input type="text" id="{{ field.id_for_label }}" name="{{ field.name }}" class="form-control {% if field.errors %}is-invalid{% endif %}" required>
+        {% endif %}
+        <!-- Display field-specific errors -->
+        {% if field.errors %}
+        <div class="invalid-feedback">
+            {% for error in field.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <!-- Display non-field errors (e.g., password mismatch) -->
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <ul class="password-requirements">
+        <li>Your password can’t be too similar to your other personal information.</li>
+        <li>Your password must contain at least 8 characters.</li>
+        <li>Your password can’t be a commonly used password.</li>
+        <li>Your password can’t be entirely numeric.</li>
+    </ul>
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+</form>
+<p class="signin-text">
+    Already have an account? <a href="{% url 'signin' %}">Sign In</a>
+        <!-- Google Sign-In Button with Logo -->
+<div class="google-signin-container">
+    {% load socialaccount %}
+    <a href="{% provider_login_url 'google' %}" class="google-signin-button">
+        <span>Sign in with Google</span>
+    </a>
+</div>
+</p>
+
+<script>
+// JavaScript to toggle password visibility
+function togglePasswordVisibility(inputId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleButton = document.querySelector(`[onclick="togglePasswordVisibility('${inputId}')"]`);
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    toggleButton.textContent = passwordInput.type === "password" ? "👁️" : "👁️";
+}
+
+// AJAX to check username uniqueness
+document.getElementById('id_username').addEventListener('input', function () {
+    const username = this.value;
+    const usernameField = this;
+
+    // Select or create the invalid and valid feedback elements
+    let invalidFeedback = usernameField.parentNode.querySelector('.invalid-feedback');
+    let validFeedback = usernameField.parentNode.querySelector('.valid-feedback');
+
+    if (!invalidFeedback) {
+        invalidFeedback = document.createElement('div');
+        invalidFeedback.classList.add('invalid-feedback', 'd-block');
+        usernameField.parentNode.appendChild(invalidFeedback);
+    }
+
+    if (!validFeedback) {
+        validFeedback = document.createElement('div');
+        validFeedback.classList.add('valid-feedback', 'd-block');
+        usernameField.parentNode.appendChild(validFeedback);
+    }
+
+    if (username.length > 3) {
+        fetch("{% url 'check_username' %}?username=" + encodeURIComponent(username))
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_unique) {
+                    usernameField.classList.remove('is-invalid');
+                    usernameField.classList.add('is-valid');
+
+                    // Hide invalid feedback
+                    invalidFeedback.style.display = 'none';
+
+                    // Show valid feedback
+                    validFeedback.style.display = 'block';
+                    validFeedback.textContent = "Looks good!";
+                } else {
+                    usernameField.classList.remove('is-valid');
+                    usernameField.classList.add('is-invalid');
+
+                    // Hide valid feedback
+                    validFeedback.style.display = 'none';
+
+                    // Show invalid feedback
+                    invalidFeedback.style.display = 'block';
+                    invalidFeedback.textContent = "A user with that username already exists.";
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    } else {
+        // Clear validation classes
+        usernameField.classList.remove('is-valid', 'is-invalid');
+
+        // Hide feedback messages
+        invalidFeedback.style.display = 'none';
+        validFeedback.style.display = 'none';
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    if (!form) return;
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Stop default form submission
+
+        const emailField = document.querySelector('input[name="email"]');
+        if (!emailField) return;
+
+        const email = emailField.value.trim();
+        let emailFeedback = emailField.parentNode.querySelector(".invalid-feedback");
+
+        // Reset previous validation messages
+        emailField.classList.remove("is-invalid", "is-valid");
+        if (emailFeedback) {
+            emailFeedback.style.display = "none";
+            emailFeedback.textContent = "";
+        }
+
+        // Ensure email is not empty before checking
+        if (!email) {
+            displayEmailError(emailField, "Please enter an email address.");
+            return;
+        }
+
+        // Check email uniqueness before submitting
+        fetch("{% url 'check_email' %}?email=" + encodeURIComponent(email))
+            .then(response => response.json())
+            .then(data => {
+                if (!data.is_unique) {
+                    displayEmailError(emailField, "A user with that email already exists.");
+                    emailField.classList.add("is-invalid");
+                } else {
+                    form.submit(); // Submit the form if email is unique
+                }
+            })
+            .catch(error => {
+                console.error("Error checking email:", error);
+                displayEmailError(emailField, "An error occurred. Please try again.");
+            });
+    });
+
+    function displayEmailError(emailField, message) {
+        let emailFeedback = emailField.parentNode.querySelector(".invalid-feedback");
+        if (!emailFeedback) {
+            emailFeedback = document.createElement("div");
+            emailFeedback.classList.add("invalid-feedback", "d-block");
+            emailField.parentNode.appendChild(emailFeedback);
+        }
+        emailFeedback.textContent = message;
+        emailFeedback.style.display = "block";
+        emailField.classList.remove("is-valid");
+        emailField.classList.add("is-invalid");
+    }
+});
+
+// Bootstrap form validation
+(function () {
+    'use strict';
+    var forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
+{% endblock %}

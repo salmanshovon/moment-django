@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Productivity App</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-bg: #ffffff;
+            --dark-bg: #2c3e50;
+            --text-light: #333;
+            --text-dark: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-bg);
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+        }
+
+        .logo {
+            width: 180px;
+            margin-bottom: 40px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 12px;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 250px;
+            flex-grow: 1;
+            padding: 30px;
+        }
+
+        /* Top Right Controls */
+        .top-right-controls {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-light);
+        }
+
+        /* Theme Handling */
+        body[data-theme="dark"] {
+            background-color: var(--dark-bg);
+            color: var(--text-dark);
+        }
+
+        body[data-theme="dark"] .main-content {
+            background-color: var(--dark-bg);
+        }
+
+        /* Settings Button */
+        .settings-btn {
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo">
+        
+        <div class="nav-buttons">
+            <button class="nav-btn">Routine</button>
+            <button class="nav-btn">Templates</button>
+            <button class="nav-btn">Tasks</button>
+            <button class="nav-btn">To Do List</button>
+        </div>
+
+        <button class="settings-btn">⚙️ Settings</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Right Controls -->
+        <div class="top-right-controls">
+            <button class="icon-btn" id="theme-toggle">🌓</button>
+            <button class="icon-btn" id="notification-toggle">🔔</button>
+            {% if user.profile.picture %}
+    <img src="{{ user.profile.picture }}" alt="Profile Picture" class="profile-img">
+{% else %}
+    {% load static %}
+    <img src="/static/img/default.png" alt="Default Profile Picture" class="profile-img">
+{% endif %}
+        </div>
+
+        {% block content %}
+        <!-- Page content will go here -->
+        {% endblock %}
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        function toggleTheme() {
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Notification Toggle
+        let notificationsOn = true;
+        document.getElementById('notification-toggle').addEventListener('click', function() {
+            notificationsOn = !notificationsOn;
+            this.textContent = notificationsOn ? '🔔' : '🔕';
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

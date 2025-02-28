@@ -1,0 +1,17 @@
+{% extends "base.html" %}  {# Or your main layout #}
+
+{% block title %}Social Login Confirmation{% endblock %}
+
+{% block content %}
+    <div class="social-login-confirm">
+        <h2>->Sign In With Google <-</h2>
+        <p>You are about to sign in using your Google account.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Continue</button>
+        </form>
+        <a href="{% url 'signin' %}" class="btn btn-secondary">Cancel</a>
+        <!-- <a href="{% url 'account_login' %}" class="btn btn-secondary">Cancel</a> -->
+    </div>
+{% endblock %}

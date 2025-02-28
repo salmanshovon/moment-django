@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Your Daily Task Assistant{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section -->
+        <div class="left-section">
+            {% load static %}
+            <img src="{% static 'img/logo.jpg' %}" alt="Logo">
+            <h1>Your Daily Task Assistant</h1>
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <div class="form-container">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+            <!-- Footer -->
+        <footer class="footer">
+            Powered by Aranya IT
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // JavaScript to toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = document.querySelector(`[onclick="togglePasswordVisibility('${inputId}')"]`);
+            passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+            toggleButton.textContent = passwordInput.type === "password" ? "👁️" : "👁️";
+        }
+    </script>
+</body>
+</html>

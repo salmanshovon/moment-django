@@ -1,0 +1,251 @@
+{% load static %}
+<div class="img-background" style="background: url('{% static "img/back2.png" %}');">
+</div>
+<div class="profile-container container mt-5">
+    <div class="row">
+        <!-- Profile Photo Section -->
+        <div class="col-md-3 text-center">
+            <div class="profile-photo-container position-relative">
+                <img src="{{ user.profile.picture|default:'/static/img/default.png' }}" alt="Profile Photo"
+                    class="rounded-circle img-fluid">
+                <div
+                    class="profile-photo-overlay position-absolute top-0 start-0 w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fas fa-camera text-white fs-4"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Details Section -->
+        <div class="col-md-9">
+            <h2 class="mb-3 fs-5" style="opacity: 0.5;">Profile Information</h2>
+            <div class="profile-details">
+                <!-- Full Name or Username -->
+                <h3 class="mb-1">
+                    {{ profile.full_name|default:profile.user.username }}
+                </h3>
+
+                <!-- Occupation (if available) -->
+                {% if profile.occupation %}
+                <p class="text-muted mb-2">{{ profile.occupation }}</p>
+                {% endif %}
+
+                <!-- Email -->
+                <p class="text-muted mb-2">
+                    <i class="fas fa-envelope me-2"></i>{{ profile.user.email }}
+                </p>
+
+                <!-- Email Verification Status -->
+                <p class="text-muted mb-2">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Email: {% if profile.is_verified %}Verified{% else %}Not Verified{% endif %}
+                </p>
+
+                <!-- Date Joined -->
+                <p class="text-muted mb-2">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Joined: {{ profile.user.date_joined|date:"F d, Y" }} ({{ profile.user.date_joined|timesince }} ago)
+                </p>
+
+                <!-- Gender -->
+                {% if profile.gender %}
+                <p class="text-muted mb-2">
+                    <i class="fas fa-venus-mars me-2"></i>
+                    Gender: {{ profile.gender }}
+                </p>
+                {% endif %}
+
+                <!-- Date of Birth (if available) -->
+                {% if profile.date_of_birth %}
+                <p class="text-muted mb-2">
+                    <i class="fas fa-birthday-cake me-2"></i>
+                    Date of Birth: {{ profile.date_of_birth|date:"F d, Y" }}
+                </p>
+                {% endif %}
+
+                <!-- Update Button -->
+                <button id="edit-profile-btn" class="btn btn-primary">
+                    <i class="fas fa-edit me-2"></i>Update Information
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    document.getElementById('edit-profile-btn').addEventListener('click', function () {
+        $(document).trigger("contentUpdated", ["{% url 'profile_edit' %}", "#new-content", true]);
+    });
+</script>
+{% load static %}
+<style>
+    .profile-container {
+        background-color: #ffffff;
+        /* White background */
+        border-radius: 12px;
+        /* Rounded edges */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        /* Soft drop shadow */
+        padding: 2rem;
+        /* Spacing inside the container */
+        max-width: 800px;
+        /* Limit width for better readability */
+        margin: 2rem auto;
+        /* Center the container */
+        border: 1px solid #e0e0e0;
+        /* Subtle border for depth */
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        /* Smooth hover effect */
+    }
+
+    /* Hover effect to make it interactive */
+    .profile-container:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        /* Larger shadow on hover */
+        transform: translateY(-4px);
+        /* Slight lift effect */
+    }
+
+
+    /* Profile Photo Container */
+    .profile-photo-container {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        position: relative;
+        cursor: pointer;
+    }
+
+    /* Profile Photo Overlay (Camera Icon) */
+    .profile-photo-overlay {
+        background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .profile-photo-container:hover .profile-photo-overlay {
+        opacity: 1;
+    }
+
+    /* Profile Details Styling */
+    .profile-details h3 {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .profile-details p {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    /* Update Button */
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+
+    /* dark theme styles */
+
+    /* Dark Theme Styles */
+    body.dark-theme .profile-container {
+        background-color: #1e1e1e;
+        /* Dark background */
+        border-color: #444;
+        /* Darker border */
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        /* Light shadow */
+    }
+
+    body.dark-theme .profile-container:hover {
+        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.5);
+        /* Darker shadow on hover */
+    }
+
+    /* Dark Theme for Profile Photo Overlay */
+    body.dark-theme .profile-photo-overlay {
+        background-color: rgba(255, 255, 255, 0.1);
+        /* Light overlay for dark theme */
+    }
+
+    /* Dark Theme for Profile Details */
+    body.dark-theme .profile-details h3 {
+        color: #e0e0e0;
+        /* Light text */
+    }
+
+    body.dark-theme .profile-details p {
+        color: #aaa;
+        /* Lighter text for details */
+    }
+
+    /* Dark Theme for Update Button */
+    body.dark-theme .btn-primary {
+        background-color: #007bff;
+        /* Keep primary button color */
+        color: #ffffff;
+        /* White text */
+    }
+
+    body.dark-theme .btn-primary:hover {
+        background-color: #0056b3;
+        /* Darker hover color */
+    }
+
+    /* Dark Theme for Text and Icons */
+    body.dark-theme .text-muted {
+        color: #aaa !important;
+        /* Lighter text for muted elements */
+    }
+
+    body.dark-theme h2 {
+        color: #e0e0e0;
+        /* Light text for headings */
+    }
+
+    body.dark-theme .fs-5 {
+        color: #e0e0e0;
+        /* Light text for specific font size */
+    }
+
+    body.dark-theme .fas {
+        color: #e0e0e0;
+        /* Light color for Font Awesome icons */
+    }
+
+    body.dark-theme .mb-1,
+    body.dark-theme .mb-2,
+    body.dark-theme .mb-3 {
+        color: #e0e0e0;
+        /* Light text for margin-bottom classes */
+    }
+
+    body.dark-theme .me-2 {
+        color: #e0e0e0;
+        /* Light text for margin-end classes */
+    }
+
+    /* Dark Theme for Specific Elements */
+    body.dark-theme .profile-details p i {
+        color: #e0e0e0;
+        /* Light color for icons inside paragraphs */
+    }
+
+    body.dark-theme .profile-details p {
+        color: #aaa;
+        /* Lighter text for details */
+    }
+
+    body.dark-theme .profile-details p strong {
+        color: #e0e0e0;
+        /* Light text for bold elements */
+    }
+</style>

@@ -1,0 +1,413 @@
+{% load static %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title fs-6">Create New Task</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="taskForm" method="post" action="{% url 'create_task' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <input type="text" name="title" id="title" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description or Notes</label>
+                                <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Task Type</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="task_type" id="oneTime" value="One-Time" checked>
+                                    <label class="form-check-label" for="oneTime">One-Time</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="task_type" id="repetitive" value="Repetitive">
+                                    <label class="form-check-label" for="repetitive">Repetitive</label>
+                                </div>
+                            </div>
+                            <div id="oneTimeFields">
+                                <div class="form-group">
+                                    <label for="one_time_date">Date</label>
+                                    <input type="date" name="one_time_date" id="one_time_date" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="one_time_time">Time</label>
+                                    <div class="inline-fields d-flex">
+                                        <input type="number" name="one_time_hour" id="one_time_hour" class="form-control text-center" placeholder="HH" maxlength="2" min="0" max="12">
+                                        <input type="number" name="one_time_minute" id="one_time_minute" class="form-control text-center" placeholder="MM" maxlength="2" min="0" max="59">
+                                        <select name="time_period" id="time_period" class="form-control">
+                                            <option value="AM">AM</option>
+                                            <option value="PM">PM</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>                            
+                            
+                            <div id="repetitiveFields" style="display: none;">
+                                <div class="form-group">
+                                    <label for="repetitive_frequency">Frequency</label>
+                                    <select name="repetitive_frequency" id="repetitive_frequency" class="form-control">
+                                        <option value="Daily">Daily</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Yearly">Yearly</option>
+                                        <option value="Custom">Custom</option>
+                                    </select>
+                                </div>
+                                <!-- Repetition -->
+                                <div id="customIntervalFields" style="display: none;">
+                                    <div class="form-group">
+                                        <label>Repetition</label> <!-- Ensure this label is visible -->
+                                        <div class="inline-fields">
+                                            <div class="form-group">
+                                                <label for="custom_interval_number">Repeat every</label>
+                                                <input type="number" name="custom_interval_number" id="custom_interval_number" class="form-control" min="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="custom_interval_unit">Interval Unit</label>
+                                                <select name="custom_interval_unit" id="custom_interval_unit" class="form-control">
+                                                    <option value="Days">Days</option>
+                                                    <option value="Weeks">Weeks</option>
+                                                    <option value="Months">Months</option>
+                                                    <option value="Years">Years</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Duration -->
+                            <div class="form-group">
+                                <label>Duration</label>
+                                <div class="inline-fields">
+                                    <div class="form-group">
+                                        <label for="task_duration_hours">Hours</label>
+                                        <input type="number" name="task_duration_hours" id="task_duration_hours" class="form-control" min="0" max="23">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="task_duration_minutes">Minutes</label>
+                                        <input type="number" name="task_duration_minutes" id="task_duration_minutes" class="form-control" min="0" max="59">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select name="priority" id="priority" class="form-control">
+                                    <option value="1">Low</option>
+                                    <option value="2">Medium</option>
+                                    <option value="3">High</option>
+                                    <option value="4">Urgent</option>
+                                    <option value="5">Critical</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select name="category" id="category" class="form-control">
+                                    <option value="">Select a category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="task_merit">Task Merit</label>
+                                <input type="number" name="task_merit" id="task_merit" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-block">Create Task</button>
+                                <a href="{% url 'home' %}" class="btn btn-secondary btn-block">Cancel</a> </div>
+                        </form>
+                        <div id="errorMessages" class="alert alert-danger" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        $(document).ready(function () {
+            // Show/hide fields based on task type
+            $('input[name="task_type"]').change(function () {
+                if ($(this).val() === "One-Time") {
+                    $('#oneTimeFields').show();
+                    $('#repetitiveFields').hide();
+                } else {
+                    $('#oneTimeFields').hide();
+                    $('#repetitiveFields').show();
+                }
+            });
+        
+            // Show/hide custom interval fields
+            $('#repetitive_frequency').change(function () {
+                if ($(this).val() === "Custom") {
+                    $('#customIntervalFields').show();
+                } else {
+                    $('#customIntervalFields').hide();
+                }
+            });
+        
+            // Function to format time
+            function formatTime(hour, minute, period) {
+                // Convert hour to 24-hour format
+                if (period === "PM" && hour < 12) {
+                    hour += 12;
+                } else if (period === "AM" && hour === 12) {
+                    hour = 0;
+                }
+                // Ensure two digits for hour and minute
+                hour = hour.toString().padStart(2, '0');
+                minute = minute.toString().padStart(2, '0');
+                return `${hour}:${minute}`;
+            }
+        
+            // Handle form submission
+            $('#taskForm').on('submit', function (e) {
+                e.preventDefault();
+        
+                const taskType = $('input[name="task_type"]:checked').val();
+        
+                // If task is One-Time, get the time values
+                if (taskType === 'One-Time') {
+                    let hour = $('#one_time_hour').val();
+                    let minute = $('#one_time_minute').val();
+                    const period = $('#time_period').val();
+        
+                    // Set default values if time fields are empty
+                    if (!hour) {
+                        hour = '12'; // Default hour value
+                    }
+                    if (!minute) {
+                        minute = '00'; // Default minute value
+                    }
+        
+                    // Format the time
+                    const formattedTime = formatTime(parseInt(hour), parseInt(minute), period);
+        
+                    // Create a hidden input for the formatted time
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'one_time_time',
+                        value: formattedTime
+                    }).appendTo('#taskForm');
+                } else {
+                    // Disable the time-related fields for Repetitive task
+                    $('#one_time_hour, #one_time_minute').prop('disabled', true);
+                }
+    
+        
+                // Submit the form via AJAX
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            // Hide error messages (if any)
+                            $('#errorMessages').hide().empty();
+
+                            // Redirect on successful task creation
+                            window.location.href = "{% url 'home' %}";
+                        }
+                    },
+                    error: function (xhr) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorHtml = '<ul>';
+
+                        // Build the error list
+                        for (const field in errors) {
+                            errors[field].forEach(msg => {
+                                errorHtml += `<li>${msg}</li>`;
+                            });
+                        }
+                        errorHtml += '</ul>';
+
+                        // Display the errors in the errorMessages div
+                        $('#errorMessages').html(errorHtml).show();
+                    }
+                });
+            });
+        });
+        </script>
+        
+<script>
+    const hrInput = document.getElementById('one_time_hour');
+    const minInput = document.getElementById('one_time_minute');
+    const hr2Input = document.getElementById('task_duration_hours')
+    const min2Input = document.getElementById('task_duration_minutes')
+
+    function handleInput(event) {
+        const inputValue = event.target.value;
+        const numericValue = inputValue.replace(/[^0-9]/g, ''); // Remove non-numeric chars
+        
+        if (event.target.id === 'one_time_hour') {
+            let value = parseInt(numericValue, 10);
+            if (isNaN(value) || value < 1) {
+                value = 1 ;
+            } else if (value > 12) {
+                value = 12;
+            }
+            event.target.value = value;
+        } else if (event.target.id === 'one_time_minute' || event.target.id === 'task_duration_minutes') {
+            let value = parseInt(numericValue, 10);
+            if (isNaN(value) || value < 0) {
+                value = 0;
+            } else if (value > 59) {
+                value = 59;
+            }
+            event.target.value = value.toString().padStart(2, '0'); // Ensure always two digits
+        } else if (event.target.id === 'task_duration_hours'){
+            let value = parseInt(numericValue, 10);
+            if (isNaN(value) || value < 0){
+                value =0;
+            } else if (value > 23){
+                value = 23
+            }
+            event.target.value = value;
+        }
+    }
+
+    hrInput.addEventListener('input', handleInput);
+    minInput.addEventListener('input', handleInput);
+    hr2Input.addEventListener('input', handleInput);
+    min2Input.addEventListener('input', handleInput);
+</script>
+
+
+
+<style>
+    /* General Form Styling */
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        max-width: 800px; /* Limit the form width for better readability */
+        margin: 0 auto; /* Center the form */
+    }
+
+    .card-header {
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        background-color: #f8f9fa; /* Light background for the header */
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem; /* Reduce spacing between form groups */
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+        padding: 0.5rem 0.75rem; /* Reduce padding to make inputs smaller */
+        font-size: 0.875rem; /* Slightly smaller font size */
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-check-input {
+        margin-top: 0.2rem;
+    }
+
+    /* Style for time input */
+    input[type="time"] {
+        appearance: none; /* Remove default styling */
+        padding: 0.5rem 0.75rem; /* Reduce padding */
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 0.875rem; /* Slightly smaller font size */
+        width: 100%;
+    }
+
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.5); /* Change the color of the time picker icon */
+    }
+
+    .form-check-label {
+        margin-left: 0.5rem;
+        font-size: 0.875rem; /* Slightly smaller font size */
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        padding: 0.5rem 1rem; /* Reduce padding */
+        font-size: 0.875rem; /* Slightly smaller font size */
+        font-weight: 600;
+        border-radius: 5px;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .alert-danger {
+        padding: 0.5rem 1rem; /* Reduce padding */
+        border-radius: 5px;
+        margin-top: 1rem;
+        font-size: 0.875rem; /* Slightly smaller font size */
+    }
+
+    /* Inline Fields for Duration and Repetition */
+    .inline-fields {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-end;
+    }
+
+    .inline-fields .form-group {
+        margin-bottom: 0;
+        flex: 1;
+    }
+
+    .inline-fields .form-group label {
+        font-size: 0.875rem; /* Slightly smaller font size */
+        margin-bottom: 0.25rem;
+    }
+
+    .inline-fields .form-control {
+        width: 100%;
+    }
+
+    /* Custom Interval Fields */
+    #customIntervalFields {
+        margin-top: 1rem;
+    }
+
+    /* Repetition Fields */
+    #repetitiveFields .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* Two-Column Layout for Desktop */
+    @media (min-width: 768px) {
+        .two-column-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 1.5rem; /* Space between columns */
+        }
+
+        .two-column-form .form-group {
+            margin-bottom: 0.75rem; /* Reduce spacing between form groups */
+        }
+
+        .two-column-form .form-group.full-width {
+            grid-column: span 2; /* Full-width fields */
+        }
+    }
+</style>

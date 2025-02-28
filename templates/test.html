@@ -1,0 +1,85 @@
+<div class="container mt-4">
+    <div class="card profile-card shadow-sm p-4">
+        <div class="d-flex align-items-center">
+            <!-- Profile Picture with Hover Upload -->
+            <div class="position-relative">
+                <img src="{{ profile.user.profile_picture|default:'/static/img/default.png' }}" alt="Profile Picture" class="profile-pic rounded-circle">
+                <label for="upload-photo" class="upload-icon">
+                    <i class="fas fa-camera"></i>
+                </label>
+                <input type="file" id="upload-photo" hidden>
+            </div>
+
+            <!-- User Info -->
+            <div class="ms-4">
+                <h4 class="fw-bold mb-1">
+                    {% if profile.full_name %}
+                        {{ profile.full_name }}
+                    {% else %}
+                        {{ profile.user.username }}
+                    {% endif %}
+                </h4>
+                {% if profile.occupation %}
+                    <p class="text-muted mb-1">{{ profile.occupation }}</p>
+                {% endif %}
+                <p class="text-muted mb-2"><i class="fas fa-envelope"></i> {{ profile.user.email }}</p>
+
+                <!-- Email Verified Badge -->
+                <span class="badge {% if profile.user.email_verified %} bg-success {% else %} bg-danger {% endif %}">
+                    {% if profile.user.email_verified %}
+                        Verified
+                    {% else %}
+                        Not Verified
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="mt-4">
+            <p><strong>Joined:</strong> {{ profile.user.date_joined|date:"F j, Y" }} <span class="text-muted">({{ profile.user.date_joined|timesince }} ago)</span></p>
+            <p><strong>Gender:</strong> {{ profile.gender|default:"Not specified" }}</p>
+        </div>
+
+        <!-- Update Profile Button -->
+        <button id="edit-profile-btn" class="btn btn-primary w-100 mt-3">Update Profile</button>
+    </div>
+</div>
+<style>
+    /* Profile Card */
+.profile-card {
+    border-radius: 12px;
+    background: #fff;
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    transition: transform 0.3s ease-in-out;
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+}
+
+/* Camera Upload Icon */
+.upload-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.upload-icon:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+</style>
