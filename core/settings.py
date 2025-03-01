@@ -29,7 +29,7 @@ def str_to_bool(value):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = str_to_bool(os.getenv('DEBUG'))
 
 
 
@@ -138,7 +138,12 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = ['static/',]
 STATIC_ROOT = 'staticfiles/'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS_STRING = os.getenv('ALLOWED_HOSTS')
+if ALLOWED_HOSTS_STRING:
+    ALLOWED_HOSTS = ALLOWED_HOSTS_STRING.split(',')
+else:
+    ALLOWED_HOSTS = []
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -187,8 +192,12 @@ REST_FRAMEWORK = {
     ],
 }
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(',')
+CSRF_TRUSTED_ORIGINS_STRING = os.getenv('CSRF_TRUSTED_ORIGINS')
+if CSRF_TRUSTED_ORIGINS_STRING:
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_STRING.split(',')
+else:
+    CSRF_TRUSTED_ORIGINS = []
 
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', default=False)
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', default=False)
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', default=False)
+SECURE_SSL_REDIRECT = str_to_bool(os.getenv('SECURE_SSL_REDIRECT'))
+SESSION_COOKIE_SECURE = str_to_bool(os.getenv('SESSION_COOKIE_SECURE'))
+CSRF_COOKIE_SECURE = str_to_bool(os.getenv('CSRF_COOKIE_SECURE'))
