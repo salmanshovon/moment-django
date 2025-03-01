@@ -22,4 +22,4 @@ jobs:
 
       - name: Deploy to cPanel
         run: |
-          ssh aranyait@sitechai.com "cd /home/aranyait/subdomain/your_project && git pull origin master && source venv/bin/activate && pip install -r requirements.txt && python manage.py migrate && touch restart.txt"
+          ssh aranyait@sitechai.com "cd /home/aranyait/subdomain/moment_django && git pull origin master && source venv/bin/activate && pip install -r requirements.txt && python manage.py migrate && touch restart.txt"
