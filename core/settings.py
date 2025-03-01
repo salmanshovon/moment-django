@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',                                                 # Required for django-allauth
+    *(['whitenoise.middleware.WhiteNoiseMiddleware'] if os.getenv('USE_WHITENOISE') == 'True' else []),
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -134,9 +135,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = os.getenv('STATIC_URL')
 STATICFILES_DIRS = ['static/',]
-STATIC_ROOT = 'staticfiles/'
+STATIC_ROOT = os.getenv('STATIC_ROOT')
 
 ALLOWED_HOSTS_STRING = os.getenv('ALLOWED_HOSTS')
 if ALLOWED_HOSTS_STRING:
@@ -201,3 +202,7 @@ else:
 SECURE_SSL_REDIRECT = str_to_bool(os.getenv('SECURE_SSL_REDIRECT'))
 SESSION_COOKIE_SECURE = str_to_bool(os.getenv('SESSION_COOKIE_SECURE'))
 CSRF_COOKIE_SECURE = str_to_bool(os.getenv('CSRF_COOKIE_SECURE'))
+
+# Optional: Use Whitenoise for serving static files in production
+if os.getenv('USE_WHITENOISE') == 'True':
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
