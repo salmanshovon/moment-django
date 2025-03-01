@@ -1,0 +1,10 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/aranyait/subdomain/moment_django
+    - cd $DEPLOYPATH
+    - git pull origin master
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    - python manage.py migrate
+    - touch restart.txt
