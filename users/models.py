@@ -43,3 +43,9 @@ def create_superuser_profile(sender, instance, created, **kwargs):
     if created and instance.is_superuser:  
         Profile.objects.get_or_create(user=instance)
         UserSettings.objects.get_or_create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def create_user_settings(sender, instance, created, **kwargs):
+    if created and not instance.is_superuser:
+        UserSettings.objects.get_or_create(user=instance)

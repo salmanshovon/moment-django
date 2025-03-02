@@ -26,8 +26,8 @@ class SignUpView(CreateView):
         user = form.save(commit=False)  # Don't save the user yet
         user.save()  # Save the user to the database
         Profile.objects.create(user=user, is_verified=False)  # Explicitly create the profile
-        # send_email_otp(user)  # Send OTP
-        print('Email Sending is omitted Now, remove the comment to send email')
+        send_email_otp(user)  # Send OTP
+        # print('Email Sending is omitted Now, remove the comment to send email')
         messages.success(self.request, "Account created successfully! Sign in now.")
         return super().form_valid(form)
     
@@ -115,10 +115,8 @@ class HomeView(TemplateView):
         if not request.user.profile.is_verified:
             return redirect('validate_otp')
         elif request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            print('HomeView GET request via AJAX')
             return render(request, self.template_name)
         else:
-            print("HomeView GET request NOT AJAX")
             return render(request, 'dashbase.html')
     
 
