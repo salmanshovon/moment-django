@@ -1,27 +1,37 @@
 <style>
   /* Custom CSS for Search Bar and Sort Button */
   .search-bar {
-    flex-grow: 1;
-    /* Ensures the search bar takes up remaining space */
+    flex-grow: 1; /* Ensures the search bar takes up remaining space */
+    position: relative; /* Required for absolute positioning of the button */
   }
 
   .search-bar input {
-    width: 100%;
-    /* Full width */
-    padding-right: 2rem;
-    /* Space for the search icon */
-    background-color: #ffffff;
-    /* White background */
-    color: #495057;
-    /* Dark text */
-    border: 1px solid #e0e0e0;
-    /* Light border */
+    width: 100%; /* Full width */
+    padding-right: 2rem; /* Space for the search icon */
+    background-color: #ffffff; /* White background */
+    color: #495057; /* Dark text */
+    border: 1px solid #e0e0e0; /* Light border */
   }
 
-  .search-icon {
-    color: #6c757d;
-    /* Muted icon color */
+  /* Custom styles for the search button */
+  .search-button {
+    background-color: #e9ecef; /* Match the default Bootstrap input background color */
+    border: 1px solid #e0e0e0; /* Remove the border */
+    padding: 0.25rem 0.5rem; /* Adjust padding to match the input */
+    color: #6c757d; /* Match the icon color to the input placeholder color */
+    transition: background-color 0.2s, color 0.2s; /* Smooth hover effect */
+    position: absolute; /* Position the button absolutely within the search bar */
+    top: 50%; /* Center vertically */
+    right: 1px; /* Adjust horizontal position */
+    transform: translateY(-50%); /* Fine-tune vertical centering */
   }
+
+  .search-button:hover {
+    background-color: #dee2e6; /* Slightly darker background on hover */
+    color: #495057; /* Slightly darker icon color on hover */
+  }
+
+
 
   .dropdown {
     flex-shrink: 0;
@@ -70,8 +80,6 @@
     scrollbar-color: #888 #f1f1f1;
     /* Thumb and track colors */
   }
-
-
 
   .outerbox {
     display: flex;
@@ -306,17 +314,19 @@
 
   /* Dark Theme */
   body.dark-theme .search-input {
-    background-color: #333;
-    /* Dark background */
-    color: #e0e0e0;
-    /* Light text */
-    border: 1px solid #444;
-    /* Dark border */
+    background-color: #333; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    border: 1px solid #444; /* Dark border */
   }
 
-  body.dark-theme .search-icon {
-    color: #aaa;
-    /* Light icon color */
+  body.dark-theme .search-button {
+    background-color: #444; /* Darker background for dark mode */
+    color: #e0e0e0; /* Light icon color for dark mode */
+  }
+
+  body.dark-theme .search-button:hover {
+    background-color: #555; /* Slightly lighter background on hover */
+    color: #ffffff; /* Brighter icon color on hover */
   }
 
   body.dark-theme .search-input::placeholder {
@@ -334,6 +344,18 @@
     border-color: #6c757d;
     /* Slightly lighter border for dark mode */
   }
+
+  body.dark-theme .dropdown .btn.btn-outline-secondary {
+    background-color: #343a40; /* Darker background for dark mode */
+    color: #f8f9fa !important; /* Light text color for dark mode */
+    border-color: #6c757d; /* Slightly lighter border for dark mode */
+  }
+
+  body.dark-theme .dropdown .btn.btn-outline-secondary:hover {
+    background-color: #454d55; /* Slightly lighter background on hover */
+    color: #ffffff !important; /* Ensure text stays bright on hover */
+  }
+
 
   /* Dark Theme for Task List */
   body.dark-theme .task-list {
@@ -437,12 +459,15 @@
 <div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
   <!-- Search Bar -->
   <div class="flex-grow-1 position-relative">
-    <input type="text" class="form-control form-control-sm search-input" placeholder="Search tasks...">
-    <!-- Optional: Search Icon -->
-    <span class="position-absolute top-50 end-0 translate-middle-y me-2">
-      <i class="fas fa-search search-icon"></i>
-    </span>
+    <form id="searchForm">
+      <input type="text" id="searchInput" class="form-control form-control-sm search-input" placeholder="Search tasks...">
+      <!-- Search btn Icon -->
+      <button type="submit" id="searchButton" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
+        <i class="fas fa-search search-icon"></i>
+      </button>
+    </form>
   </div>
+    
 
   <!-- Sort Button with Dropdown -->
   <div class="dropdown">
@@ -508,9 +533,12 @@
     fetchTasks();
 
     // Function to fetch tasks
-    async function fetchTasks() {
+    async function fetchTasks(query = '') {
       try {
-        const response = await fetch('{% url "task_list" %}', {
+        // Build the URL with the query parameter if provided
+        const url = query ? `{% url "task_list" %}?q=${encodeURIComponent(query)}` : '{% url "task_list" %}';
+
+        const response = await fetch(url, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -524,7 +552,7 @@
         }
 
         const tasks = await response.json();
-        renderTasks(tasks);
+        renderTasks(tasks); // Render the tasks in the UI
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
@@ -939,12 +967,26 @@
       button.addEventListener('click', () => showTab(button.getAttribute('onclick').match(/'(\w+)'/)[1]));
     });
 
+
+    // search button function
+    // Get the form and input elements
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+
+    // Attach event listener to the form
+    searchForm.addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent the form from submitting the traditional way
+      const query = searchInput.value.trim(); // Get the search query
+      fetchTasks(query); // Fetch tasks with the search query
+    });
+
     // Sort function:
     function sortAction() {
       const dropdownButton = document.getElementById('sortDropdown');
       const dropdownItems = document.querySelectorAll('#sortDropdown + .dropdown-menu .dropdown-item');
       const sortKey = 'sortPreference'; // Key for local storage
       const lineanim = document.querySelector('#loading-line')
+      const searchInput = document.getElementById('searchInput');
 
       // Function to update the dropdown button text
       function updateDropdownText(selectedItem) {
@@ -965,10 +1007,12 @@
           });
 
           if (response.ok) {
-            // $(document).trigger('contentUpdated', ["{% url 'view_task' %}", '#new-content', true]);
-            // lineanim.style.display = 'block';
-            fetchTasks();
-            // lineanim.style.display = 'none';
+            const query = searchInput.value.trim();
+            if (query !== ""){
+              fetchTasks(query)
+            } else {
+              fetchTasks()
+            }
           } else {
             showMessage('Error!', 'error');
           }

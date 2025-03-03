@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
+from django.db.models import Q
 from rest_framework.response import Response
 from tasks.models import Task
 from .serializers import TaskDetails, TaskList, UserSettingsSerializer
@@ -16,6 +17,15 @@ class TaskListAPIView(generics.ListAPIView):
 
         # Get the base queryset filtered by the logged-in user and active tasks
         queryset = Task.objects.filter(user=self.request.user, is_active=True)
+
+        # Check if a search query is provided
+        search_query = self.request.query_params.get('q', None)
+        if search_query:
+            # Filter tasks based on the search query
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |  # Search by title
+                Q(description__icontains=search_query)  # Search by description
+            )
 
         # Apply sorting based on the criteria
         if sort_criteria == 'priority':
