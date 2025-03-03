@@ -17,9 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, reverse_lazy
 from django.views.generic.base import RedirectView
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(os.getenv('ADMIN_URL'), admin.site.urls),
     path('', RedirectView.as_view(url=reverse_lazy('signin'), permanent=True), name='root_redirect'),
     path("accounts/", include("allauth.urls")),
     path('users/', include('users.urls')),
