@@ -139,7 +139,7 @@
 
   .task-card:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
   }
 
   .task-card.high {
@@ -322,6 +322,7 @@
   body.dark-theme .search-button {
     background-color: #444; /* Darker background for dark mode */
     color: #e0e0e0; /* Light icon color for dark mode */
+    border: #444;
   }
 
   body.dark-theme .search-button:hover {
@@ -375,6 +376,10 @@
     /* Dark background */
     color: #e0e0e0;
     /* Light text */
+  }
+
+  body.dark-theme .task-card:hover {
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.35);
   }
 
   body.dark-theme .task-card.high {
@@ -433,7 +438,7 @@
   }
 
   body.dark-theme .tab-buttons button.active {
-    background-color: #007bff;
+    background-color: #326294;
     /* Active button color */
     color: #ffffff;
     /* White text */
@@ -449,6 +454,26 @@
   body.dark-theme .task-card .details .separator {
     background-color: #555;
     /* Darker separator */
+  }
+
+  /* Dark Theme for Buttons */
+  body.dark-theme .btn-primary {
+    background-color: #0056b3; /* Keep primary button color */
+    color: #ffffff; /* Light text */
+  }
+
+  body.dark-theme .btn-primary:hover {
+    background-color: #004085; /* Darker hover color */
+  }
+
+  body.dark-theme .btn-outline-secondary {
+    border-color: #6c757d; /* Keep border color */
+    color: #e0e0e0; /* Keep text color */
+  }
+
+  body.dark-theme .btn-outline-secondary:hover {
+    background-color: #6c757d; /* Keep hover background color */
+    color: #ffffff; /* Light text */
   }
 </style>
 

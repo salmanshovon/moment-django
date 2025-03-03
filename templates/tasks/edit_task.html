@@ -188,22 +188,17 @@
 
     /* Dark Theme for Buttons */
     body.dark-theme .btn-primary {
-        background-color: #007bff;
-        /* Keep primary button color */
-        color: #ffffff;
-        /* Light text */
+        background-color: #0056b3; /* Keep primary button color */
+        color: #ffffff; /* Light text */
     }
 
     body.dark-theme .btn-primary:hover {
-        background-color: #0056b3;
-        /* Darker hover color */
+        background-color: #004085; /* Darker hover color */
     }
 
     body.dark-theme .btn-outline-secondary {
-        border-color: #6c757d;
-        /* Keep border color */
-        color: #6c757d;
-        /* Keep text color */
+        border-color: #6c757d; /* Keep border color */
+        color: #e0e0e0; /* Keep text color */
     }
 
     body.dark-theme .btn-outline-secondary:hover {
@@ -237,6 +232,15 @@
         /* Dark border */
         color: #ffffff;
         /* Light text */
+    }
+        /* Dark Theme Placeholder Text */
+        body.dark-theme .form-control::placeholder {
+        color: #b0b0b0; /* Light gray for better contrast */
+        opacity: 1; /* Ensure full visibility */
+    }
+    /* Dark Theme - Brighter Tooltip Icon */
+    body.dark-theme .fa-info-circle {
+        color: #a8a8a8; /* Soft yellow for better contrast */
     }
 </style>
 {% load static %}
@@ -341,8 +345,7 @@
                                     title="Rate the task's value to you on a scale of 1 to 100. Higher numbers indicate greater importance">
                                     <i class="fas fa-info-circle"></i>
                                 </span>
-                                <input type="number" name="task_merit" id="task_merit" class="form-control text-center"
-                                    value="{{ task.task_merit }}">
+                                <input type="number" name="task_merit" id="task_merit" class="form-control text-left" value="{{ task.task_merit }}">
                             </div>
                         </div>
 
@@ -447,7 +450,7 @@
                                     title="Rate the task's value to you on a scale of 1 to 100. Higher numbers indicate greater importance">
                                     <i class="fas fa-info-circle"></i>
                                 </span>
-                                <input type="number" name="task_merit" id="task_merit" class="form-control text-center"
+                                <input type="number" name="task_merit" id="task_merit" class="form-control text-left"
                                     placeholder="Enter value (1-100)" value="{{ task.task_merit }}">
                             </div>
                         </div>

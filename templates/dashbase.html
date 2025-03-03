@@ -405,6 +405,10 @@ body.dark-theme .dropdown-menu {
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); /* Light shadow */
 }
 
+body.dark-theme .dropdown-menu .text-muted{
+    color: #aaa !important;
+}
+
 body.dark-theme .dropdown-item {
     color: #ffffff; /* Light text for dropdown items */
 }
@@ -582,7 +586,7 @@ body.dark-theme .spinner {
                 <ul class="nav flex-column child-list">
                     <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Add a Task</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_task' %}">View Tasks</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'security' %}">Manage Tasks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'security' %}">Import Tasks</a></li>
                 </ul>
             </li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-chart-line"></i> Analytics</a></li>
@@ -730,29 +734,27 @@ body.dark-theme .spinner {
             });
 
             // Script for drop down menu of the profile button on navbar
-            document.addEventListener("DOMContentLoaded", function() {
-                const profilePic = document.getElementById("profile-pic");
-                const profileDropdown = document.getElementById("profileDropdown");
-            
-                profilePic.addEventListener("click", function(event) {
-                    event.stopPropagation(); // Prevent click from bubbling up to document
-            
-                    profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
-                });
-            
-                // Close the dropdown if the user clicks anywhere else on the document
-                document.addEventListener("click", function(event) {
-                    if (!profileDropdown.contains(event.target)) { // Check if click is outside the dropdown
-                        profileDropdown.style.display = "none";
-                    }
-                });
+            const profilePic = document.getElementById("profile-pic");
+            const profileDropdown = document.getElementById("profileDropdown");
+        
+            profilePic.addEventListener("click", function(event) {
+                event.stopPropagation(); // Prevent click from bubbling up to document
+        
+                profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
             });
-    
-            // Prevent closing the sidebar when clicking inside it
-            $("#sidebar").click(function (e) {
-                e.stopPropagation();
+        
+            // Close the dropdown if the user clicks anywhere else on the document
+            document.addEventListener("click", function(event) {
+                if (!profileDropdown.contains(event.target)) { // Check if click is outside the dropdown
+                    profileDropdown.style.display = "none";
+                }
             });
-    
+
+        // Prevent closing the sidebar when clicking inside it
+        $("#sidebar").click(function (e) {
+            e.stopPropagation();
+        });
+
             // Handle sidebar link clicks
             $("#sidebar").off('click', '.nav-link').on('click', '.nav-link', function(e) {
                 e.preventDefault(); // Prevent the default link behavior
