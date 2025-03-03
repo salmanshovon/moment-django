@@ -721,19 +721,20 @@ body.dark-theme .spinner {
             e.stopPropagation(); // Prevent event bubbling
         });
 
-            // Toggle sidebar visibility when clicking the hamburger icon
-            $(".navbar-toggler").click(function () {
-                $("#sidebar").toggleClass("show");
-            });
-    
-            // Close sidebar when clicking outside the sidebar and toggler button
-            $(document).click(function (e) {
-                if (!$(e.target).closest("#sidebar, .navbar-toggler").length) {
-                    $("#sidebar").removeClass("show");
-                }
-            });
+        // Toggle sidebar visibility when clicking the hamburger icon
+        $(".navbar-toggler").click(function () {
+            $("#sidebar").toggleClass("show");
+        });
 
-            // Script for drop down menu of the profile button on navbar
+        // Close sidebar when clicking outside the sidebar and toggler button
+        $(document).click(function (e) {
+            if (!$(e.target).closest("#sidebar, .navbar-toggler").length) {
+                $("#sidebar").removeClass("show");
+            }
+        });
+
+        // Script for drop down menu of the profile button on navbar
+        document.addEventListener("DOMContentLoaded", function() {
             const profilePic = document.getElementById("profile-pic");
             const profileDropdown = document.getElementById("profileDropdown");
         
@@ -749,33 +750,34 @@ body.dark-theme .spinner {
                     profileDropdown.style.display = "none";
                 }
             });
+        });
 
         // Prevent closing the sidebar when clicking inside it
         $("#sidebar").click(function (e) {
             e.stopPropagation();
         });
 
-            // Handle sidebar link clicks
-            $("#sidebar").off('click', '.nav-link').on('click', '.nav-link', function(e) {
-                e.preventDefault(); // Prevent the default link behavior
-                const url = $(this).attr("href"); // Get the href of the clicked link
-    
-                // If the link has a valid URL, collapse the sidebar on mobile
-                if (url && url !== "#" && $(window).width() <= 768) {
-                    $("#sidebar").removeClass("show");
-                }
-    
-                // Prevent the default link behavior if the link is for expanding/collapsing
-                if (!url || url === "#") {
-                    e.preventDefault();
-                }
-    
-                // Trigger content update for valid URLs
-                if (url && url !== "#") {
-                    e.preventDefault(); // Prevent default navigation
-                    $(document).trigger("contentUpdated", [url, "#new-content", true]);
-                }
-            });
+        // Handle sidebar link clicks
+        $("#sidebar").off('click', '.nav-link').on('click', '.nav-link', function(e) {
+            e.preventDefault(); // Prevent the default link behavior
+            const url = $(this).attr("href"); // Get the href of the clicked link
+
+            // If the link has a valid URL, collapse the sidebar on mobile
+            if (url && url !== "#" && $(window).width() <= 768) {
+                $("#sidebar").removeClass("show");
+            }
+
+            // Prevent the default link behavior if the link is for expanding/collapsing
+            if (!url || url === "#") {
+                e.preventDefault();
+            }
+
+            // Trigger content update for valid URLs
+            if (url && url !== "#") {
+                e.preventDefault(); // Prevent default navigation
+                $(document).trigger("contentUpdated", [url, "#new-content", true]);
+            }
+        });
 
     });
 
@@ -805,7 +807,6 @@ body.dark-theme .spinner {
         document.body.classList.toggle('dark-theme', savedTheme);
         themeSwitch.checked = savedTheme;
     });
-
 
     </script>
     <script src="{% static 'js/messages.js' %}"></script>
