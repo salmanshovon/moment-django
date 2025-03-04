@@ -165,7 +165,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# SITE_ID = 0                                                                                    # Ensure this matches the Site ID in the Django admin panel
+# SITE_ID = 1                                                                                    # Ensure this matches the Site ID in the Django admin panel
 
 SOCIALACCOUNT_ADAPTER = "users.adapters.MySocialAccountAdapter"
 ACCOUNT_EMAIL_VERIFICATION = "none"                                                              # Disable email verification for allauth social login because we track that in profile model

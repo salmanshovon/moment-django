@@ -14,13 +14,13 @@ class CreateTaskView(View):
     template_name = "tasks/create_task.html"
 
     def get(self, request, *args, **kwargs):
-        categories = TaskCategory.objects.filter(user=request.user)
+        categories = TaskCategory.get_categories(user=request.user)
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return render(request, self.template_name, {"categories": categories})
         return render(request, "dashbase.html")
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
+        # print(request.POST)
         task_type = request.POST.get("task_type")  # Determine task type
 
         if task_type == "One-Time":
@@ -70,7 +70,7 @@ class EditTaskView(View):
 
     def get(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, id=task_id, user=request.user)
-        categories = TaskCategory.objects.filter(user=request.user)
+        categories = TaskCategory.get_categories(user=request.user)
         durationHr = task.duration // 60
         durationMn = task.duration % 60
 
@@ -92,7 +92,7 @@ class EditTaskView(View):
         return render(request, "dashbase.html", context)
 
     def post(self, request, task_id, *args, **kwargs):
-        print(request.POST)
+        # print(request.POST)
         task = get_object_or_404(Task, id=task_id, user=request.user)
         task_type = request.POST.get("task_type")  # Determine task type
 

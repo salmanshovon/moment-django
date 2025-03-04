@@ -82,17 +82,6 @@ class Task(models.Model):
         self.save()
     
 
-class TaskCategory(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-
-
-    def __str__(self):
-        return self.title
-    
-
-
 class PublicTask(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -111,19 +100,79 @@ class PublicTask(models.Model):
 class PublicTaskCategory(models.Model):
     title = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True, null=True)
+    color = models.CharField(max_length=7, blank=True, null=True, help_text="HTML color code (e.g., #FFFFFF or #000000)")
 
     def __str__(self):
         return self.title
-    
 
+
+class TaskCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(PublicTaskCategory, on_delete=models.CASCADE, null=True, blank=True)  # Link to public category (optional)
+    custom_title = models.CharField(max_length=255, null=True, blank=True)  # For custom categories
+    custom_description = models.TextField(blank=True, null=True)  # For custom categories
+    custom_color = models.CharField(max_length=7, blank=True, null=True, help_text="HTML color code (e.g., #FFFFFF or #000000)")
+    is_removed = models.BooleanField(default=False)  # Track if the user has removed this category
+
+    class Meta:
+        unique_together = ('user', 'category')  # Ensure each user-category pair is unique
+
+    def __str__(self):
+        if self.category:
+            return f"{self.user.username} - {self.category.title}"
+        return f"{self.user.username} - {self.custom_title} (Custom)"
+    
+    def get_category_details(self):
+        """
+        Returns the category details based on whether it's a public or custom category.
+        """
+        if self.category and not self.is_removed:
+            # Return details from the linked PublicTaskCategory
+            return {
+                'title': self.category.title,
+                'description': self.category.description,
+                'color': self.category.color,
+                'is_public': True,
+            }
+        else:
+            # Return details from custom fields
+            return {
+                'title': self.custom_title,
+                'description': self.custom_description,
+                'color': self.custom_color,
+                'is_public': False,
+            }
+
+    @classmethod
+    def get_categories(cls, user):
+        """
+        Returns all category IDs, titles, and colors for a given user.
+        """
+        categories = cls.objects.filter(user=user)
+
+        return [
+            {
+                'id': cat.category.id if cat.category else cat.id,
+                'title': cat.category.title if cat.category else cat.custom_title,
+                'color': getattr(cat.category, 'color', cat.custom_color or '#FFFFFF'),
+            }
+            for cat in categories if not cat.is_removed
+        ]
+        
+    
 @receiver(post_save, sender=User)
 def assign_public_categories_to_user(sender, instance, created, **kwargs):
     if created:
         public_categories = PublicTaskCategory.objects.all()
 
-        # Create TaskCategory instances for the new user
+        # Create UserTaskCategory instances for the new user
         TaskCategory.objects.bulk_create([
-            TaskCategory(user=instance, title=cat.title, description=cat.description)
+            TaskCategory(
+                user=instance,
+                category=cat,  # Link to the public category
+                custom_title=None,  # Not a custom category
+                custom_description=None,  # Not a custom category
+                custom_color=None  # Copy the color from the public category
+            )
             for cat in public_categories
         ])
-

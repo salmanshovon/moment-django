@@ -1,6 +1,25 @@
 from django.contrib import admin
 from .models import Task, TaskCategory, PublicTask, PublicTaskCategory
 
+@admin.register(PublicTaskCategory)
+class PublicTaskCategoryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'color')  # Added 'color'
+    search_fields = ('title',)
+    ordering = ('title',)
+
+@admin.register(TaskCategory)
+class UserTaskCategoryAdmin(admin.ModelAdmin):
+    list_display = ('user', 'get_category_title', 'custom_title', 'custom_description', 'custom_color', 'is_removed') #added color and removed TaskCategory as it does not exist.
+    list_filter = ('user', 'is_removed')
+    search_fields = ('user__username', 'category__title', 'custom_title')
+
+    def get_category_title(self, obj):
+        if obj.category:
+            return obj.category.title
+        return None
+    get_category_title.short_description = 'Public Category Title'
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     list_display = (
@@ -25,12 +44,6 @@ class TaskAdmin(admin.ModelAdmin):
     frequency_display.short_description = "Frequency"
 
 
-@admin.register(TaskCategory)
-class TaskCategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', "description")
-    list_filter = ('title','user',)
-    search_fields = ('title', 'user__username')
-
 @admin.register(PublicTask)
 class PublicTaskAdmin(admin.ModelAdmin):
     list_display = (
@@ -40,10 +53,4 @@ class PublicTaskAdmin(admin.ModelAdmin):
         'priority', 'category', 'is_repetitive'
     )
     search_fields = ('title', 'description')
-    ordering = ('title',)
-
-@admin.register(PublicTaskCategory)
-class PublicTaskCategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description')
-    search_fields = ('title',)
     ordering = ('title',)

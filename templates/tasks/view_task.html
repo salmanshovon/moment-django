@@ -135,6 +135,7 @@
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     font-size: 0.975rem;
+    background-color: var(--task-bg-color);
   }
 
   .task-card:hover {
@@ -379,16 +380,18 @@
     color: #e0e0e0;
   }
 
-  /* Dark Theme for Task Cards */
-  body.dark-theme .task-card {
-    background-color: #333;
-    /* Dark background */
+  /* Dark Theme for Task Title */
+  body.dark-theme .task-title {
     color: #e0e0e0;
     /* Light text */
   }
 
+  body.dark-theme .task-card {
+      background-color: var(--task-dark-bg-color);
+  }
+
   body.dark-theme .task-card:hover {
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.35);
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.55);
   }
 
   body.dark-theme .task-card.high {
@@ -453,12 +456,6 @@
     /* White text */
   }
 
-  /* Dark Theme for Task Title */
-  body.dark-theme .task-title {
-    color: #e0e0e0;
-    /* Light text */
-  }
-
   /* Dark Theme for Separator */
   body.dark-theme .task-card .details .separator {
     background-color: #555;
@@ -491,17 +488,6 @@
 
 <!-- Search Bar and Sort Button -->
 <div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
-  <!-- Search Bar -->
-  <div class="flex-grow-1 position-relative">
-    <form id="searchForm">
-      <input type="text" id="searchInput" class="form-control form-control-sm search-input" placeholder="Search tasks...">
-      <!-- Search btn Icon -->
-      <button type="submit" id="searchButton" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
-        <i class="fas fa-search search-icon"></i>
-      </button>
-    </form>
-  </div>
-    
 
   <!-- Sort Button with Dropdown -->
   <div class="dropdown">
@@ -518,6 +504,17 @@
       <li><a class="dropdown-item" data-sort="updated">Updated Date</a></li>
       <li><a class="dropdown-item" data-sort="task_merit">Merit</a></li>
     </ul>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="flex-grow-1 position-relative">
+    <form id="searchForm">
+      <input type="text" id="searchInput" class="form-control form-control-sm search-input" placeholder="Search tasks...">
+      <!-- Search btn Icon -->
+      <button type="submit" id="searchButton" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
+        <i class="fas fa-search search-icon"></i>
+      </button>
+    </form>
   </div>
 </div>
 
@@ -658,11 +655,19 @@
 
 
 
-    // Function to create a task card
+    // Function to create a task card ${getPriorityClass(task.priority)}
     function createTaskCard(task) {
       const taskCard = document.createElement('div');
-      taskCard.className = `task-card ${getPriorityClass(task.priority)}`;
+      taskCard.className = `task-card task-${task.id}`;
       taskCard.onclick = () => showTaskDetail(task.id);
+
+      if (task.color) {
+        const darkerColor = darkenHexColor(task.color, 0.7);
+
+        // Set CSS variables for the task card
+        taskCard.style.setProperty('--task-bg-color', task.color);
+        taskCard.style.setProperty('--task-dark-bg-color', darkerColor);
+    }
 
       // Task Title with Icon
       const title = document.createElement('h4');
@@ -717,12 +722,12 @@
     }
 
     // Helper function to create a separator
-    function createSeparator() {
-      const separator = document.createElement('span');
-      separator.className = 'separator';
-      separator.textContent = '•';
-      return separator;
-    }
+    // function createSeparator() {
+    //   const separator = document.createElement('span');
+    //   separator.className = 'separator';
+    //   separator.textContent = '•';
+    //   return separator;
+    // }
 
     // Function to create a separator
     function createSeparator() {
@@ -730,6 +735,25 @@
       separator.className = 'separator';
       return separator;
     }
+
+    // dark color for dark theme
+    function darkenHexColor(hex, percent) {
+      // Remove the '#' if it exists
+      hex = hex.replace(/^#/, '');
+
+      // Parse the HEX into RGB components
+      let r = parseInt(hex.slice(0, 2), 16);
+      let g = parseInt(hex.slice(2, 4), 16);
+      let b = parseInt(hex.slice(4, 6), 16);
+
+      // Darken the RGB values
+      r = Math.max(0, Math.floor(r * (1 - percent)));
+      g = Math.max(0, Math.floor(g * (1 - percent)));
+      b = Math.max(0, Math.floor(b * (1 - percent)));
+
+      // Convert back to HEX
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  }
 
     // Function to get priority class
     function getPriorityClass(priority) {

@@ -8,7 +8,7 @@ from datetime import datetime
 class TaskCategoryForm(forms.ModelForm):
     class Meta:
         model = TaskCategory
-        fields = ['title', 'description']
+        fields = ['custom_title', 'custom_description']
 
 # Common choices for frequency interval
 FREQUENCY_INTERVAL_CHOICES = [
