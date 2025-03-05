@@ -299,7 +299,7 @@
                                         value="{{ task.due_time|time:'i' }}">
                                     <select name="time_period" id="time_period" class="form-control">
                                         <option value="AM" {% if task.due_time|time:'A' == "AM" %}selected{% endif %}>AM</option>
-                                        <option value="AM" {% if task.due_time|time:'A' == "AM" %}selected{% endif %}>AM</option>
+                                        <option value="PM" {% if task.due_time|time:'A' == "PM" %}selected{% endif %}>PM</option>
                                     </select>
                                 </div>
                             </div>
