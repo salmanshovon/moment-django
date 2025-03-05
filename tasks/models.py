@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import timedelta
+from django.db.models import F, ExpressionWrapper, IntegerField
 
 PRIORITY_CHOICES = [
     (1, "Low"),
@@ -13,74 +14,6 @@ PRIORITY_CHOICES = [
     (5, "Critical"),
 ]
 
-class Task(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
-    category = models.ForeignKey("TaskCategory", on_delete=models.SET_NULL, blank=True, null=True)
-    task_merit = models.IntegerField(blank=True, null=True)  # Merit score for the task
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    duration = models.IntegerField(default=20) #default duration of a task is 20 minutes if not specified...
-    # Fields for task scheduling
-    due_date = models.DateField()  # Due date for the task
-    due_time = models.TimeField(blank=True, null=True) # Time field for one-time tasks
-    is_repetitive = models.BooleanField(default=False)  # True for repetitive, False for one-time
-    frequency_interval = models.IntegerField(blank=True, null=True)  # Interval in days (e.g., 7 for weekly, 30 for monthly)
-    notification_days = models.IntegerField(default=1)  # Days before the due date to notify the user
-    is_active = models.BooleanField(default=True)  # Active status for scheduling
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.full_clean()  # Validate before saving
-
-        # Set default notification days based on frequency_interval
-        if self.is_repetitive and not self.notification_days:
-            self.set_default_notification_days()
-
-        super().save(*args, **kwargs)
-
-    def set_default_notification_days(self):
-        """
-        Set default notification days based on the task's frequency_interval.
-        """
-        if self.frequency_interval == 1:  # Daily
-            self.notification_days = 1
-        elif self.frequency_interval == 7:  # Weekly
-            self.notification_days = 2
-        elif self.frequency_interval == 30:  # Monthly
-            self.notification_days = 5
-        elif self.frequency_interval == 365:  # Yearly
-            self.notification_days = 30
-        else:
-            # For custom intervals, default to 1 day notification
-            self.notification_days = 1
-
-    def update_due_date(self):
-        """
-        Update the due date for repetitive tasks based on frequency_interval.
-        """
-        if self.is_repetitive and self.frequency_interval:
-            self.due_date += timedelta(days=self.frequency_interval)
-            self.save()  # Save the updated due date
-
-    def deactivate(self):
-        """
-        Deactivate the task (mark as inactive).
-        """
-        self.is_active = False
-        self.save()
-
-    def activate(self):
-        """
-        Activate the task (mark as active).
-        """
-        self.is_active = True
-        self.save()
-    
 
 class PublicTask(models.Model):
     title = models.CharField(max_length=255)
@@ -159,7 +92,80 @@ class TaskCategory(models.Model):
             for cat in categories if not cat.is_removed
         ]
         
+
+class Task(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
+    category = models.ForeignKey("TaskCategory", on_delete=models.SET_NULL, blank=True, null=True)
+    task_merit = models.IntegerField(blank=True, null=True)  # Merit score for the task
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    duration = models.IntegerField(default=20) #default duration of a task is 20 minutes if not specified...
+    # Fields for task scheduling
+    due_date = models.DateField()  # Due date for the task
+    due_time = models.TimeField(blank=True, null=True) # Time field for one-time tasks
+    is_repetitive = models.BooleanField(default=False)  # True for repetitive, False for one-time
+    frequency_interval = models.IntegerField(blank=True, null=True)  # Interval in days (e.g., 7 for weekly, 30 for monthly)
+    notification_days = models.IntegerField(default=1)  # Days before the due date to notify the user
+    is_active = models.BooleanField(default=True)  # Active status for scheduling
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Validate before saving
+
+        # Set default notification days based on frequency_interval
+        if self.is_repetitive and not self.notification_days:
+            self.set_default_notification_days()
+
+        super().save(*args, **kwargs)
+
+
+    def update_due_date(self):
+        """
+        Update the due date for repetitive tasks based on frequency_interval.
+        """
+        if self.is_repetitive and self.frequency_interval:
+            self.due_date += timedelta(days=self.frequency_interval)
+            self.save()  # Save the updated due date
+
+    def deactivate(self):
+        """
+        Deactivate the task (mark as inactive).
+        """
+        self.is_active = False
+        self.save()
+
+    def activate(self):
+        """
+        Activate the task (mark as active).
+        """
+        self.is_active = True
+        self.save()
+
+    @staticmethod
+    def get_user_tasks(user):
+        today = timezone.localdate()
+        
+        # Fetch all tasks for the user that are active
+        tasks = Task.objects.filter(
+            user=user,
+            is_active=True
+        )
+        
+        # Filter tasks where (due_date - today) <= notification_days
+        filtered_tasks = [
+            task for task in tasks
+            if (task.due_date - today) <= timedelta(days=task.notification_days)
+        ]
+        
+        return filtered_tasks
     
+
+
 @receiver(post_save, sender=User)
 def assign_public_categories_to_user(sender, instance, created, **kwargs):
     if created:

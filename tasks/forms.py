@@ -31,6 +31,7 @@ class OneTimeTaskForm(forms.ModelForm):
             "due_date",
             "due_time",
             "duration",
+            "notification_days",
         ]
         widgets = {
             "due_date": forms.DateInput(attrs={"type": "date"}),
@@ -39,6 +40,7 @@ class OneTimeTaskForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        print(f'RAW DATA: {self.data}')
         print(f"Cleaned data from super().clean(): {cleaned_data}")
 
         # Extract data from the form
@@ -47,6 +49,7 @@ class OneTimeTaskForm(forms.ModelForm):
         duration_minutes = self.data.get('duration')
         priority = self.data.get('priority')
         task_merit = self.data.get('task_merit')
+        notification_days = self.data.get('notification_days')
 
         # Validate date (due_date)
         if one_time_date:
@@ -62,8 +65,8 @@ class OneTimeTaskForm(forms.ModelForm):
                     cleaned_data['due_date'] = due_date
             except ValueError:
                 self.add_error('due_date', "Invalid date format. Use YYYY-MM-DD.")
-        else:
-            self.add_error('due_date', "This field is required.")
+        # else:
+        #     self.add_error('due_date', "This field is required.")
 
         # Validate time (due_time)
         if due_time:
@@ -145,6 +148,7 @@ class RepetitiveTaskForm(forms.ModelForm):
             "due_date",
             "duration",
             "frequency_interval",
+            "notification_days",
         ]
         widgets = {
             "due_date": forms.DateInput(attrs={"type": "date"}),
@@ -152,6 +156,7 @@ class RepetitiveTaskForm(forms.ModelForm):
 
 
     def clean(self):
+        print(self.data)
         cleaned_data = super().clean()
 
         frequency_interval = cleaned_data.get('frequency_interval')
@@ -172,6 +177,7 @@ class RepetitiveTaskForm(forms.ModelForm):
                 cleaned_data['frequency_interval'] = int(frequency_interval)
             except (TypeError, ValueError):
                 raise forms.ValidationError("Invalid frequency interval selected.")
+        
 
         return cleaned_data
 

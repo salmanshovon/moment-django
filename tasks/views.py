@@ -18,6 +18,24 @@ class CreateTaskView(View):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return render(request, self.template_name, {"categories": categories})
         return render(request, "dashbase.html")
+    
+    @staticmethod
+    def set_default_notification_days(interval):
+        """
+        Set default notification days based on the task's frequency_interval.
+        """
+        if interval == 1:  # Daily
+            notification_days = 1
+        elif interval == 7:  # Weekly
+            notification_days = 2
+        elif interval == 30:  # Monthly
+            notification_days = 5
+        elif interval >= 365:  # Yearly
+            notification_days = 30
+        else:
+            # For custom intervals, default to 1 day notification
+            notification_days = 1
+        return notification_days
 
     def post(self, request, *args, **kwargs):
         # print(request.POST)
@@ -35,6 +53,7 @@ class CreateTaskView(View):
             task = form.save(commit=False)  # Don't save yet
             task.user = request.user  # Assign the user
 
+
             if task_type == "Repetitive":
                 existing_task = Task.objects.filter(
                     user=request.user, title__iexact=task.title, is_repetitive=True
@@ -46,7 +65,7 @@ class CreateTaskView(View):
                 else:
                     task.is_repetitive = True
 
-                if task.notification_days:
+                if task.notification_days != 9999999999:
                     if task.frequency_interval < task.notification_days:
                         form.add_error(
                             "notification_days",
@@ -54,7 +73,7 @@ class CreateTaskView(View):
                         )
                         return JsonResponse({"success": False, "errors": form.errors}, status=400)
                 else:
-                    task.notification_days = Task.set_default_notification_days()
+                    task.notification_days = CreateTaskView.set_default_notification_days(task.frequency_interval)
             
             task.save()
             return JsonResponse({"success": True, "message": "Task added successfully!"})
@@ -115,17 +134,10 @@ class EditTaskView(View):
                 if existing_task:
                     form.add_error("title", "A repetitive task with this name already exists!")
                     return JsonResponse({"success": False, "errors": form.errors}, status=400)
-
-                if updated_task.notification_days:
-                    if updated_task.frequency_interval < updated_task.notification_days:
-                        form.add_error(
-                            "notification_days",
-                            "Notification days cannot exceed the task frequency interval.",
-                        )
-                        return JsonResponse({"success": False, "errors": form.errors}, status=400)
                 else:
-                    updated_task.notification_days = Task.set_default_notification_days()
-
+                    updated_task.is_repetitive = True
+            else:
+                updated_task.is_repetitive = False
             updated_task.save()
             return JsonResponse({"success": True, "message": "Task updated successfully!"})
 

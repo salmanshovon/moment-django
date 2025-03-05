@@ -339,7 +339,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="notification_days">Notification Days</label>
-                                    <input type="number" name="notification_days" id="notification_days" class="form-control" min="1" placeholder="How many days before to notify?">
+                                    <input type="number" name="notification_days2" id="notification_days2" class="form-control" min="1" placeholder="How many days before to notify?">
                                 </div>
                                 <div class="form-group">
                                     <label for="priority">Priority</label>
@@ -422,6 +422,8 @@
                 const durationMin = $('input[name="duration_min"]').val();
                 const durationHr2 = $('input[name="duration_hr2"]').val();
                 const durationMin2 = $('input[name="duration_min2"]').val();
+                const noti_day = $('input[name="notification_days"]').val();
+                const noti_day2 = $('input[name="notification_days2"]').val();
 
                 const dueDate = $('input[name="due_date2"]').val();
                 const formInterval = $('#frequency_interval').val();
@@ -444,6 +446,7 @@
                 // Convert duration to total minutes
                 let totalDurationMinutes;
                 let x = null;
+                let notice_day = null;
                 let oneTime24HrString = null;
 
                 // Convert one-time task time to 24-hour format
@@ -467,12 +470,17 @@
                     x = 30; // Set x to 30
                 } else {
                     totalDurationMinutes = (parseInt(durationHr2) * 60) + parseInt(durationMin2);
+                    if (noti_day2 ===''){
+                        notice_day = 9999999999
+                    } else {
+                        notice_day = noti_day2
+                    }
                 }
 
                 // Get the form data and remove unnecessary fields
                 let formData = $(this).serializeArray().filter(item => {
                     // Remove fields we don't want to submit
-                    return !['duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2'].includes(item.name);
+                    return !['duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2',].includes(item.name);
                 });
 
                 // Add the calculated duration in minutes
@@ -487,6 +495,10 @@
                         name: 'due_date',
                         value: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
                     });
+                    formData.push({
+                        name: 'notification_days',
+                        value: notice_day
+                    })
                 } else {
                     formData.push({
                         name: 'due_date', value: dueDate

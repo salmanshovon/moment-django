@@ -629,9 +629,16 @@ body.dark-theme .spinner {
     <div class="sidebar d-flex flex-column" id="sidebar">
         <ul class="nav flex-column flex-grow-1" style="margin-left: 1rem;">
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-calendar-alt"></i> Routine</a></li>
             <li class="nav-item has-children">
-                <a class="nav-link parent-link"><i class="fas fa-user"></i>Task</a>
+                <a class="nav-link parent-link"><i class="fas fa-calendar-alt"></i>Routine</a>
+                <ul class="nav flex-column child-list">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'scheduler' %}">View Schedule</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'scheduler' %}">Create New Schedule</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Schedule Templates</a></li>
+                </ul>
+            </li>
+            <li class="nav-item has-children">
+                <a class="nav-link parent-link"><i class="fas fa-list-check"></i>Task</a>
                 <ul class="nav flex-column child-list">
                     <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Add a Task</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'view_task' %}">View Tasks</a></li>

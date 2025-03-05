@@ -1,0 +1,214 @@
+<style>
+    .task-list {
+        list-style: none;
+        padding: 0;
+        min-height: 150px;
+        border: 2px dashed #ccc;
+        background-color: #f8f9fa;
+    }
+
+    .task-item {
+        background: #007bff;
+        color: white;
+        padding: 10px;
+        margin: 5px;
+        cursor: grab;
+        border-radius: 5px;
+    }
+
+    .dropzone {
+        background-color: #e8f0fe;
+    }
+
+    .tasks, .schedule {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .schedule {
+        height: calc(100vh - 40px); /* Full height minus padding */
+    }
+
+    .tasks {
+        height: calc(100vh - 40px); /* Full height minus padding */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .tasks > div {
+        flex: 1;
+    }
+    .container-x {
+        height: calc(100dvh - 107px);
+    }
+
+    .schedule .dropzone{
+        height: calc(100vh - 230px);
+    }
+</style>
+</head>
+<body>
+<div class="container-x p-3">
+    <div class="row h-100 g-3">
+        <!-- Schedule Section (Left) -->
+        <div class="col-8 h-100">
+            <div class="schedule h-100">
+                <h5>Task Scheduler</h5>
+                <ul id="schedule-list" class="task-list dropzone" data-type="schedule"></ul>
+            </div>
+        </div>
+
+        <!-- Tasks Section (Right) -->
+        <div class="col-4 h-100">
+            <div class="tasks h-100">
+                <div>
+                    <h5>One-time Tasks</h5>
+                    <ul id="one-time-tasks" class="task-list" data-type="onetime">
+                        <li class="task-item" draggable="true" data-id="1" data-item-type="onetime">Task A</li>
+                        <li class="task-item" draggable="true" data-id="2" data-item-type="onetime">Task B</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>Repetitive Tasks</h5>
+                    <ul id="repetitive-tasks" class="task-list" data-type="repetitive">
+                        <li class="task-item" draggable="true" data-id="3" data-item-type="repetitive">Task X</li>
+                        <li class="task-item" draggable="true" data-id="4" data-item-type="repetitive">Task Y</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function () {
+    // URL to fetch tasks (Django URL name: get_sch_tasks)
+    const url = "{% url 'get_sch_tasks' %}";
+
+    // Fetch tasks using AJAX
+    $.ajax({
+        url: url,
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+            // Clear existing items in the lists
+            $("#one-time-tasks").empty();
+            $("#repetitive-tasks").empty();
+
+            // Loop through the tasks and populate the lists
+            data.forEach(function (task) {
+                // Create a task item with necessary attributes
+                const taskItem = $("<li></li>")
+                    .addClass("task-item")
+                    .attr("draggable", "true")
+                    .attr("data-id", task.id)
+                    .attr("data-item-type", task.is_repetitive ? "repetitive" : "onetime")
+                    .text(task.title);
+
+                // Append to the appropriate list based on is_repetitive
+                if (task.is_repetitive) {
+                    $("#repetitive-tasks").append(taskItem);
+                } else {
+                    $("#one-time-tasks").append(taskItem);
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching tasks:", error);
+        }
+    });
+});
+
+(function () {
+    const dropzones = document.querySelectorAll(".task-list");
+
+    dropzones.forEach(zone => {
+        zone.addEventListener("dragover", function (event) {
+            event.preventDefault();
+            const dragging = document.querySelector(".dragging");
+            if (!dragging) return; // Prevent errors if no item is being dragged
+
+            const draggingType = dragging.dataset.itemType;
+            const destinationType = zone.dataset.type;
+
+            // Allow dropping only if:
+            // 1. The destination is the schedule list, or
+            // 2. The destination matches the item's type (onetime or repetitive)
+            if (destinationType === "schedule" || destinationType === draggingType) {
+                const afterElement = getDragAfterElement(zone, event.clientY);
+                if (afterElement == null) {
+                    zone.appendChild(dragging);
+                } else {
+                    zone.insertBefore(dragging, afterElement);
+                }
+            }
+        });
+
+        zone.addEventListener("drop", function (event) {
+            event.preventDefault();
+            const dragging = document.querySelector(".dragging");
+            if (dragging) {
+                dragging.classList.remove("dragging");
+                dragging.style.opacity = "1"; // Smoothly show the item again
+            }
+        });
+
+        zone.addEventListener("dragleave", function () {
+            zone.classList.remove("over");
+        });
+    });
+
+    // Function to make an element draggable
+    function makeDraggable(task) {
+        task.setAttribute("draggable", "true");
+
+        task.addEventListener("dragstart", function (event) {
+            event.dataTransfer.setData("text/plain", event.target.dataset.id);
+            event.target.classList.add("dragging");
+            setTimeout(() => {
+                event.target.style.opacity = "0"; // Hide smoothly on drag
+            }, 0);
+        });
+
+        task.addEventListener("dragend", function (event) {
+            event.target.classList.remove("dragging");
+            event.target.style.opacity = "1"; // Fade back in on drop
+        });
+    }
+
+    // Function to get the correct insertion point in the list
+    function getDragAfterElement(zone, y) {
+        const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - (box.top + box.height / 2);
+            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Attach draggable functionality to existing task items
+    document.querySelectorAll(".task-item").forEach(makeDraggable);
+
+    // Observe dynamically added tasks
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1 && node.classList.contains("task-item")) {
+                    makeDraggable(node); // Make newly added tasks draggable
+                }
+            });
+        });
+    });
+
+    // Start observing changes in the task lists
+    dropzones.forEach(zone => {
+        observer.observe(zone, { childList: true });
+    });
+
+})();
+
+
+</script>

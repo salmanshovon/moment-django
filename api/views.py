@@ -7,6 +7,17 @@ from .serializers import TaskDetails, TaskList, UserSettingsSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 
+
+class SchedulerTasksView(generics.ListAPIView):
+    serializer_class = TaskList
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Get the user from the request (or from the URL parameter)
+        user = self.request.user  # Assuming the user is authenticated
+        # Use the static method `get_user_tasks` to fetch the tasks
+        return Task.get_user_tasks(user)
+
 class TaskListAPIView(generics.ListAPIView):
     serializer_class = TaskList
     permission_classes = [permissions.IsAuthenticated]
