@@ -662,7 +662,7 @@
       taskCard.onclick = () => showTaskDetail(task.id);
 
       if (task.color) {
-        const darkerColor = darkenHexColor(task.color, 0.7);
+        const darkerColor = darkenHexColor(task.color, 0.1);
 
         // Set CSS variables for the task card
         taskCard.style.setProperty('--task-bg-color', task.color);
@@ -721,14 +721,6 @@
       return taskCard;
     }
 
-    // Helper function to create a separator
-    // function createSeparator() {
-    //   const separator = document.createElement('span');
-    //   separator.className = 'separator';
-    //   separator.textContent = '•';
-    //   return separator;
-    // }
-
     // Function to create a separator
     function createSeparator() {
       const separator = document.createElement('div');
@@ -736,25 +728,61 @@
       return separator;
     }
 
-    // dark color for dark theme
-    function darkenHexColor(hex, percent) {
-      // Remove the '#' if it exists
-      hex = hex.replace(/^#/, '');
+    // Dark color for dark theme background
+      function darkenHexColor(hex, factor) {
+        // Remove the '#' if it exists
+        hex = hex.replace(/^#/, '');
 
-      // Parse the HEX into RGB components
-      let r = parseInt(hex.slice(0, 2), 16);
-      let g = parseInt(hex.slice(2, 4), 16);
-      let b = parseInt(hex.slice(4, 6), 16);
+        // Parse the HEX into RGB components
+        let r = parseInt(hex.slice(0, 2), 16) / 255;
+        let g = parseInt(hex.slice(2, 4), 16) / 255;
+        let b = parseInt(hex.slice(4, 6), 16) / 255;
 
-      // Darken the RGB values
-      r = Math.max(0, Math.floor(r * (1 - percent)));
-      g = Math.max(0, Math.floor(g * (1 - percent)));
-      b = Math.max(0, Math.floor(b * (1 - percent)));
+        // Convert RGB to HSL
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
 
-      // Convert back to HEX
-      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-  }
+        if (max === min) {
+            h = s = 0; // achromatic
+        } else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
 
+        // Adjust lightness to make the color darker
+        l = l * factor;
+
+        // Slightly increase saturation to make the color richer
+        s = Math.min(s * 1.2, 1); // Limit saturation to 1 to avoid oversaturation
+
+        // Convert HSL back to RGB
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+
+        // Convert RGB back to HEX
+        r = Math.round(r * 255);
+        g = Math.round(g * 255);
+        b = Math.round(b * 255);
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).padStart(6, '0')}`;
+    }
+
+    function hue2rgb(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+    }
     // Function to get priority class
     function getPriorityClass(priority) {
       switch (priority) {
