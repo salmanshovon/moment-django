@@ -599,7 +599,7 @@
                     data: $.param(formData), // Convert the array to a URL-encoded string
                     success: function (response) {
                         if (response.success) {
-                            showMessage(response.message)
+                            showMessage(response.message, 'success')
                             $(document).trigger('contentUpdated', ["{% url 'view_task' %}", '#new-content', true]);
                         }
                     },

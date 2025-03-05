@@ -229,13 +229,28 @@
     font-weight: 500;
   }
 
-  .badge.up {
-    background-color: #dc3545;
+  .badge.Low {
+    background-color: #228B22; /* Darker Green */
     color: #ffffff;
   }
 
-  .badge.down {
-    background-color: #28a745;
+  .badge.Medium {
+    background-color: #FFD700; /* Darker Yellow/Gold */
+    color: #000000; /* Black text for better contrast */
+  }
+
+  .badge.High {
+    background-color: #FF8C00; /* Darker Orange/Dark Goldenrod */
+    color: #ffffff;
+  }
+
+  .badge.Critical {
+    background-color: #DC143C; /* Darker Red/Crimson */
+    color: #ffffff;
+  }
+
+  .badge.Urgent {
+    background-color: #8B0000; /* Very Dark Red/Dark Red */
     color: #ffffff;
   }
 
@@ -701,9 +716,11 @@
 
       // Priority Badge with Icon
       const priorityBadge = document.createElement('span');
-      priorityBadge.className = `badge ${getPriorityBadgeClass(task.priority)}`;
+      priorityBadge.className = `badge ${getPriorityLabel(task.priority)}`;
       priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`; // Icon for priority
       priorityBadge.style.marginLeft = 'auto'; // Push the badge to the right
+
+      console.log(priorityBadge)
 
       // Append elements to details
       details.appendChild(duration);
