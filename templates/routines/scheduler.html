@@ -4,16 +4,58 @@
         padding: 0;
         min-height: 150px;
         border: 2px dashed #ccc;
-        background-color: #f8f9fa;
+        background-color: #88a9ca;
     }
 
     .task-item {
-        background: #007bff;
         color: white;
         padding: 10px;
         margin: 5px;
         cursor: grab;
         border-radius: 5px;
+        display: flex;
+    }
+
+    .task-item.one-time {
+        background-color: rgb(55, 92, 172);
+    }
+
+    .task-item.repetitive {
+        background-color: rgb(204, 66, 147);
+    }
+
+    .badge {
+        font-size: 0.625rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-left: auto;
+        margin-top: auto;
+    }
+
+    .badge.Low {
+        background-color: #228B22; /* Darker Green */
+        color: #ffffff;
+    }
+
+    .badge.Medium {
+        background-color: #FFD700; /* Darker Yellow/Gold */
+        color: #000000; /* Black text for better contrast */
+    }
+
+    .badge.High {
+        background-color: #FF8C00; /* Darker Orange/Dark Goldenrod */
+        color: #ffffff;
+    }
+
+    .badge.Critical {
+        background-color: #DC143C; /* Darker Red/Crimson */
+        color: #ffffff;
+    }
+
+    .badge.Urgent {
+        background-color: #8B0000; /* Very Dark Red/Dark Red */
+        color: #ffffff;
     }
 
     .dropzone {
@@ -29,6 +71,7 @@
 
     .schedule {
         height: calc(100vh - 40px); /* Full height minus padding */
+        width: 100%;
     }
 
     .tasks {
@@ -48,18 +91,61 @@
     .schedule .dropzone{
         height: calc(100vh - 230px);
     }
+
+    .dropdwon-date {
+        min-width: 120px; /* Ensures the dropdown has a fixed minimum width */
+    }
+
+    #selectedDateDisplay {
+        white-space: nowrap; /* Prevents text from wrapping */
+        overflow: hidden; /* Ensures it doesn’t break layout */
+        text-overflow: ellipsis; /* Adds '...' if text is too long */
+        max-width: 200px; /* Adjust as needed */
+        display: inline-block;
+    }
+    .time-slot {
+        display: flex;
+        flex-direction: column;
+        height: 50%; /* Adjust as needed */
+        border-bottom: 1px solid #eee; /* Optional: for visual separation */
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+
 </style>
 </head>
 <body>
 <div class="container-x p-3">
     <div class="row h-100 g-3">
         <!-- Schedule Section (Left) -->
-        <div class="col-8 h-100">
-            <div class="schedule h-100">
-                <h5>Task Scheduler</h5>
-                <ul id="schedule-list" class="task-list dropzone" data-type="schedule"></ul>
+        <div class="col-8 h-100 d-flex">
+            <div class="schedule h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="mb-0">Task Scheduler</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="ms-3">
+                            <span>For&nbsp;</span>
+                        </div>
+                        <select class="form-select dropdwon-date" id="dateSelector">
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                        </select>
+                        <div class="ms-3">
+                            <span id="selectedDateDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-grow-1 border-top">
+                    <div class="time-column" style="width: 80px; overflow-y: auto;">
+                        <div id="time-slots">
+                            </div>
+                    </div>
+                    <ul id="schedule-list" class="task-list dropzone flex-grow-1" data-type="schedule" style="overflow-y: auto;"></ul>
+                </div>
             </div>
         </div>
+        
+        
 
         <!-- Tasks Section (Right) -->
         <div class="col-4 h-100">
@@ -83,9 +169,56 @@
     </div>
 </div>
 <script>
+
+    function formatDate(date) {
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    function updateDateDisplay() {
+        const dateSelector = document.getElementById('dateSelector');
+        const dateDisplay = document.getElementById('selectedDateDisplay');
+        let selectedDate = new Date();
+
+        if (dateSelector.value === "tomorrow") {
+            selectedDate.setDate(selectedDate.getDate() + 1);
+        }
+
+        dateDisplay.textContent = formatDate(selectedDate);
+    }
+
+    // Initial date display
+    updateDateDisplay();
+
+    // Update date display on dropdown change
+    document.getElementById('dateSelector').addEventListener('change', updateDateDisplay);
+
+
+
 $(document).ready(function () {
     // URL to fetch tasks (Django URL name: get_sch_tasks)
     const url = "{% url 'get_sch_tasks' %}";
+
+    // Function to get priority label based on priority value
+    function getPriorityLabel(priority) {
+        switch (priority) {
+            case 5:
+                return "Urgent";
+            case 4:
+                return "Critical";
+            case 3:
+                return "High";
+            case 2:
+                return "Medium";
+            case 1:
+                return "Low";
+            default:
+                return "Unknown";
+        }
+    }
+
+    // Global array to store all tasks
+    let allTasks = [];
 
     // Fetch tasks using AJAX
     $.ajax({
@@ -97,7 +230,13 @@ $(document).ready(function () {
             $("#one-time-tasks").empty();
             $("#repetitive-tasks").empty();
 
-            // Loop through the tasks and populate the lists
+            // Store tasks in the global array
+            allTasks = [...data];
+
+            // Sort tasks by priority (5 at the top, 1 at the bottom)
+            data.sort((a, b) => b.priority - a.priority);
+
+            // Loop through the sorted tasks and populate the lists
             data.forEach(function (task) {
                 // Create a task item with necessary attributes
                 const taskItem = $("<li></li>")
@@ -105,7 +244,16 @@ $(document).ready(function () {
                     .attr("draggable", "true")
                     .attr("data-id", task.id)
                     .attr("data-item-type", task.is_repetitive ? "repetitive" : "onetime")
-                    .text(task.title);
+                    .text(task.title)
+                    .addClass(task.is_repetitive ? "repetitive" : "one-time");
+
+                // Create a priority badge with icon
+                const priorityBadge = $("<span></span>")
+                    .addClass(`badge ${getPriorityLabel(task.priority)}`)
+                    .html(`<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`);
+
+                // Append the priority badge to the task item
+                taskItem.append(priorityBadge);
 
                 // Append to the appropriate list based on is_repetitive
                 if (task.is_repetitive) {
@@ -119,96 +267,150 @@ $(document).ready(function () {
             console.error("Error fetching tasks:", error);
         }
     });
-});
 
-(function () {
-    const dropzones = document.querySelectorAll(".task-list");
 
-    dropzones.forEach(zone => {
-        zone.addEventListener("dragover", function (event) {
-            event.preventDefault();
-            const dragging = document.querySelector(".dragging");
-            if (!dragging) return; // Prevent errors if no item is being dragged
+    (function () {
+        const dropzones = document.querySelectorAll(".task-list");
 
-            const draggingType = dragging.dataset.itemType;
-            const destinationType = zone.dataset.type;
+        dropzones.forEach(zone => {
+            zone.addEventListener("dragover", function (event) {
+                event.preventDefault();
+                const dragging = document.querySelector(".dragging");
+                if (!dragging) return; // Prevent errors if no item is being dragged
 
-            // Allow dropping only if:
-            // 1. The destination is the schedule list, or
-            // 2. The destination matches the item's type (onetime or repetitive)
-            if (destinationType === "schedule" || destinationType === draggingType) {
-                const afterElement = getDragAfterElement(zone, event.clientY);
-                if (afterElement == null) {
-                    zone.appendChild(dragging);
+                const draggingType = dragging.dataset.itemType;
+                const destinationType = zone.dataset.type;
+
+                // Allow dropping only if:
+                // 1. The destination is the schedule list, or
+                // 2. The destination matches the item's type (onetime or repetitive)
+                if (destinationType === "schedule" || destinationType === draggingType) {
+                    const afterElement = getDragAfterElement(zone, event.clientY);
+                    if (afterElement == null) {
+                        zone.appendChild(dragging);
+                    } else {
+                        zone.insertBefore(dragging, afterElement);
+                    }
                 } else {
-                    zone.insertBefore(dragging, afterElement);
-                }
+                zone.classList.add("border-danger"); // Add red border for invalid drop
             }
-        });
+            });
 
-        zone.addEventListener("drop", function (event) {
-            event.preventDefault();
-            const dragging = document.querySelector(".dragging");
-            if (dragging) {
-                dragging.classList.remove("dragging");
-                dragging.style.opacity = "1"; // Smoothly show the item again
-            }
-        });
+            zone.addEventListener("drop", function (event) {
+                event.preventDefault();
+                const dragging = document.querySelector(".dragging");
+                if (dragging) {
+                    dragging.classList.remove("dragging");
+                    dragging.style.opacity = "1"; // Smoothly show the item again
+                    zone.classList.remove("border-danger");
 
-        zone.addEventListener("dragleave", function () {
-            zone.classList.remove("over");
-        });
-    });
-
-    // Function to make an element draggable
-    function makeDraggable(task) {
-        task.setAttribute("draggable", "true");
-
-        task.addEventListener("dragstart", function (event) {
-            event.dataTransfer.setData("text/plain", event.target.dataset.id);
-            event.target.classList.add("dragging");
-            setTimeout(() => {
-                event.target.style.opacity = "0"; // Hide smoothly on drag
-            }, 0);
-        });
-
-        task.addEventListener("dragend", function (event) {
-            event.target.classList.remove("dragging");
-            event.target.style.opacity = "1"; // Fade back in on drop
-        });
-    }
-
-    // Function to get the correct insertion point in the list
-    function getDragAfterElement(zone, y) {
-        const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
-
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - (box.top + box.height / 2);
-            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    // Attach draggable functionality to existing task items
-    document.querySelectorAll(".task-item").forEach(makeDraggable);
-
-    // Observe dynamically added tasks
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1 && node.classList.contains("task-item")) {
-                    makeDraggable(node); // Make newly added tasks draggable
+                    if (zone.id === "schedule-list") {
+                        updateTimeSlots(); // Update time slots when dropped into schedule
+                    } else if (zone.id === "one-time-tasks" || zone.id === "repetitive-tasks") {
+                        updateTimeSlots(); // Update time slots when removed from schedule
+                    }
                 }
             });
+
+            zone.addEventListener("dragleave", function () {
+                zone.classList.remove("over");
+                zone.classList.remove("border-danger");
+            });
         });
-    });
 
-    // Start observing changes in the task lists
-    dropzones.forEach(zone => {
-        observer.observe(zone, { childList: true });
-    });
+        // Function to make an element draggable
+        function makeDraggable(task) {
+            task.setAttribute("draggable", "true");
 
-})();
+            task.addEventListener("dragstart", function (event) {
+                event.dataTransfer.setData("text/plain", event.target.dataset.id);
+                event.target.classList.add("dragging");
+                setTimeout(() => {
+                    event.target.style.opacity = "0"; // Hide smoothly on drag
+                }, 0);
+            });
 
+            task.addEventListener("dragend", function (event) {
+                event.target.classList.remove("dragging");
+                event.target.style.opacity = "1"; // Fade back in on drop
+            });
+        }
+
+        // Function to get the correct insertion point in the list
+        function getDragAfterElement(zone, y) {
+            const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - (box.top + box.height / 2);
+                return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Attach draggable functionality to existing task items
+        document.querySelectorAll(".task-item").forEach(makeDraggable);
+
+        // Observe dynamically added tasks
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1 && node.classList.contains("task-item")) {
+                        makeDraggable(node); // Make newly added tasks draggable
+                    }
+                });
+            });
+        });
+
+        // Start observing changes in the task lists
+        dropzones.forEach(zone => {
+            observer.observe(zone, { childList: true });
+        });
+
+        // Function to calculate and update time slots
+        function updateTimeSlots() {
+            const scheduleList = document.getElementById("schedule-list");
+            const timeSlotsContainer = document.getElementById("time-slots");
+            timeSlotsContainer.innerHTML = ""; // Clear existing time slots
+
+            let currentTime = new Date();
+            currentTime.setHours(6, 0, 0, 0); // Start from 6:00 AM
+
+            scheduleList.querySelectorAll(".task-item").forEach(taskItem => {
+                const taskId = taskItem.dataset.id;
+                const taskData = getTaskDataById(taskId); // Function to fetch task data
+
+                if (taskData) {
+                    const durationMinutes = taskData.duration; // Assuming duration is in minutes
+                    const endTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+
+                    const startTimeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    const timeSlotDiv = document.createElement("div");
+                    timeSlotDiv.classList.add("time-slot");
+
+                    const startTimeSpan = document.createElement("span");
+                    startTimeSpan.textContent = startTimeString;
+
+                    const endTimeSpan = document.createElement("span");
+                    endTimeSpan.textContent = endTimeString;
+
+                    timeSlotDiv.appendChild(startTimeSpan);
+                    timeSlotDiv.appendChild(endTimeSpan);
+
+                    timeSlotsContainer.appendChild(timeSlotDiv);
+
+                    currentTime = endTime; // Update current time for the next task
+                }
+            });
+        }
+
+        // Function to fetch task data by ID (now using the global array)
+        function getTaskDataById(taskId) {
+            return allTasks.find(task => task.id === parseInt(taskId));
+        }
+
+    })();
+});
 
 </script>

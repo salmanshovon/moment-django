@@ -137,6 +137,10 @@
             background-color: rgba(255, 255, 255, 0.3); /* Black overlay with 50% opacity */
         }
 
+        .cblogo {
+            margin-left: 330px;
+        }
+
         /* Warning Display */
         .warningdiv {
             position: fixed;
@@ -374,6 +378,9 @@
 
     /* Responsive Design */
     @media (max-width: 768px) {
+        .cblogo {
+            margin-left: 0;
+        }
         .sidebar {
             width: 250px;
             left: -250px;
@@ -553,7 +560,7 @@ body.dark-theme .spinner {
             </button>
 
             <!-- Centered Brand Logo -->
-            <div class="d-flex justify-content-center flex-grow-1">
+            <div class="d-flex justify-content-center flex-grow-1 cblogo">
                 <a class="navbar-brand d-flex align-items-center" href="#">
                     <img src="{% static 'img/logo.jpg' %}" alt="Logo" width="40" height="40" class="me-2">
                     <span>M O M E N T</span>
