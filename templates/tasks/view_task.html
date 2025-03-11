@@ -799,23 +799,6 @@
         if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
         return p;
     }
-    // Function to get priority class
-    function getPriorityClass(priority) {
-      switch (priority) {
-        case 1:
-          return 'low';
-        case 2:
-          return 'medium';
-        case 3:
-          return 'high';
-        case 4:
-          return 'urgent';
-        case 5:
-          return 'critical';
-        default:
-          return '';
-      }
-    }
 
     // Function to get priority label
     function getPriorityLabel(priority) {

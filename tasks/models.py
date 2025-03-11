@@ -147,8 +147,11 @@ class Task(models.Model):
         self.save()
 
     @staticmethod
-    def get_user_tasks(user):
-        today = timezone.localdate()
+    def get_user_tasks(user, param):
+        if param:
+            date = timezone.localdate()
+        else:
+            date = timezone.localdate() + timedelta(days=1)  # Tomorrow's date
         
         # Fetch all tasks for the user that are active
         tasks = Task.objects.filter(
@@ -156,12 +159,14 @@ class Task(models.Model):
             is_active=True
         )
         
-        # Filter tasks where (due_date - today) <= notification_days
-        filtered_tasks = [
-            task for task in tasks
-            if (task.due_date - today) <= timedelta(days=task.notification_days)
-        ]
-        
+        filtered_tasks = []
+        for task in tasks:
+            if task.frequency_interval == 1:
+                filtered_tasks.append(task)
+            else:
+                days_until_due = (task.due_date - date).days
+                if 0 <= days_until_due <= task.notification_days:
+                    filtered_tasks.append(task)
         return filtered_tasks
     
 

@@ -3,7 +3,8 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
 from tasks.models import Task
-from .serializers import TaskDetails, TaskList, UserSettingsSerializer
+from routines.models import Routine
+from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 
@@ -15,8 +16,10 @@ class SchedulerTasksView(generics.ListAPIView):
     def get_queryset(self):
         # Get the user from the request (or from the URL parameter)
         user = self.request.user  # Assuming the user is authenticated
+        param = self.request.GET.get('param', 'true')  # Get param as a string
         # Use the static method `get_user_tasks` to fetch the tasks
-        return Task.get_user_tasks(user)
+        param = param.lower() == 'true'  # True if 'true', False if 'false'
+        return Task.get_user_tasks(user, param=param)
 
 class TaskListAPIView(generics.ListAPIView):
     serializer_class = TaskList
@@ -94,3 +97,25 @@ class UpdateSortPreferenceView(APIView):
             serializer.save()
             return Response({"success": True}, status=status.HTTP_200_OK)
         return Response({'success': False},serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class RoutineCreateUpdateView(generics.CreateAPIView):
+    queryset = Routine.objects.all()
+    serializer_class = RoutineSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Save the routine with the current authenticated user.
+        """
+        print("Received Data:", self.request.data)
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Override the create method to return a custom success response.
+        """
+        response = super().create(request, *args, **kwargs)
+        return Response(
+            {"message": "Routine saved successfully!", "routine": response.data},
+            status=status.HTTP_201_CREATED
+        )

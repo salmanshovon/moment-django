@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from tasks.models import Task
+from routines.models import Routine
+from django.utils import timezone
 from users.models import UserSettings
 
 class TaskDetails(serializers.ModelSerializer):
@@ -67,3 +69,44 @@ class UserSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSettings
         fields = ['sort']
+
+class RoutineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Routine
+        fields = ['id', 'user', 'for_date', 'tasks', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+    def validate_tasks(self, value):
+        """
+        Validate the 'tasks' field to ensure it contains the required structure.
+        """
+        for task in value:
+            if not all(key in task for key in ['start_time', 'duration', 'task_id', 'title', 'category', 'priority']):
+                raise serializers.ValidationError("Each task must contain 'start_time', 'duration', 'task_id', 'title', 'category', and 'priority'.")
+        return value
+
+    def create(self, validated_data):
+        """
+        Create a new Routine instance if one does not exist for the given for_date.
+        """
+        user = self.context['request'].user
+        for_date = validated_data['for_date']
+
+        # Check if a routine already exists for the given date and user
+        routine, created = Routine.objects.get_or_create(
+            user=user,
+            for_date=for_date,
+            defaults={
+                'tasks': validated_data['tasks'],
+                'created_at': timezone.now(),
+                'updated_at': timezone.now(),
+            }
+        )
+
+        # If the routine already exists, update it
+        if not created:
+            routine.tasks = validated_data['tasks']
+            routine.updated_at = timezone.now()
+            routine.save()
+
+        return routine
