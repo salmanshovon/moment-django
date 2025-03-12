@@ -29,18 +29,62 @@
     .task-list {
         list-style: none;
         padding: 0;
-        min-height: 150px;
-        border: 2px dashed #ccc;
+        min-height: 300px;
+        /* border: 2px dashed #ccc; */
         background-color: #88a9ca;
+        border: solid 2px #ccc;
+        border-radius: 8px;
+    }
+
+    .task-list .one-time-tasks {
+        height: 600px;
+        overflow-y: auto;
     }
 
     .task-item {
-        color: white;
-        padding: 10px;
-        margin: 5px;
-        cursor: grab;
-        border-radius: 5px;
+        padding: 0.5rem;
+        margin-bottom: 0.3rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.7rem;
+        background-color: var(--task-bg-color);
+        margin-left: 3px;
+        margin-right: 3px;
+        margin-top: 3px;
+    }
+
+    .task-item .task-title {
+        color: #ffffff;
         display: flex;
+        align-items: center;
+        /* Align icon and text vertically */
+        gap: 8px;
+        /* Space between icon and text */
+        font-size: 18px;
+        /* Adjust font size */
+        font-weight: 600;
+        /* Darker text for better readability */
+        margin-bottom: 8px;
+        /* Add space below the title */
+    }
+
+    .task-item .details {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        color: #e0e0e0;
+        height: 15px; /* Set a fixed height */
+        overflow: visible; /* Ensure overflow is not hidden */
+        position: relative;
+    }
+
+    .task-item .details .separator {
+        width: 1px;
+        height: 0.9rem;
+        background-color: #e0e0e0;
+        bottom: 10px;
     }
 
     .task-item.one-time {
@@ -48,10 +92,33 @@
     }
 
     .task-item.repetitive {
-        background-color: rgb(204, 66, 147);
+        background-color: rgb(114, 31, 80);
+    }
+
+    .badges-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* Space between badges */
+        margin-bottom: 0; /* Remove bottom margin */
+        justify-content: flex-end; /* Align badges to the bottom */
+        margin-left: auto;
+        overflow: visible; /* Allow badges to grow upwards */
+        position: absolute; /* Position relative to .details */
+        bottom: 0; /* Align to the bottom of .details */
+        right: 0; /* Align to the right of .details */
     }
 
     .badge {
+        font-size: 0.625rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-left: auto;
+        margin-top: auto;
+    }
+
+    .category-badge {
+        color: #3d3d3d; /* Dark teal for text */
         font-size: 0.625rem;
         padding: 0.2rem 0.4rem;
         border-radius: 4px;
@@ -112,7 +179,7 @@
         flex: 1;
     }
     .container-x {
-        height: calc(100dvh - 107px);
+        height: calc(100dvh - 100px);
     }
 
     .schedule .dropzone{
@@ -130,11 +197,16 @@
         max-width: 200px; /* Adjust as needed */
         display: inline-block;
     }
+
+    .time-slots {
+        height: calc(100vh - 300px);
+    }
     .time-slot {
         display: flex;
         flex-direction: column;
-        height: 50%; /* Adjust as needed */
-        border-bottom: 1px solid #eee; /* Optional: for visual separation */
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #eee;
         padding: 5px;
         font-size: 0.8rem;
     }
@@ -142,8 +214,8 @@
 </style>
 </head>
 <body>
-<div class="container-x p-3">
-    <div class="row h-100 g-3">
+<div class="container-x p-1">
+    <div class="row h-100 g-2">
         <!-- Schedule Section (Left) -->
         <div class="col-8 h-100 d-flex">
             <div class="schedule h-100 d-flex flex-column">
@@ -163,7 +235,7 @@
                     </div>
                 </div>
                 <div class="d-flex flex-grow-1 border-top">
-                    <div class="time-column" style="width: 80px; overflow-y: auto;">
+                    <div class="time-column" style="width: 80px; overflow-y: auto; margin-top: 3px;">
                         <div id="time-slots">
                             </div>
                     </div>
@@ -207,11 +279,11 @@
 </div>
 
 <script>
-
 // ----------------------------adding new scripts above------------------
 $(document).ready(function () {
     // URL to fetch tasks (Django URL name: get_sch_tasks)
-    const url = "{% url 'get_sch_tasks' %}";
+    const task_url = "{% url 'get_sch_tasks' %}";
+    const routine_url = "{% url 'routine_view' %}";
 
 
     function formatDate1(date) {
@@ -221,10 +293,24 @@ $(document).ready(function () {
 
     // Function to format date
     function formatDate(dateString) {
-      const date = new Date(dateString);
-      const options = { year: 'numeric', month: 'long', day: '2-digit' };
-      return date.toLocaleDateString('en-US', options);
-    } 
+    const date = new Date(dateString);
+    
+    // Define short month names
+    const shortMonth = date.toLocaleString('en-US', { month: 'short' });
+
+    // Extract day and year
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    return `${day}-${shortMonth}-${year}`;
+    }
+
+    // Function to create a separator
+    function createSeparator() {
+      const separator = document.createElement('div');
+      separator.className = 'separator';
+      return separator;
+    }
 
     function updateDateDisplay() {
         const dateSelector = document.getElementById('dateSelector');
@@ -233,9 +319,11 @@ $(document).ready(function () {
 
         if (dateSelector.value === "tomorrow") {
             selectedDate.setDate(selectedDate.getDate() + 1);
-            fetchTasks(false)
+            fetchRoutine(false);
+            fetchTasks(false);
         } else {
-            fetchTasks(true)
+            fetchRoutine(true);
+            fetchTasks(true);
         }
 
         dateDisplay.textContent = formatDate1(selectedDate);
@@ -268,10 +356,114 @@ $(document).ready(function () {
     // Global array to store all tasks
     let allTasks = [];
 
+
+    // Fetch routine using AJAX
+    function fetchRoutine(paramValue) {
+        $.ajax({
+            url: routine_url,
+            method: "GET",
+            data: { param: paramValue }, // Pass param value dynamically
+            dataType: "json",
+            success: function (data) {
+                // Clear existing items in the schedule list
+                $("#schedule-list").empty();
+                $("#time-slots").empty();
+
+                // Check if the response contains tasks
+                if (data !==3 && data.tasks && data.tasks.length > 0) {
+                    // Loop through the tasks and populate the schedule list
+                    allTasks = [...data.tasks];
+                    data.tasks.forEach(function (task) {
+                        // Create a task item with necessary attributes
+                        const taskItem = $("<li></li>")
+                            .addClass("task-item")
+                            .attr("draggable", "true")
+                            .attr("data-id", task.id) // Use task_id from the task
+                            .attr("data-item-type", task.is_repetitive ? "repetitive" : "onetime")
+                            .addClass(task.is_repetitive ? "repetitive" : "one-time");
+
+                        // Task Title with Icon
+                        const title = document.createElement('h4');
+                        title.className = 'task-title'; // Add a class for styling
+                        title.innerHTML = `
+                            <span class="title-icon"><i class="bi bi-card-heading"></i></span>
+                            <span class="title-text">${task.title}</span>
+                        `;
+
+                        // Task Details Container
+                        const details = document.createElement('div');
+                        details.className = 'details';
+
+                        // Duration with Icon
+                        const duration = document.createElement('span');
+                        duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+
+                        // Due Date with Icon
+                        let dueDate = null;
+                        if (task.is_repetitive) {
+                            dueDate = document.createElement('span');
+                            dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> ${task.frequency_interval === 1 ? 'Repeats everyday' : `Repeats in every ${task.frequency_interval ? task.frequency_interval : 'Undefined'} days`}`; // Icon for repetitive tasks
+                        } else {
+                            dueDate = document.createElement('span');
+                            dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> Due: ${formatDate(task.due_date)} - ${task.due_time ? formatTime(task.due_time) : 'anytime'}`; // Icon for due date
+                        }
+
+                        // Append elements to details
+                        details.appendChild(duration);
+                        details.appendChild(createSeparator());
+                        details.appendChild(dueDate);
+
+                        // Badges Container (for category and priority)
+                        const badgesContainer = document.createElement('div');
+                        badgesContainer.className = 'badges-container';
+
+                        // Category Badge with Icon
+                        const categoryBadge = document.createElement('span');
+                        categoryBadge.className = `badge category-badge`;
+                        categoryBadge.innerHTML = `<i class="bi bi-tag"></i> ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
+                        // Check if task.color exists and apply it as background color
+                        if (task.color) {
+                            categoryBadge.style.backgroundColor = task.color;
+                        }
+
+                        // Priority Badge with Icon
+                        const priorityBadge = document.createElement('span');
+                        priorityBadge.className = `badge ${getPriorityLabel(task.priority)}`;
+                        priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`; // Icon for priority
+
+                        // Append badges to the badges container
+                        badgesContainer.appendChild(categoryBadge);
+                        badgesContainer.appendChild(priorityBadge);
+                        details.appendChild(badgesContainer);
+
+                        // Append both lines to the task item
+                        taskItem.append(title);
+                        taskItem.append(details);
+
+                        // Append the task item to the schedule list
+                        $("#schedule-list").append(taskItem);
+
+                        // Attach double-click event listener to the task item
+                        taskItem.on("dblclick", function () {
+                            showTaskDetail(task.id); // Use task_id to show details
+                        });
+                    });
+                    // Call updateTimeSlots to generate time slots after adding tasks
+                    updateTimeSlots();
+                } else {
+                    showMessage('No tasks added!', 'info');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching routine:", error);
+            }
+        });
+    }
+
     // Fetch tasks using AJAX
     function fetchTasks(paramValue) {
         $.ajax({
-            url: url,
+            url: task_url,
             method: "GET",
             data: { param: paramValue }, // Pass param value dynamically
             dataType: "json",
@@ -288,7 +480,6 @@ $(document).ready(function () {
 
                 // Loop through the sorted tasks and populate the lists
                 data.forEach(function (task) {
-                    // Create a task item with necessary attributes
                     // Check if the task.id exists in the #schedule-list
                     const isTaskInScheduleList = $(`#schedule-list [data-id="${task.id}"]`).length > 0;
 
@@ -296,21 +487,75 @@ $(document).ready(function () {
                     if (isTaskInScheduleList) {
                         return; // Skip this iteration
                     }
+
+                    // Create a task item with necessary attributes
                     const taskItem = $("<li></li>")
                         .addClass("task-item")
                         .attr("draggable", "true")
                         .attr("data-id", task.id)
                         .attr("data-item-type", task.is_repetitive ? "repetitive" : "onetime")
-                        .text(task.title)
                         .addClass(task.is_repetitive ? "repetitive" : "one-time");
 
-                    // Create a priority badge with icon
-                    const priorityBadge = $("<span></span>")
-                        .addClass(`badge ${getPriorityLabel(task.priority)}`)
-                        .html(`<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`);
+                    // Task Title with Icon
+                    const title = document.createElement('h4');
+                    title.className = 'task-title'; // Add a class for styling
+                    title.innerHTML = `
+                        <span class="title-icon"><i class="bi bi-card-heading"></i></span>
+                        <span class="title-text">${task.title}</span>
+                    `;
 
-                    // Append the priority badge to the task item
-                    taskItem.append(priorityBadge);
+                    // Task Details Container
+                    const details = document.createElement('div');
+                    details.className = 'details';
+
+                    // Duration with Icon
+                    const duration = document.createElement('span');
+                    duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+
+                    // Due Date with Icon
+                    let dueDate = null;
+                    if (task.is_repetitive) {
+                        dueDate = document.createElement('span');
+                        dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> ${task.frequency_interval === 1 ? 'Repeats everyday' : `Repeats in every ${task.frequency_interval ? task.frequency_interval : 'Undefined'} days`}`; // Icon for repetitive tasks
+                    } else {
+                        dueDate = document.createElement('span');
+                        dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> Due: ${formatDate(task.due_date)} - ${task.due_time ? formatTime(task.due_time) : 'anytime'}`; // Icon for due date
+                    }
+
+                    // Append elements to details
+                    details.appendChild(duration);
+                    details.appendChild(createSeparator());
+                    details.appendChild(dueDate);
+
+                    // Badges Container (for category and priority)
+                    const badgesContainer = document.createElement('div');
+                    badgesContainer.className = 'badges-container';
+
+                    // Category Badge with Icon
+                    const categoryBadge = document.createElement('span');
+                    categoryBadge.className = `badge category-badge`;
+                    categoryBadge.innerHTML = `<i class="bi bi-tag"></i> ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
+                    // Check if task.color exists and apply it as background color
+                    if (task.color) {
+                        categoryBadge.style.backgroundColor = task.color;
+                    }
+
+
+                    // Priority Badge with Icon
+                    const priorityBadge = document.createElement('span');
+                    priorityBadge.className = `badge ${getPriorityLabel(task.priority)}`;
+                    priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`; // Icon for priority
+
+                    // Append badges to the badges container
+                    badgesContainer.appendChild(categoryBadge);
+                    badgesContainer.appendChild(priorityBadge);
+
+                    details.appendChild(badgesContainer);
+
+                    // Append both lines to the task item
+                    taskItem.append(title);
+                    taskItem.append(details);
+                    // taskItem.append(badgesContainer); // Add badges container to the bottom-right
 
                     // Append to the appropriate list based on is_repetitive
                     if (task.is_repetitive) {
@@ -357,15 +602,20 @@ $(document).ready(function () {
         // Prepare tasks data
         const tasks = Array.from(scheduleListItems).map(item => {
             const taskId = parseInt(item.getAttribute('data-id'));
-            const task = allTasks.find(t => t.id === taskId); // Use .id instead of task_id
+            const task = allTasks.find(t => t.id === taskId); 
             if (task) {
                 return {
                     start_time: task.start_time,
                     duration: task.duration,
-                    task_id: task.id, // Use .id instead of task_id
+                    id: task.id, 
                     title: task.title,
                     category: task.category,
                     priority: task.priority,
+                    is_repetitive: task.is_repetitive,
+                    frequency_interval: task.frequency_interval,
+                    due_date: task.due_date,
+                    due_time: task.due_time,
+                    color: task.color,
                 };
             } else {
                 console.error(`Task with ID ${taskId} not found in allTasks.`);
@@ -375,11 +625,9 @@ $(document).ready(function () {
 
         // Check if there are valid tasks to save
         if (tasks.length === 0) {
-            console.warn("No valid tasks found to save.");
-            alert("No valid tasks found to save."); // Provide user feedback
+            showMessage('No tasks to save', 'error');
             return;
         }
-        console.log(tasks);
 
         // Send data to the backend
         const post_url = "{% url 'routine_save' %}";
@@ -450,7 +698,7 @@ $(document).ready(function () {
 
     function formatDuration(minutes) {
       if (minutes === null || minutes === undefined) {
-        return "Duration: N/A"; // Handle cases where duration is not available
+        return "N/A"; // Handle cases where duration is not available
       }
 
       const hours = Math.floor(minutes / 60);
@@ -459,9 +707,9 @@ $(document).ready(function () {
       const formattedHours = String(hours).padStart(2, '0');
       const formattedMinutes = String(remainingMinutes).padStart(2, '0');
       if (formattedHours === `00`) {
-        return `Duration: ${formattedMinutes} Minutes`;
+        return `${formattedMinutes} Minutes`;
       } else {
-        return `Duration: ${formattedHours} hr ${formattedMinutes} min`;
+        return `${formattedHours} hr ${formattedMinutes} min`;
       }
 
     }
@@ -609,158 +857,154 @@ $(document).ready(function () {
       taskDetailContainer.style.display = 'none';
     }
 
+    const dropzones = document.querySelectorAll(".task-list");
 
+    dropzones.forEach(zone => {
+        zone.addEventListener("dragover", function (event) {
+            event.preventDefault();
+            const dragging = document.querySelector(".dragging");
+            if (!dragging) return; // Prevent errors if no item is being dragged
 
+            const draggingType = dragging.dataset.itemType;
+            const destinationType = zone.dataset.type;
 
-    (function () {
-        const dropzones = document.querySelectorAll(".task-list");
-
-        dropzones.forEach(zone => {
-            zone.addEventListener("dragover", function (event) {
-                event.preventDefault();
-                const dragging = document.querySelector(".dragging");
-                if (!dragging) return; // Prevent errors if no item is being dragged
-
-                const draggingType = dragging.dataset.itemType;
-                const destinationType = zone.dataset.type;
-
-                // Allow dropping only if:
-                // 1. The destination is the schedule list, or
-                // 2. The destination matches the item's type (onetime or repetitive)
-                if (destinationType === "schedule" || destinationType === draggingType) {
-                    const afterElement = getDragAfterElement(zone, event.clientY);
-                    if (afterElement == null) {
-                        zone.appendChild(dragging);
-                    } else {
-                        zone.insertBefore(dragging, afterElement);
-                    }
+            // Allow dropping only if:
+            // 1. The destination is the schedule list, or
+            // 2. The destination matches the item's type (onetime or repetitive)
+            if (destinationType === "schedule" || destinationType === draggingType) {
+                const afterElement = getDragAfterElement(zone, event.clientY);
+                if (afterElement == null) {
+                    zone.appendChild(dragging);
                 } else {
-                zone.classList.add("border-danger"); // Add red border for invalid drop
-            }
-            });
-
-            zone.addEventListener("drop", function (event) {
-                event.preventDefault();
-                const dragging = document.querySelector(".dragging");
-                if (dragging) {
-                    dragging.classList.remove("dragging");
-                    dragging.style.opacity = "1"; // Smoothly show the item again
-                    zone.classList.remove("border-danger");
-
-                    if (zone.id === "schedule-list") {
-                        updateTimeSlots(); // Update time slots when dropped into schedule
-                    } else if (zone.id === "one-time-tasks" || zone.id === "repetitive-tasks") {
-                        updateTimeSlots(); // Update time slots when removed from schedule
-                    }
+                    zone.insertBefore(dragging, afterElement);
                 }
-            });
+            } else {
+            zone.classList.add("border-danger"); // Add red border for invalid drop
+        }
+        });
 
-            zone.addEventListener("dragleave", function () {
-                zone.classList.remove("over");
+        zone.addEventListener("drop", function (event) {
+            event.preventDefault();
+            const dragging = document.querySelector(".dragging");
+            if (dragging) {
+                dragging.classList.remove("dragging");
+                dragging.style.opacity = "1"; // Smoothly show the item again
                 zone.classList.remove("border-danger");
-            });
+
+                if (zone.id === "schedule-list") {
+                    updateTimeSlots(); // Update time slots when dropped into schedule
+                } else if (zone.id === "one-time-tasks" || zone.id === "repetitive-tasks") {
+                    updateTimeSlots(); // Update time slots when removed from schedule
+                }
+            }
         });
 
-        // Function to make an element draggable
-        function makeDraggable(task) {
-            task.setAttribute("draggable", "true");
+        zone.addEventListener("dragleave", function () {
+            zone.classList.remove("over");
+            zone.classList.remove("border-danger");
+        });
+    });
 
-            task.addEventListener("dragstart", function (event) {
-                event.dataTransfer.setData("text/plain", event.target.dataset.id);
-                event.target.classList.add("dragging");
-                setTimeout(() => {
-                    event.target.style.opacity = "0"; // Hide smoothly on drag
-                }, 0);
-            });
+    // Function to make an element draggable
+    function makeDraggable(task) {
+        task.setAttribute("draggable", "true");
 
-            task.addEventListener("dragend", function (event) {
-                event.target.classList.remove("dragging");
-                event.target.style.opacity = "1"; // Fade back in on drop
-            });
-        }
-
-        // Function to get the correct insertion point in the list
-        function getDragAfterElement(zone, y) {
-            const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
-
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - (box.top + box.height / 2);
-                return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
-
-        // Attach draggable functionality to existing task items
-        document.querySelectorAll(".task-item").forEach(makeDraggable);
-
-        // Observe dynamically added tasks
-        const observer = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === 1 && node.classList.contains("task-item")) {
-                        makeDraggable(node); // Make newly added tasks draggable
-                    }
-                });
-            });
+        task.addEventListener("dragstart", function (event) {
+            event.dataTransfer.setData("text/plain", event.target.dataset.id);
+            event.target.classList.add("dragging");
+            setTimeout(() => {
+                event.target.style.opacity = "0"; // Hide smoothly on drag
+            }, 0);
         });
 
-        // Start observing changes in the task lists
-        dropzones.forEach(zone => {
-            observer.observe(zone, { childList: true });
+        task.addEventListener("dragend", function (event) {
+            event.target.classList.remove("dragging");
+            event.target.style.opacity = "1"; // Fade back in on drop
         });
+    }
 
-        // Function to calculate and update time slots
-        function updateTimeSlots() {
-            const scheduleList = document.getElementById("schedule-list");
-            const timeSlotsContainer = document.getElementById("time-slots");
-            timeSlotsContainer.innerHTML = ""; // Clear existing time slots
+    // Function to get the correct insertion point in the list
+    function getDragAfterElement(zone, y) {
+        const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
 
-            let currentTime = new Date();
-            currentTime.setHours(6, 0, 0, 0); // Start from 6:00 AM
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - (box.top + box.height / 2);
+            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
 
-            scheduleList.querySelectorAll(".task-item").forEach(taskItem => {
-                const taskId = taskItem.dataset.id;
-                const taskData = getTaskDataById(taskId); // Function to fetch task data
+    // Attach draggable functionality to existing task items
+    document.querySelectorAll(".task-item").forEach(makeDraggable);
 
-                if (taskData) {
-                    const durationMinutes = taskData.duration; // Assuming duration is in minutes
-                    const endTime = new Date(currentTime.getTime() + durationMinutes * 60000);
-
-                    const startTimeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    // Add start_time to the task in allTasks array
-                    const taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
-                    if (taskIndex !== -1) {
-                        allTasks[taskIndex].start_time = startTimeString; // Add start_time to the task
-                        console.log(allTasks[taskIndex].start_time);
-                    }
-
-                    const timeSlotDiv = document.createElement("div");
-                    timeSlotDiv.classList.add("time-slot");
-
-                    const startTimeSpan = document.createElement("span");
-                    startTimeSpan.textContent = startTimeString;
-
-                    const endTimeSpan = document.createElement("span");
-                    endTimeSpan.textContent = endTimeString;
-
-                    timeSlotDiv.appendChild(startTimeSpan);
-                    timeSlotDiv.appendChild(endTimeSpan);
-
-                    timeSlotsContainer.appendChild(timeSlotDiv);
-
-                    currentTime = endTime; // Update current time for the next task
+    // Observe dynamically added tasks
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1 && node.classList.contains("task-item")) {
+                    makeDraggable(node); // Make newly added tasks draggable
                 }
             });
-        }
+        });
+    });
 
-        // Function to fetch task data by ID (now using the global array)
-        function getTaskDataById(taskId) {
-            return allTasks.find(task => task.id === parseInt(taskId));
-        }
+    // Start observing changes in the task lists
+    dropzones.forEach(zone => {
+        observer.observe(zone, { childList: true });
+    });
 
-    })();
+    // Function to calculate and update time slots
+    function updateTimeSlots() {
+        const scheduleList = document.getElementById("schedule-list");
+        const timeSlotsContainer = document.getElementById("time-slots");
+        timeSlotsContainer.innerHTML = ""; // Clear existing time slots
+
+        let currentTime = new Date();
+        currentTime.setHours(6, 0, 0, 0); // Start from 6:00 AM
+
+        scheduleList.querySelectorAll(".task-item").forEach(taskItem => {
+            const taskId = taskItem.dataset.id;
+            const taskData = getTaskDataById(taskId); // Function to fetch task data
+            if (taskData) {
+                // Get computed height of the corresponding task-item
+                const taskHeight = taskItem.getBoundingClientRect().height;
+
+                const durationMinutes = taskData.duration; // Assuming duration is in minutes
+                const endTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+
+                const startTimeString = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const endTimeString = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                // Add start_time to the task in allTasks array
+                const taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
+                if (taskIndex !== -1) {
+                    allTasks[taskIndex].start_time = startTimeString; // Add start_time to the task
+                }
+
+                const timeSlotDiv = document.createElement("div");
+                timeSlotDiv.classList.add("time-slot");
+                timeSlotDiv.style.height = `${taskHeight+4}px`;
+
+                const startTimeSpan = document.createElement("span");
+                startTimeSpan.textContent = startTimeString;
+
+                const endTimeSpan = document.createElement("span");
+                endTimeSpan.textContent = endTimeString;
+
+                timeSlotDiv.appendChild(startTimeSpan);
+                timeSlotDiv.appendChild(endTimeSpan);
+
+                timeSlotsContainer.appendChild(timeSlotDiv);
+
+                currentTime = endTime; // Update current time for the next task
+            }
+        });
+    }
+
+    // Function to fetch task data by ID (now using the global array)
+    function getTaskDataById(taskId) {
+        return allTasks.find(task => task.id === parseInt(taskId));
+    }
 });
 
 </script>

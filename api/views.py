@@ -7,6 +7,7 @@ from routines.models import Routine
 from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class SchedulerTasksView(generics.ListAPIView):
@@ -119,3 +120,34 @@ class RoutineCreateUpdateView(generics.CreateAPIView):
             {"message": "Routine saved successfully!", "routine": response.data},
             status=status.HTTP_201_CREATED
         )
+    
+
+class RoutineDetailView(APIView):
+    serializer_class = RoutineSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        # Get the user from the request (or from the URL parameter)
+        user = request.user  # Assuming the user is authenticated
+        param = request.GET.get('param', 'true')  # Get param as a string
+        
+        # Determine the target date based on the 'param' value
+        if param == 'true':
+            target_date = timezone.now().date()  # Today's date
+        elif param == 'false':
+            target_date = timezone.now().date() + timezone.timedelta(days=1)  # Tomorrow's date
+        else:
+            # Handle invalid 'param' values
+            raise ValueError("Invalid 'param' value. It must be 'true' or 'false'.")
+        
+        # Fetch the routine for the user and target date
+        routine = Routine.objects.filter(user=user, for_date=target_date).first()
+
+        # Return serialized routine if found, otherwise return null
+        if routine:
+            serializer = RoutineSerializer(routine)
+            return Response(serializer.data, status=200)
+        else:
+            return Response(3, status=200)  # Return null in JSON format
+
+

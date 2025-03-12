@@ -81,8 +81,8 @@ class RoutineSerializer(serializers.ModelSerializer):
         Validate the 'tasks' field to ensure it contains the required structure.
         """
         for task in value:
-            if not all(key in task for key in ['start_time', 'duration', 'task_id', 'title', 'category', 'priority']):
-                raise serializers.ValidationError("Each task must contain 'start_time', 'duration', 'task_id', 'title', 'category', and 'priority'.")
+            if not all(key in task for key in ['start_time', 'duration', 'id', 'title', 'category', 'priority','is_repetitive','frequency_interval', 'due_date', 'due_time', 'color']):
+                raise serializers.ValidationError("Each task must contain 'start_time', 'duration', 'id', 'title', 'frequency_interval', 'due_date', 'due_time', 'color', 'category', and 'priority'.")
         return value
 
     def create(self, validated_data):
