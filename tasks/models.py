@@ -85,20 +85,21 @@ class TaskCategory(models.Model):
 
         return [
             {
-                'id': cat.category.id if cat.category else cat.id,
+                'id': cat.id,
                 'title': cat.category.title if cat.category else cat.custom_title,
                 'color': getattr(cat.category, 'color', cat.custom_color or '#FFFFFF'),
             }
             for cat in categories if not cat.is_removed
         ]
-        
+
+
 
 class Task(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
-    category = models.ForeignKey("TaskCategory", on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(TaskCategory, on_delete=models.SET_NULL, blank=True, null=True)
     task_merit = models.IntegerField(blank=True, null=True)  # Merit score for the task
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
@@ -110,6 +111,7 @@ class Task(models.Model):
     frequency_interval = models.IntegerField(blank=True, null=True)  # Interval in days (e.g., 7 for weekly, 30 for monthly)
     notification_days = models.IntegerField(default=1)  # Days before the due date to notify the user
     is_active = models.BooleanField(default=True)  # Active status for scheduling
+    in_routine = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -156,7 +158,7 @@ class Task(models.Model):
         # Fetch all tasks for the user that are active
         tasks = Task.objects.filter(
             user=user,
-            is_active=True
+            is_active=True,
         )
         
         filtered_tasks = []
@@ -165,7 +167,7 @@ class Task(models.Model):
                 filtered_tasks.append(task)
             else:
                 days_until_due = (task.due_date - date).days
-                if 0 <= days_until_due <= task.notification_days:
+                if 0 <= days_until_due <= task.notification_days and not task.in_routine:
                     filtered_tasks.append(task)
         return filtered_tasks
     

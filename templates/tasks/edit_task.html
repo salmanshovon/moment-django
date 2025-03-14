@@ -435,6 +435,7 @@
                             <div class="form-group">
                                 <label for="category">Category</label>
                                 <select id="category" name="category" class="form-control">
+                                    <option value="">Select a category</option>
                                     {% if categories %}
                                         {% for category in categories %}
                                             <option value="{{ category.id }}" {% if task.category_id == category.id %}selected{% endif %}>

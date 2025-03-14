@@ -71,6 +71,7 @@ class UserSettingsSerializer(serializers.ModelSerializer):
         fields = ['sort']
 
 class RoutineSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Routine
         fields = ['id', 'user', 'for_date', 'tasks', 'created_at', 'updated_at']
@@ -87,26 +88,49 @@ class RoutineSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Create a new Routine instance if one does not exist for the given for_date.
+        Create a new Routine instance and update the `in_routine` field of tasks to True.
         """
         user = self.context['request'].user
         for_date = validated_data['for_date']
+        tasks_data = validated_data['tasks']
 
         # Check if a routine already exists for the given date and user
         routine, created = Routine.objects.get_or_create(
             user=user,
             for_date=for_date,
-            defaults={
-                'tasks': validated_data['tasks'],
-                'created_at': timezone.now(),
-                'updated_at': timezone.now(),
-            }
+            defaults={'tasks': tasks_data, 'created_at': timezone.now(), 'updated_at': timezone.now()}
         )
 
-        # If the routine already exists, update it
-        if not created:
-            routine.tasks = validated_data['tasks']
-            routine.updated_at = timezone.now()
-            routine.save()
+        if created:
+            # If the routine is newly created, update the in_routine field for tasks
+            task_ids = [task['id'] for task in tasks_data]
+            Task.objects.filter(id__in=task_ids).update(in_routine=True)
+            return routine
+        else:
+            # If routine already exists, call update method
+            return self.update(routine, validated_data)
 
-        return routine
+    
+    def update(self, instance, validated_data):
+        """
+        Update the Routine instance and handle the `in_routine` field of tasks.
+        """
+        old_task_ids = [task['id'] for task in instance.tasks]  # IDs of tasks currently in the routine
+        new_task_ids = [task['id'] for task in validated_data['tasks']]  # IDs of tasks in the updated routine
+
+        # Update the routine instance
+        instance.tasks = validated_data['tasks']
+        instance.updated_at = timezone.now()
+        instance.save()
+
+        # Update the `in_routine` field for tasks that are no longer in the routine
+        tasks_to_remove = set(old_task_ids) - set(new_task_ids)
+        if tasks_to_remove:
+            Task.objects.filter(id__in=tasks_to_remove).update(in_routine=False)
+
+        # Update the `in_routine` field for tasks that are newly added to the routine
+        tasks_to_add = set(new_task_ids) - set(old_task_ids)
+        if tasks_to_add:
+            Task.objects.filter(id__in=tasks_to_add).update(in_routine=True)
+
+        return instance
