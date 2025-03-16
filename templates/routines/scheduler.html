@@ -37,6 +37,10 @@
         border-radius: 8px;
     }
 
+    #repetitive-tasks, #one-time-tasks {
+        overflow-y: auto;
+    }
+
     #misc-tasks {
         min-height: 80px; /* Or any smaller height you prefer */
         display: flex; /* Enable flexbox for the list */
@@ -180,7 +184,7 @@
 
     .tasks {
         min-height: 500px;
-        overflow-y: auto;
+        /* overflow-y: auto; */
         min-width: 300px;
         overflow-x: hidden;
         /* height: calc(100vh - 40px); */
@@ -195,7 +199,7 @@
     .container-x {
         height: calc(100dvh - 100px);
         min-width: 900px;
-        overflow-x: auto;
+        /* overflow-x: auto; */
     }
 
     .schedule .dropzone{
@@ -347,16 +351,25 @@ $(document).ready(function () {
         const dateDisplay = document.getElementById('selectedDateDisplay');
         let selectedDate = new Date();
 
+        // Using the functions in sequence
         if (dateSelector.value === "tomorrow") {
             selectedDate.setDate(selectedDate.getDate() + 1);
             day = false;
-            fetchRoutine(day);
-            fetchTasks(day);
+
+            // Fetch routine first, then fetch tasks
+            fetchRoutine(day, function () {
+                fetchTasks(day);
+            });
+
             unsavedChanges = false;
         } else {
             day = true;
-            fetchRoutine(day);
-            fetchTasks(day);
+
+            // Fetch routine first, then fetch tasks
+            fetchRoutine(day, function () {
+                fetchTasks(day);
+            });
+
             unsavedChanges = false;
         }
 
@@ -489,7 +502,7 @@ $(document).ready(function () {
     }
 
     // Fetch routine using AJAX
-    function fetchRoutine(paramValue) {
+    function fetchRoutine(paramValue, callback) {
         $.ajax({
             url: routine_url,
             method: "GET",
@@ -502,7 +515,7 @@ $(document).ready(function () {
                 allTskRtn = [];
 
                 // Check if the response contains tasks
-                if (data !==3 && data.tasks && data.tasks.length > 0) {
+                if (data !== 3 && data.tasks && data.tasks.length > 0) {
                     // Loop through the tasks and populate the schedule list
                     allTskRtn = [...data.tasks];
                     routine_date = data.updated_at;
@@ -521,6 +534,11 @@ $(document).ready(function () {
                     updateTimeSlots();
                 } else {
                     showMessage('No tasks added!', 'info');
+                }
+
+                // Invoke the callback function after `fetchRoutine` completes
+                if (callback) {
+                    callback();
                 }
             },
             error: function (xhr, status, error) {
