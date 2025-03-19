@@ -123,13 +123,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 # TIMEZONE
 TIME_ZONE = 'Asia/Dhaka'
 USE_TZ = True
+
+GEOIP_PATH = os.path.join(BASE_DIR, "geoip") # Path to the GeoIP database directory
 
 
 # Static files (CSS, JavaScript, Images)

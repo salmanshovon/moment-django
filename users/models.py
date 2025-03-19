@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.dispatch import receiver
 from allauth.socialaccount.signals import social_account_added
 from django.db.models.signals import post_save
+from .utils import get_timezone_from_ip
+from allauth.account.signals import user_logged_in
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -18,6 +20,7 @@ class Profile(models.Model):
     occupation = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    user_timezone = models.CharField(max_length=50, default="Asia/Dhaka")
 
     def __str__(self):
         return self.user.username
@@ -49,3 +52,15 @@ def create_superuser_profile(sender, instance, created, **kwargs):
 def create_user_settings(sender, instance, created, **kwargs):
     if created and not instance.is_superuser:
         UserSettings.objects.get_or_create(user=instance)
+
+
+@receiver(user_logged_in)
+def update_timezone_on_login(sender, request, user, **kwargs):
+    # Check if the user has a profile
+    if hasattr(user, 'profile'):
+        # Get the user's timezone from IP
+        user_timezone = get_timezone_from_ip(request) or "UTC"  # Default to UTC if not found
+        
+        # Update the user's timezone in their profile
+        user.profile.user_timezone = user_timezone
+        user.profile.save()

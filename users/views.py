@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 from django.contrib import messages
 import json
-from .utils import send_email_otp, verify_otp, update_password
+from .utils import send_email_otp, verify_otp, update_password, get_timezone_from_ip
 from .models import Profile
 
 def not_authenticated(user):

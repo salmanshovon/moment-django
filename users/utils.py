@@ -2,6 +2,8 @@ import random
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.gis.geoip2 import GeoIP2
+from ipware import get_client_ip
 
 
 def generate_otp(user):
@@ -124,5 +126,20 @@ def update_password(user, password):
     user.save()
     return True
 
-# @csrf_exempt
+
+def get_timezone_from_ip(request):
+    """
+    Get user's timezone from their IP address using GeoIP2.
+    """
+    ip, is_routable = get_client_ip(request)  # Extract user IP
+    if ip is None:
+        return None  # No IP found
+
+    try:
+        geo = GeoIP2()
+        timezone = geo.city(ip).get("time_zone")
+        return timezone
+    except Exception:
+        return None  # GeoIP lookup failed
+
 
