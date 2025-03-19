@@ -27,4 +27,4 @@ Pipfile.lock
 
 # OS
 .DS_Store
-.mmdb
+*.mmdb

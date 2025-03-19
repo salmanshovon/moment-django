@@ -46,6 +46,12 @@ class SignInView(LoginView):
                 user = authenticate(request, username=username, password=password)
 
                 if user is not None:
+                    # Get user's timezone from IP
+                    user_timezone = get_timezone_from_ip(request) or "UTC"  # Default to UTC if not found
+                    
+                    # Update user's timezone in their profile
+                    user.profile.user_timezone = user_timezone
+                    user.profile.save()
                     login(request, user)
                     return JsonResponse({"success": True,"redirect_url": str(self.success_url)})
             else:
