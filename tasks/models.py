@@ -4,7 +4,8 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import timedelta
-from django.db.models import F, ExpressionWrapper, IntegerField
+from users.models import Profile
+import pytz
 
 PRIORITY_CHOICES = [
     (1, "Low"),
@@ -150,10 +151,13 @@ class Task(models.Model):
 
     @staticmethod
     def get_user_tasks(user, param):
+        # Get user's timezone or fallback to UTC
+        profile = Profile.objects.get(user=user)
+        user_tz = pytz.timezone(profile.user_timezone) if profile.user_timezone else pytz.UTC
         if param:
-            date = timezone.localdate()
+            date = timezone.localtime(timezone.now(), user_tz).date()  # Today's date in user's timezone
         else:
-            date = timezone.localdate() + timedelta(days=1)  # Tomorrow's date
+            date = timezone.localtime(timezone.now(), user_tz).date() + timedelta(days=1)  # Tomorrow's date
         
         # Fetch all tasks for the user that are active
         tasks = Task.objects.filter(
@@ -170,7 +174,33 @@ class Task(models.Model):
                 if 0 <= days_until_due <= task.notification_days and not task.in_routine:
                     filtered_tasks.append(task)
         return filtered_tasks
-    
+
+
+class ArchivedTask(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)  # Use the same choices as Task
+    category = models.ForeignKey(TaskCategory, on_delete=models.SET_NULL, blank=True, null=True)
+    task_merit = models.IntegerField(blank=True, null=True)  # Merit score for the task
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    duration = models.IntegerField(default=20)  # Default duration of a task is 20 minutes
+    due_date = models.DateField()  # Due date for the task
+    due_time = models.TimeField(blank=True, null=True)  # Time field for one-time tasks
+    is_repetitive = models.BooleanField(default=False)  # True for repetitive, False for one-time
+    frequency_interval = models.IntegerField(blank=True, null=True)  # Interval in days
+    notification_days = models.IntegerField(default=1)  # Days before the due date to notify the user
+    is_active = models.BooleanField(default=False)  # Archived tasks are inactive by default
+    in_routine = models.BooleanField(default=False)
+    archived_at = models.DateTimeField(default=timezone.now)  # Timestamp when the task was archived
+
+    def __str__(self):
+        return f"Archived Task: {self.title} (User: {self.user.username})"
+
+    class Meta:
+        verbose_name = "Archived Task"
+        verbose_name_plural = "Archived Tasks"
 
 
 @receiver(post_save, sender=User)
