@@ -54,6 +54,7 @@ def create_user_settings(sender, instance, created, **kwargs):
         UserSettings.objects.get_or_create(user=instance)
 
 
+#Following signal only works for social login
 @receiver(user_logged_in)
 def update_timezone_on_login(sender, request, user, **kwargs):
     # Check if the user has a profile

@@ -486,24 +486,26 @@
                 // Add the calculated duration in minutes
                 formData.push({ name: 'duration', value: totalDurationMinutes });
 
-                // Check if x is 30 and add due_time to formData
+                // Check if x is 30(means one-time selected) and add due_time to formData
                 if (x === 30) {
                     formData.push({ name: 'due_time', value: oneTime24HrString });
-                } else if(dueDate === ""){
-                    // Push tomorrows's date as 'due_date' in YYYY-MM-DD format
-                    formData.push({
-                        name: 'due_date',
-                        value: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
-                    });
+                } else {
+                    if(dueDate === ""){
+                        // Push tomorrows's date as 'due_date' in YYYY-MM-DD format
+                        formData.push({
+                            name: 'due_date',
+                            value: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
+                        });
+                    } else {
+                        formData.push({
+                            name: 'due_date', value: dueDate
+                        });
+                    }
                     formData.push({
                         name: 'notification_days',
                         value: notice_day
                     })
-                } else {
-                    formData.push({
-                        name: 'due_date', value: dueDate
-                    })
-                }
+                } 
 
                 // Submit the form via AJAX
                 $.ajax({
