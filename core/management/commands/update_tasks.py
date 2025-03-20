@@ -8,7 +8,7 @@ from tasks.models import Task, ArchivedTask
 from users.models import Profile
 from routines.models import Notification
 
-BATCH_SIZE = 1000  # Define the batch size
+BATCH_SIZE = 1000
 
 class Command(BaseCommand):
     help = "Update due dates for overdue repetitive tasks, archive past non-repetitive tasks, and remove old notifications based on user's timezone"
@@ -41,11 +41,19 @@ class Command(BaseCommand):
                 user_yesterday = user_now - timedelta(days=1)
 
                 # Delete notifications older than 36 hours in batches
-                deleted_notifications = Notification.objects.filter(
-                    user=user,
-                    date_time__lt=user_36_hours_ago
-                )[:BATCH_SIZE].delete()
-                deleted_notifications_count += deleted_notifications[0]  # Count deleted notifications
+                while True:
+                    # Fetch IDs of notifications to delete
+                    notification_ids = Notification.objects.filter(
+                        user=user,
+                        date_time__lt=user_36_hours_ago
+                    ).values_list('id', flat=True)[:BATCH_SIZE]
+
+                    if not notification_ids:
+                        break  # Exit the loop if no more notifications to delete
+
+                    # Delete the notifications in the current batch
+                    deleted_count, _ = Notification.objects.filter(id__in=notification_ids).delete()
+                    deleted_notifications_count += deleted_count
 
                 for task in tasks:
                     if task.is_repetitive:
