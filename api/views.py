@@ -4,7 +4,7 @@ from django.db.models import Q
 from rest_framework.response import Response
 from tasks.models import Task
 from routines.models import Routine, Notification
-from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer
+from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -158,3 +158,29 @@ class NotificationsView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Notification.get_user_notifications(user)
+
+class NotificationUpdateView(generics.GenericAPIView):
+    serializer_class = NotificationUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, *args, **kwargs):
+        print(self.request.data)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        notification_ids = serializer.validated_data['notification_ids']
+        is_read = serializer.validated_data.get('is_read')
+        is_generated = serializer.validated_data.get('is_generated')
+
+        notifications = Notification.objects.filter(id__in=notification_ids)
+
+        if notifications.count() != len(notification_ids):
+            return Response({"error": "One or more notification IDs not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        for notification in notifications:
+            if is_read is not None:
+                notification.is_read = is_read
+            if is_generated is not None:
+                notification.is_generated = is_generated
+            notification.save()
+
+        return Response({"message": "Notifications updated successfully."}, status=status.HTTP_200_OK)

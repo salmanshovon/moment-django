@@ -162,3 +162,21 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ['id', 'task', 'title', 'message', 'date_time', 'is_generated', 'is_read', 'notification_type', 'created_at', 'updated_at']
+
+class NotificationUpdateSerializer(serializers.Serializer):
+    notification_ids = serializers.ListField(child=serializers.IntegerField())
+    is_read = serializers.BooleanField(required=False)
+    is_generated = serializers.BooleanField(required=False)
+
+    def validate(self, data):
+        notification_ids = data.get('notification_ids', [])
+        is_read = data.get('is_read')
+        is_generated = data.get('is_generated')
+
+        if not notification_ids:
+            raise serializers.ValidationError("notification_ids are required.")
+
+        if is_read is None and is_generated is None:
+            raise serializers.ValidationError("Either is_read or is_generated must be provided.")
+
+        return data

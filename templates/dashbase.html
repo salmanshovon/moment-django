@@ -23,6 +23,12 @@
     padding: 5px 0;
 }
 
+.notification-scroll {
+    max-height: 250px; /* Adjust based on your preference */
+    overflow-y: auto;
+}
+
+
 
         /* Loading Screen Styles */
         #loading-screen {
@@ -755,11 +761,71 @@ body.dark-theme .spinner {
             }
         }
     
-        // Example usage:
-        // updateNotificationCount(1); // Hide the badge
-        updateNotificationCount(3); // Show the badge with count 3
-    
-        // You would typically call this function whenever the notification count changes.
+        document.addEventListener("DOMContentLoaded", function() {
+            const notificationBtn = document.getElementById("notificationDropdown");
+
+            notificationBtn.addEventListener("click", function(event) {
+                const ids = getNonGeneratedNotificationIds();
+                updateNotifications(ids);
+                fetchNotifications();
+                // showMessage('-----');
+
+            });
+        });
+
+        function getNonGeneratedNotificationIds() {
+            const notifications = document.querySelectorAll('.dropdown-menu li[data-gen="false"]');
+            const notificationIds = [];
+
+            notifications.forEach(notification => {
+                const notificationId = notification.getAttribute('data-id');
+                if (notificationId) {
+                    notificationIds.push(notificationId);
+                }
+            });
+
+            return notificationIds;
+        }
+
+        // Example function to update notifications
+        async function updateNotifications(notificationIds) {
+            const url = '{% url 'update_notification' %}'; // Replace with your actual endpoint URL
+            csrftoken = getCSRFToken();
+            const payload = {
+                notification_ids: notificationIds,
+                is_generated: true, // Set is_generated to true
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                        // 'Authorization': `Bearer ${yourAuthToken}`, // Include authentication token if required
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log(result.message); // "Notifications updated successfully."
+            } catch (error) {
+                console.error('Error updating notifications:', error);
+            }
+        }
+
+        function getCSRFToken() {
+            return document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+        }
+
+
     </script>
 
 
@@ -866,24 +932,7 @@ body.dark-theme .spinner {
             }
         });
 
-        // Script for drop down menu of the profile button on navbar
-        document.addEventListener("DOMContentLoaded", function() {
-            const profilePic = document.getElementById("profile-pic");
-            const profileDropdown = document.getElementById("profileDropdown");
-        
-            profilePic.addEventListener("click", function(event) {
-                event.stopPropagation(); // Prevent click from bubbling up to document
-        
-                profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
-            });
-        
-            // Close the dropdown if the user clicks anywhere else on the document
-            document.addEventListener("click", function(event) {
-                if (!profileDropdown.contains(event.target)) { // Check if click is outside the dropdown
-                    profileDropdown.style.display = "none";
-                }
-            });
-        });
+
 
         // Prevent closing the sidebar when clicking inside it
         $("#sidebar").click(function (e) {
@@ -974,7 +1023,11 @@ body.dark-theme .spinner {
                 <p class="fw-bold mb-0">Notifications</p>
             </li>
             <li><hr class="dropdown-divider"></li>
+            <div class="notification-scroll"> <!-- Scrollable container -->
+            </div>
         `;
+
+        const notificationScrollContainer = notificationDropdown.querySelector('.notification-scroll');
 
         const currentDate = new Date();
         let pastNotificationsCount = 0; // Counter for past notifications
@@ -996,8 +1049,8 @@ body.dark-theme .spinner {
                 // Generate HTML for each notification using the second function
                 const notificationItem = generateNotificationHTML(notification);
 
-                // Append the generated HTML to the dropdown
-                notificationDropdown.insertAdjacentHTML('beforeend', notificationItem);
+                // Append the generated HTML to the scrollable container
+                notificationScrollContainer.insertAdjacentHTML('beforeend', notificationItem);
 
                 // Increment the counter if the notification is not already generated
                 if (!notification.is_generated) {
@@ -1074,14 +1127,14 @@ body.dark-theme .spinner {
 
         // Generate the HTML for the notification item
         const notificationHTML = `
-        <li class="px-3 py-2">
+        <li class="px-3 py-2" data-id="${notification.id}" data-gen="${notification.is_generated}" data-read="${notification.is_read}">
             <div class="notification-item">
-            <div class="d-flex align-items-center mb-1">
-                <i class="${iconClass} me-2"></i>
-                <p class="mb-0 fw-bold">${notification.title}</p>
-            </div>
-            <small class="text-muted">${notification.message}</small>
-            <small class="text-muted d-block">${notiDateTime(notification.date_time)}</small>
+                <div class="d-flex align-items-center mb-1">
+                    <i class="${iconClass} me-2"></i>
+                    <p class="mb-0 fw-bold">${notification.title}</p>
+                </div>
+                <small class="text-muted">${notification.message}</small>
+                <small class="text-muted d-block">${notiDateTime(notification.date_time)}</small>
             </div>
         </li>
         <li><hr class="dropdown-divider"></li>
