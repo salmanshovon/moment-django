@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
 from tasks.models import Task
-from routines.models import Routine
-from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer
+from routines.models import Routine, Notification
+from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -151,3 +151,10 @@ class RoutineDetailView(APIView):
             return Response(3, status=200)  # Return null in JSON format
 
 
+class NotificationsView(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Notification.get_user_notifications(user)

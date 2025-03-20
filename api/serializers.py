@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from tasks.models import Task
-from routines.models import Routine
+from routines.models import Routine, Notification
 from django.utils import timezone
 from users.models import UserSettings
+
 
 class TaskDetails(serializers.ModelSerializer):
 
@@ -108,14 +109,15 @@ class RoutineSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         for_date = validated_data['for_date']
         tasks_data = validated_data['tasks']
+        current_time = timezone.now()
 
         # Check if a routine already exists for the given date and user
         routine, created = Routine.objects.get_or_create(
             user=user,
             for_date=for_date,
-            defaults={'tasks': tasks_data, 'created_at': timezone.now(), 'updated_at': timezone.now()}
+            defaults={'tasks': tasks_data, 'created_at': current_time, 'updated_at': current_time}
         )
-
+        Notification.create_or_update_notifications(user, tasks_data)
         if created:
             # If the routine is newly created, update the in_routine field for tasks where is_task is True
             task_ids = [task['id'] for task in tasks_data if task.get('is_task', False)]
@@ -155,3 +157,8 @@ class RoutineSerializer(serializers.ModelSerializer):
             Task.objects.filter(id__in=tasks_to_add).update(in_routine=True)
 
         return instance
+    
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'task', 'title', 'message', 'date_time', 'is_generated', 'is_read', 'notification_type', 'created_at', 'updated_at']

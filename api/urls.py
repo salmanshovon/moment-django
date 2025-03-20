@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView
+from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView, NotificationsView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path('get-scheduling-tasks', SchedulerTasksView.as_view(), name='get_sch_tasks'),
     path('routine-save/', RoutineCreateUpdateView.as_view(), name='routine_save'),
     path('routine-view/', RoutineDetailView.as_view(), name='routine_view'),
+    path('notification/', NotificationsView.as_view(), name='get_notifications'),
 ]

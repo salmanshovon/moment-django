@@ -1404,8 +1404,7 @@ $(document).ready(function () {
                 const endTimeString = endTime.toLocaleTimeString([], formatOptions).toUpperCase();
 
                 // Save time in 24-hour format in the arrays
-                const startTime24hr = currentTime.toTimeString().slice(0, 5); // Extracts hh:mm in 24-hour format
-                const endTime24hr = endTime.toTimeString().slice(0, 5); // Extracts hh:mm in 24-hour format
+                const startTime24hr = currentTime.toISOString().slice(0, 16).replace('T', ' '); // Formats as "YYYY-MM-DD hh:mm"
 
                 // Add start_time to the task in the appropriate array (allTasks, allTskRtn, or allMscRtn)
                 let taskIndex = -1;
