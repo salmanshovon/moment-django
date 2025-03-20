@@ -40,6 +40,7 @@ class Command(BaseCommand):
         # Process tasks for each user
         for user, tasks in tasks_by_user.items():
             user_tz = user_timezone_map.get(user, pytz.UTC)  # Fallback to UTC if profile not found
+            print(f'{user} - {user_tz}')
             user_now = timezone.localtime(timezone.now(), user_tz).date()
             user_yesterday = user_now - timedelta(days=1)  # Yesterday in the user's timezone
 

@@ -6,6 +6,9 @@ from django.http import JsonResponse
 from .forms import TaskCategoryForm, OneTimeTaskForm, RepetitiveTaskForm
 from .models import Task, TaskCategory
 from django.utils.decorators import method_decorator
+import pytz
+from datetime import datetime
+from django.utils import timezone
 
 
 
@@ -74,7 +77,14 @@ class CreateTaskView(View):
                         return JsonResponse({"success": False, "errors": form.errors}, status=400)
                 else:
                     task.notification_days = CreateTaskView.set_default_notification_days(task.frequency_interval)
-            
+            else:
+                profile = self.request.user.profile
+                user_tz = pytz.timezone(profile.user_timezone) if profile.user_timezone else pytz.UTC
+                due_date = task.due_date
+                current_date = timezone.localtime(timezone.now(), user_tz).date()
+                if due_date < current_date:
+                    form.add_error('due_date', "Task date must be today or in the future.")
+                    return JsonResponse({"success": False, "errors": form.errors}, status=400) 
             task.save()
             return JsonResponse({"success": True, "message": "Task added successfully!"})
 
@@ -136,7 +146,24 @@ class EditTaskView(View):
                     return JsonResponse({"success": False, "errors": form.errors}, status=400)
                 else:
                     updated_task.is_repetitive = True
+
+                if task.notification_days != 9999999999:
+                    if task.frequency_interval < task.notification_days:
+                        form.add_error(
+                            "notification_days",
+                            "Notification days cannot exceed the task frequency interval.",
+                        )
+                        return JsonResponse({"success": False, "errors": form.errors}, status=400)
+                else:
+                    task.notification_days = CreateTaskView.set_default_notification_days(task.frequency_interval)
             else:
+                profile = self.request.user.profile
+                user_tz = pytz.timezone(profile.user_timezone) if profile.user_timezone else pytz.UTC
+                due_date = task.due_date
+                current_date = timezone.localtime(timezone.now(), user_tz).date()
+                if due_date < current_date:
+                    form.add_error('due_date', "Task date must be today or in the future.")
+                    return JsonResponse({"success": False, "errors": form.errors}, status=400)
                 updated_task.is_repetitive = False
             updated_task.save()
             return JsonResponse({"success": True, "message": "Task updated successfully!"})

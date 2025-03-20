@@ -422,7 +422,6 @@
                 const durationMin = $('input[name="duration_min"]').val();
                 const durationHr2 = $('input[name="duration_hr2"]').val();
                 const durationMin2 = $('input[name="duration_min2"]').val();
-                const noti_day = $('input[name="notification_days"]').val();
                 const noti_day2 = $('input[name="notification_days2"]').val();
 
                 const dueDate = $('input[name="due_date2"]').val();
@@ -455,6 +454,7 @@
                     const oneTimeHour = parseInt($('input[name="one_time_hour"]').val());
                     const oneTimeMinute = parseInt($('input[name="one_time_minute"]').val());
                     const timePeriod = $('select[name="time_period"]').val();
+                    
 
                     let oneTime24Hour = oneTimeHour;
 
@@ -480,7 +480,7 @@
                 // Get the form data and remove unnecessary fields
                 let formData = $(this).serializeArray().filter(item => {
                     // Remove fields we don't want to submit
-                    return !['duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2',].includes(item.name);
+                    return !['notification_days2','due_date2','duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2',].includes(item.name);
                 });
 
                 // Add the calculated duration in minutes
@@ -504,7 +504,7 @@
                     formData.push({
                         name: 'notification_days',
                         value: notice_day
-                    })
+                    });
                 } 
 
                 // Submit the form via AJAX

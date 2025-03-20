@@ -417,7 +417,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="notification_days">Notification Days</label>
-                                <input type="number" name="notification_days" id="notification_days"
+                                <input type="number" name="notification_days2" id="notification_days2"
                                     class="form-control" min="1" placeholder="How many days before to notify?"
                                     value="{{ task.notification_days }}">
                             </div>
@@ -513,6 +513,7 @@
                 const durationMin = $('input[name="duration_min"]').val();
                 const durationHr2 = $('input[name="duration_hr2"]').val();
                 const durationMin2 = $('input[name="duration_min2"]').val();
+                const noti_day2 = $('input[name="notification_days2"]').val();
 
                 const dueDate = $('input[name="due_date2"]').val();
                 const formInterval = $('#frequency_interval').val();
@@ -535,6 +536,7 @@
                 // Convert duration to total minutes
                 let totalDurationMinutes;
                 let x = null;
+                let notitce_day = null;
                 let oneTime24HrString = null;
 
                 // Convert one-time task time to 24-hour format
@@ -558,12 +560,17 @@
                     x = 30; // Set x to 30
                 } else {
                     totalDurationMinutes = (parseInt(durationHr2) * 60) + parseInt(durationMin2);
+                    if (noti_day2 ===''){
+                        notice_day = 9999999999
+                    } else {
+                        notice_day = noti_day2
+                    }
                 }
 
                 // Get the form data and remove unnecessary fields
                 let formData = $(this).serializeArray().filter(item => {
                     // Remove fields we don't want to submit
-                    return !['duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2'].includes(item.name);
+                    return !['notification_days2','due_date2','duration_hr', 'duration_min', 'one_time_hour', 'one_time_minute', 'time_period', 'due_time2'].includes(item.name);
                 });
 
                 // Add the calculated duration in minutes
@@ -572,26 +579,24 @@
                 // Check if x is 30 and add due_time to formData
                 if (x === 30) {
                     formData.push({ name: 'due_time', value: oneTime24HrString });
-                } else if (dueDate === "") {
-                    // Push tomorrows's date as 'due_date' in YYYY-MM-DD format
-                    formData.push({
-                        name: 'due_date',
-                        value: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
-                    });
                 } else {
+                    if(dueDate === ""){
+                        // Push tomorrows's date as 'due_date' in YYYY-MM-DD format
+                        formData.push({
+                            name: 'due_date',
+                            value: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
+                        });
+                    } else {
+                        formData.push({
+                            name: 'due_date', value: dueDate
+                        });
+                    }
                     formData.push({
-                        name: 'due_date', value: dueDate
-                    })
+                        name: 'notification_days',
+                        value: notice_day
+                    });
                 }
 
-                // Check if task repeptitive and frequency Interval custom
-                if (x !== 30 && formInterval === 'custom') {
-                    formData = formData.filter(item => item.name !== 'frequency_interval');
-                    formData.push({
-                        name: 'frequency_interval',
-                        value: $('input[name="custom_interval_number"]').val()
-                    });
-                }
 
                 // Submit the form via AJAX
                 $.ajax({

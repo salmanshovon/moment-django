@@ -1,8 +1,5 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from .models import Task, TaskCategory
-import json
-from django.utils import timezone
 from datetime import datetime
 
 class TaskCategoryForm(forms.ModelForm):
@@ -38,35 +35,21 @@ class OneTimeTaskForm(forms.ModelForm):
             "due_time": forms.TimeInput(attrs={"type": "time"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)  # Get request from kwargs
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         print(f'RAW DATA: {self.data}')
         print(f"Cleaned data from super().clean(): {cleaned_data}")
 
         # Extract data from the form
-        one_time_date = self.data.get('due_date')  # Use 'one_time_date' from form data
         due_time = self.data.get('due_time')
         duration_minutes = self.data.get('duration')
         priority = self.data.get('priority')
         task_merit = self.data.get('task_merit')
-        notification_days = self.data.get('notification_days')
 
-        # Validate date (due_date)
-        if one_time_date:
-            try:
-                due_date = datetime.strptime(one_time_date, "%Y-%m-%d").date()  # Parse one_time_date
-                # Get the current date (without time)
-                current_date = timezone.now().date()
-                # Check if the due_date is in the past
-                if due_date < current_date:
-                    self.add_error('due_date', "Task date must be today or in the future.")
-                else:
-                    # Add the validated due_date to cleaned_data
-                    cleaned_data['due_date'] = due_date
-            except ValueError:
-                self.add_error('due_date', "Invalid date format. Use YYYY-MM-DD.")
-        # else:
-        #     self.add_error('due_date', "This field is required.")
 
         # Validate time (due_time)
         if due_time:
