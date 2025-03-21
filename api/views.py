@@ -108,7 +108,6 @@ class RoutineCreateUpdateView(generics.CreateAPIView):
         """
         Save the routine with the current authenticated user.
         """
-        print("Received Data:", self.request.data)
         serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):

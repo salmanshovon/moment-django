@@ -35,6 +35,30 @@
         background: #555; /* Darker gray on hover */
     }
 
+    .task-category-title {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px; /* Capsule shape */
+        color: white; /* Text color */
+        margin-bottom: 8px; /* Add some spacing */
+        align-self: flex-start;
+    }
+
+    .task-category-title.one-time {
+        background-color: rgb(55, 92, 172); /* One-time color */
+    }
+
+    .task-category-title.repetitive {
+        background-color: rgb(114, 31, 80); /* Repetitive color */
+    }
+
+    .task-category-title.misc {
+        background-color: black; /* Misc color */
+    }
+    .task-category{
+        margin-bottom: 10px;
+    }
+
     .task-detail {
         position: fixed;
         top: 50%;
@@ -147,14 +171,27 @@
 
     .task-item.misc {
         background-color: #1f1f1f;
-        white-space: nowrap; /* Prevent text from wrapping */
-        width: 100; /* Occupy full width of the container */
-        height: 60px; /* Set a fixed height or use min-height */
+        white-space: nowrap; /* Prevent text wrapping */
+        min-height: 60px; /* Set a minimum height */
         padding: 10px; /* Add padding for better spacing */
         box-sizing: border-box; /* Include padding in width/height calculations */
         display: flex; /* Use flexbox for alignment */
-        align-items: center; /* Vertically center content */
-        justify-content: space-between; /* Space out content */
+        flex-direction: column; /* Stack children vertically */
+        justify-content: center; /* Center content vertically */
+        align-items: flex-start; /* Align content to the left */
+    }
+
+    .task-item.misc .task-title {
+        width: 100%; /* Occupy full width */
+        margin-bottom: 0px; /* Add space between title and details */
+    }
+
+    .task-item.misc .details {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: flex-start; /* Align details to the left */
+        width: 100%; /* Occupy full width */
     }
 
     .task-item.misc.x {
@@ -317,6 +354,84 @@
         flex-grow: 1;
     }
 
+    /* Dark Theme Styles */
+
+    body.dark-theme .tasks, body.dark-theme .schedule {
+        background:rgba(73, 73, 73, 0.5);
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    body.dark-theme .schedule .dropzone {
+        background-color: #7c7c7c;
+    }
+
+    body.dark-theme .task-list {
+        background-color: #384755;
+    }
+
+    /* Dark theme styling for dropdown date input */
+    body.dark-theme .dropdwon-date {
+        background-color: #333; /* Dark input background */
+        color: #fff; /* Light text */
+        border: 1px solid #555; /* Subtle border */
+        border-radius: 5px;
+    }
+
+    /* Adjust placeholder text for better visibility */
+    body.dark-theme .dropdwon-date::placeholder {
+        color: #aaa; /* Light gray placeholder text */
+    }
+
+    /* Highlight on focus */
+    body.dark-theme .dropdwon-date:focus {
+        border-color: #888; /* Slightly lighter border on focus */
+        outline: none;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark Theme for Task Details */
+    body.dark-theme .task-detail {
+        background-color: #333;
+        /* Dark background */
+        color: #e0e0e0;
+        /* Light text */
+    }
+
+    /* Dark Theme for Overlay */
+    body.dark-theme .overlay {
+        background: rgba(0, 0, 0, 0.7);
+        /* Darker overlay */
+    }
+
+    /* Dark theme styling for duration input container */
+    body.dark-theme .duration-hour,
+    body.dark-theme .duration-minute {
+        background-color: #5a5a5a; /* Dark input background */
+        color: #fff; /* Light text */
+        border: 1px solid #707070; /* Subtle border */
+        padding: 5px;
+        text-align: center;
+        border-radius: 5px;
+    }
+
+    /* Adjust input placeholders for better visibility */
+    body.dark-theme .duration-hour::placeholder,
+    body.dark-theme .duration-minute::placeholder {
+        color: #aaa; /* Lighter placeholder text */
+    }
+
+    /* Style the container text */
+    body.dark-theme .bi-clock {
+        color: #bbb; /* Light gray icon */
+    }
+
+    body.dark-theme .duration-hour:focus,
+    body.dark-theme .duration-minute:focus {
+        border-color: #888; /* Highlight on focus */
+        outline: none;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
 </style>
 </head>
 <body>
@@ -361,22 +476,22 @@
         <!-- Tasks Section (Right) -->
         <div class="col-5 h-100">
             <div class="tasks h-100">
-                <div>
-                    <p>One-time Tasks</p>
+                <div class="task-category">
+                    <p class="task-category-title one-time">One-time Tasks</p>
                     <ul id="one-time-tasks" class="task-list" data-type="onetime">
                         <li class="task-item" draggable="true" data-id="1" data-item-type="onetime">Task A</li>
                         <li class="task-item" draggable="true" data-id="2" data-item-type="onetime">Task B</li>
                     </ul>
                 </div>
-                <div>
-                    <p>Repetitive Tasks</p>
+                <div class="task-category">
+                    <p class="task-category-title repetitive">Repetitive Tasks</p>
                     <ul id="repetitive-tasks" class="task-list" data-type="repetitive">
                         <li class="task-item" draggable="true" data-id="3" data-item-type="repetitive">Task X</li>
                         <li class="task-item" draggable="true" data-id="4" data-item-type="repetitive">Task Y</li>
                     </ul>
                 </div>
-                <div>
-                    <p>Misc</p>
+                <div class="task-category">
+                    <p class="task-category-title misc">Misc</p>
                     <ul id="misc-tasks" class="task-list" data-type="misc">
                         <li class="task-item misc y" draggable="true" data-id="1" data-item-type="misc" data-src="msc">
                             <h4 class="task-title">
@@ -568,7 +683,7 @@ $(document).ready(function () {
         let dueDate = null;
         if (task.is_repetitive) {
             dueDate = document.createElement('span');
-            dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> ${task.frequency_interval === 1 ? 'Repeats everyday' : `Repeats in every ${task.frequency_interval ? task.frequency_interval : 'Undefined'} days`}`; // Icon for repetitive tasks
+            dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> Due: ${formatDate(task.due_date)} | (${getRepeatFrequencyText(task.frequency_interval)})`; // Icon for repetitive tasks
         } else {
             dateValue = document.getElementById('dateSelector');
             dueDate = document.createElement('span');
@@ -688,7 +803,7 @@ $(document).ready(function () {
                 data.forEach(function (task) {
 
                     // Define the keys to compare
-                    const keysToCompare = ['duration', 'category', 'priority', 'is_repetitive', 'frequency_interval', 'due_date', 'due_time', 'color'];
+                    const keysToCompare = ['duration', 'category', 'priority', 'is_repetitive', 'frequency_interval', 'color'];
 
                     // Find the task in allTskRtn with the same id
                     const taskInAllTskRtn = allTskRtn.find(t => t.id === task.id);
@@ -1326,9 +1441,21 @@ $(document).ready(function () {
         // Duration with Icon
         const duration = document.createElement('span');
         duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+        
+        // Badges Container (for category and priority)
+        const badgesContainer = document.createElement('div');
+        badgesContainer.className = 'badges-container';
+
+        // Category Badge with Icon
+        const categoryBadge = document.createElement('span');
+        categoryBadge.className = `badgex category-badge`;
+        categoryBadge.innerHTML = `<i class="bi bi-tag"></i>'Misc`; // Icon for category
+        categoryBadge.style.backgroundColor = '#ffffff';
+        badgesContainer.appendChild(categoryBadge);
 
         // Append duration to details
         details.appendChild(duration);
+        details.appendChild(badgesContainer);
 
         // Append both lines to the task item
         taskItem.append(title);
@@ -1442,6 +1569,22 @@ $(document).ready(function () {
 
         // Set the total height to the dropzone
         dropzone.style.height = `${totalHeight + counter * 5}px`;
+    }
+
+    function getRepeatFrequencyText(interval) {
+        if (interval === 1) {
+            return "Reapeats Daily";
+        } else if (interval === 7) {
+            return "Repeats Weekly";
+        } else if (interval === 30 || interval === 31) { // Assuming 30 or 31 represents monthly
+            return "Repeats Monthly";
+        } else if (interval === 365 || interval === 366) { // Assuming 365 or 366 represents yearly
+            return "Repeats Yearly";
+        } else if (interval && interval % 1 === 0 && interval > 0) { // Check if interval is a positive integer
+            return `Repeats every ${interval} days`;
+        } else {
+            return "Undefined";
+        }
     }
 
 

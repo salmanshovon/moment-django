@@ -484,6 +484,10 @@ body.dark-theme .navbar .notification-btn {
     color: #ffffff; /* Light text for notification button */
 }
 
+body.dark-theme .notification-item, body.dark-theme .notiheader {
+    color: #ffffff;
+}
+
 /* Dark Theme for Navbar Brand Text */
 body.dark-theme .navbar-brand span {
     color: #e0e0e0; /* Light text color for dark theme */
@@ -1048,7 +1052,7 @@ body.dark-theme .spinner {
         // Clear existing notifications (optional, depending on your use case)
         notificationDropdown.innerHTML = `
             <li class="text-center px-3 py-2">
-                <p class="fw-bold mb-0">Notifications</p>
+                <p class="fw-bold mb-0 notiheader">Notifications</p>
             </li>
             <li><hr class="dropdown-divider"></li>
             <div class="notification-scroll"> <!-- Scrollable container -->
@@ -1119,7 +1123,7 @@ body.dark-theme .spinner {
                 showMessage(nextNotification.message, 'info');
 
                 // Append the generated HTML to the dropdown
-                const notificationDropdown = document.querySelector('.dropdown-menu');
+                const notificationDropdown = document.querySelector('.notification-scroll');
                 notificationDropdown.insertAdjacentHTML('beforeend', notificationItem);
 
                 // Update the notification badge count

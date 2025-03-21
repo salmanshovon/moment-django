@@ -168,17 +168,12 @@ class Task(models.Model):
         filtered_tasks = []
         for task in tasks:
             if task.frequency_interval == 1:
-                print(f"adding daily task: {task.title}")
                 filtered_tasks.append(task)
             else:
-                print(f"processing task: {task.title}")
                 days_until_due = (task.due_date - date).days
-                print(f"days untill due: {days_until_due} - notification days: {task.notification_days} - routine: {task.in_routine}")
+                # print(f"days untill due: {days_until_due} - notification days: {task.notification_days} - routine: {task.in_routine}")
                 if 0 <= days_until_due <= task.notification_days and not task.in_routine:
-                    print('added the task')
                     filtered_tasks.append(task)
-                else:
-                    print('skipped the task')
         return filtered_tasks
 
 
