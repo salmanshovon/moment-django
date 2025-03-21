@@ -24,11 +24,34 @@
 }
 
 .notification-scroll {
-    max-height: 250px; /* Adjust based on your preference */
+    max-height: 350px; /* Adjust based on your preference */
     overflow-y: auto;
 }
 
+/* General Scrollbar Styling (WebKit) */
+.notification-scroll::-webkit-scrollbar {
+    width: 8px; /* Adjust width as needed */
+}
 
+.notification-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light background for the track */
+    border-radius: 4px;
+}
+
+.notification-scroll::-webkit-scrollbar-thumb {
+    background: #888; /* Medium gray for the thumb */
+    border-radius: 4px;
+}
+
+.notification-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker gray on hover */
+}
+
+/* Firefox Scrollbar Styling (Limited) */
+.notification-scroll {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #888 #f1f1f1; /* Thumb and track colors */
+}
 
         /* Loading Screen Styles */
         #loading-screen {
@@ -625,7 +648,7 @@ body.dark-theme .spinner {
 
                 <!-- Profile Dropdown Container -->
                 <div class="dropdown profile-dropdown-container">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                         <img src="{{ user.profile.picture|default:'/static/img/default.png' }}" alt="Profile Picture" class="profile-pic rounded-circle">
                     </a>
 
@@ -766,8 +789,13 @@ body.dark-theme .spinner {
 
             notificationBtn.addEventListener("click", function(event) {
                 const ids = getNonGeneratedNotificationIds();
-                updateNotifications(ids);
-                fetchNotifications();
+                if (ids.length > 0) {
+                    updateNotifications(ids);
+                    updateNotificationCount(0);
+                    setTimeout(function() {
+                        fetchNotifications();
+                    }, 2000); // 2000 milliseconds = 2 seconds
+                }
                 // showMessage('-----');
 
             });

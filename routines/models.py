@@ -35,7 +35,7 @@ class Notification(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True)  # Assuming a Task model exists
+    task = models.IntegerField(null=True, blank=True)  # Changed from ForeignKey to IntegerField
     title = models.CharField(max_length=255)
     message = models.TextField()
     date_time = models.DateTimeField()  # When the notification should be triggered
@@ -72,27 +72,29 @@ class Notification(models.Model):
 
         # Get the current time in the user's timezone
         current_time = timezone.localtime(timezone.now(), user_tz)
+        # current_time = c_time.replace(tzinfo=None)
 
         # Fetch all notifications for the user in a single query
         user_notifications = Notification.objects.filter(user=user)
-        notifications_dict = {notification.task_id: notification for notification in user_notifications}
+        notifications_dict = {notification.task: notification for notification in user_notifications}  # Use 'task' instead of 'task_id'
 
         notifications_to_update = []
         notifications_to_create = []
 
         for task in tasks:
             # Parse the task's start time (assumed to already be in the user's timezone)
-            task_start_time = datetime.strptime(task['start_time'], "%Y-%m-%d %H:%M")
-            task_start_time = user_tz.localize(task_start_time)
+            task_start_time = datetime.fromisoformat(task['start_time'].replace('Z', '+00:00')) #replace Z with +00:00 to make it parseable by fromisoformat.
+            task_start_time = timezone.localtime(task_start_time, user_tz)
 
             task_id = task.get('id')
-            notification = notifications_dict.get(task_id)
+            notification = notifications_dict.get(task_id)  # Lookup by task_id
 
             if notification:
                 # If the notification exists, update its time with the given time
                 old_time = notification.date_time
                 notification.date_time = task_start_time
 
+                # Reset notification flags if the task is rescheduled to the future
                 if old_time < current_time and task_start_time > current_time:
                     notification.is_generated = False
                     notification.is_read = False
@@ -102,15 +104,12 @@ class Notification(models.Model):
                 # If the notification doesn't exist, create it with the given time
                 notification_data = {
                     'user': user,
+                    'task': task_id,  # Always set the task field with task_id
                     'title': task['title'],
                     'message': f"Reminder for {task['title']}",
                     'date_time': task_start_time,
                     'notification_type': 'reminder',
                 }
-
-                # Only add the task foreign key if is_task is True
-                if task.get('is_task', False):
-                    notification_data['task_id'] = task_id
 
                 notifications_to_create.append(
                     Notification(**notification_data)

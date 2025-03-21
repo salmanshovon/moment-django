@@ -68,7 +68,7 @@ class Command(BaseCommand):
                         updated_tasks.append(task)
                     else:
                         # Archive non-repetitive tasks that are overdue
-                        if task.due_date < user_yesterday.date():
+                        if task.due_date <= user_yesterday.date():
                             archived_tasks.append(ArchivedTask(
                                 user=task.user,
                                 title=task.title,
@@ -88,6 +88,7 @@ class Command(BaseCommand):
                                 in_routine=task.in_routine,
                                 archived_at=timezone.now(),
                             ))
+
                             task.delete()  # Delete the original task
 
         # Bulk update repetitive tasks

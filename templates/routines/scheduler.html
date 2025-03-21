@@ -179,7 +179,7 @@
         right: 0; /* Align to the right of .details */
     }
 
-    .badge {
+    .badgex {
         font-size: 0.625rem;
         padding: 0.2rem 0.4rem;
         border-radius: 4px;
@@ -198,27 +198,27 @@
         margin-top: auto;
     }
 
-    .badge.Low {
+    .badgex.Low {
         background-color: #228B22; /* Darker Green */
         color: #ffffff;
     }
 
-    .badge.Medium {
+    .badgex.Medium {
         background-color: #FFD700; /* Darker Yellow/Gold */
         color: #000000; /* Black text for better contrast */
     }
 
-    .badge.High {
+    .badgex.High {
         background-color: #FF8C00; /* Darker Orange/Dark Goldenrod */
         color: #ffffff;
     }
 
-    .badge.Critical {
+    .badgex.Critical {
         background-color: #DC143C; /* Darker Red/Crimson */
         color: #ffffff;
     }
 
-    .badge.Urgent {
+    .badgex.Urgent {
         background-color: #8B0000; /* Very Dark Red/Dark Red */
         color: #ffffff;
     }
@@ -412,6 +412,7 @@ $(document).ready(function () {
     let day = true;
 
     // Global array to store all tasks
+    let selectedDayStartTime = new Date(); // Initialize with today's date
     let allTasks = [];
     let allTskRtn = [];
     let allMscRtn = [];
@@ -467,27 +468,23 @@ $(document).ready(function () {
         const dateDisplay = document.getElementById('selectedDateDisplay');
         let selectedDate = new Date();
 
-        // Using the functions in sequence
         if (dateSelector.value === "tomorrow") {
             selectedDate.setDate(selectedDate.getDate() + 1);
             day = false;
-
-            // Fetch routine first, then fetch tasks
-            fetchRoutine(day, function () {
-                fetchTasks(day);
-            });
-
-            unsavedChanges = false;
         } else {
             day = true;
-
-            // Fetch routine first, then fetch tasks
-            fetchRoutine(day, function () {
-                fetchTasks(day);
-            });
-
-            unsavedChanges = false;
         }
+
+        // Set the selectedDayStartTime to the beginning of the selected day
+        selectedDayStartTime = new Date(selectedDate);
+        selectedDayStartTime.setHours(0, 0, 0, 0);
+
+        // Fetch routine first, then fetch tasks
+        fetchRoutine(day, function () {
+            fetchTasks(day);
+        });
+
+        unsavedChanges = false;
 
         dateDisplay.textContent = formatDate1(selectedDate);
         makeMiscTasks();
@@ -589,7 +586,7 @@ $(document).ready(function () {
 
         // Category Badge with Icon
         const categoryBadge = document.createElement('span');
-        categoryBadge.className = `badge category-badge`;
+        categoryBadge.className = `badgex category-badge`;
         categoryBadge.innerHTML = `<i class="bi bi-tag"></i> ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
         // Check if task.color exists and apply it as background color
         if (task.color) {
@@ -598,7 +595,7 @@ $(document).ready(function () {
 
         // Priority Badge with Icon
         const priorityBadge = document.createElement('span');
-        priorityBadge.className = `badge ${getPriorityLabel(task.priority)}`;
+        priorityBadge.className = `badgex ${getPriorityLabel(task.priority)}`;
         priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`; // Icon for priority
 
         // Append badges to the badges container
@@ -836,6 +833,7 @@ $(document).ready(function () {
         })
         .then(data => {
             showMessage(data.message, 'success');
+            fetchNotifications();
             fetchRoutine(day);
             fetchTasks(day);
         })
@@ -1380,8 +1378,8 @@ $(document).ready(function () {
         let totalHeight = 0; // Variable to store the total height of all task items
         let counter = 0;
 
-        let currentTime = new Date();
-        currentTime.setHours(6, 0, 0, 0); // Start from 6:00 AM
+         // Use the global selectedDayStartTime for initialization
+        let currentTime = new Date(selectedDayStartTime); // Create a new Date from the global variable
 
         scheduleList.querySelectorAll(".task-item").forEach(taskItem => {
             const taskId = taskItem.dataset.id;
@@ -1402,7 +1400,7 @@ $(document).ready(function () {
                 const endTimeString = endTime.toLocaleTimeString([], formatOptions).toUpperCase();
 
                 // Save time in 24-hour format in the arrays
-                const startTime24hr = currentTime.toISOString().slice(0, 16).replace('T', ' '); // Formats as "YYYY-MM-DD hh:mm"
+                const startTime24hr = currentTime.toISOString();
 
                 // Add start_time to the task in the appropriate array (allTasks, allTskRtn, or allMscRtn)
                 let taskIndex = -1;
