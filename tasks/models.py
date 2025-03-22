@@ -23,6 +23,7 @@ class PublicTask(models.Model):
     category = models.ForeignKey("TaskCategory", on_delete=models.SET_NULL, blank=True, null=True)
     task_merit = models.IntegerField(blank=True, null=True)  # Merit score for the task
 
+    duration = models.IntegerField(default=20) #default duration of a task is 20 minutes if not specified...
     is_repetitive = models.BooleanField(default=False)  # True for repetitive, False for one-time
     frequency_interval = models.IntegerField(blank=True, null=True)  # Interval in days (e.g., 7 for weekly, 30 for monthly)
     notification_days = models.IntegerField(default=1)  # Days before the due date to notify the user

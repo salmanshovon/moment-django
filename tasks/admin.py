@@ -119,7 +119,7 @@ class TaskAdmin(admin.ModelAdmin):
 @admin.register(PublicTask)
 class PublicTaskAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'description', 'priority', 'category', 'task_merit', 'is_repetitive', 'frequency_interval', 'notification_days'
+        'title', 'description', 'priority', 'category', 'duration', 'task_merit', 'is_repetitive', 'frequency_interval', 'notification_days'
     )
     list_filter = (
         'priority', 'category', 'is_repetitive'

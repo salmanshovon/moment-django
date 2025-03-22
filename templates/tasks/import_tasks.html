@@ -1,0 +1,72 @@
+<style>
+      /* Custom CSS for Search Bar and Sort Button */
+  .search-bar {
+    flex-grow: 1; /* Ensures the search bar takes up remaining space */
+    position: relative; /* Required for absolute positioning of the button */
+  }
+
+  .search-bar input {
+    width: 100%; /* Full width */
+    padding-right: 2rem; /* Space for the search icon */
+    background-color: #ffffff; /* White background */
+    color: #495057; /* Dark text */
+    border: 1px solid #e0e0e0; /* Light border */
+  }
+
+  /* Custom styles for the search button */
+  .search-button {
+    background-color: #e9ecef; /* Match the default Bootstrap input background color */
+    border: 1px solid #e0e0e0; /* Remove the border */
+    padding: 0.25rem 0.5rem; /* Adjust padding to match the input */
+    color: #6c757d; /* Match the icon color to the input placeholder color */
+    transition: background-color 0.2s, color 0.2s; /* Smooth hover effect */
+    position: absolute; /* Position the button absolutely within the search bar */
+    top: 50%; /* Center vertically */
+    right: 1px; /* Adjust horizontal position */
+    transform: translateY(-50%); /* Fine-tune vertical centering */
+  }
+
+  .search-button:hover {
+    background-color: #dee2e6; /* Slightly darker background on hover */
+    color: #495057; /* Slightly darker icon color on hover */
+  }
+
+
+
+  .dropdown {
+    flex-shrink: 0;
+    /* Prevents the sort button from shrinking */
+  }
+</style>
+
+<!-- Search Bar and Sort Button -->
+<div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
+
+    <!-- Sort Button with Dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="sortDropdown"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        Sort by: Priority
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+        <li><a class="dropdown-item" data-sort="priority">Priority</a></li>
+        <li><a class="dropdown-item" data-sort="title">Title</a></li>
+        <li><a class="dropdown-item" data-sort="due_date">Due Date</a></li>
+        <li><a class="dropdown-item" data-sort="duration">Duration</a></li>
+        <li><a class="dropdown-item" data-sort="added">Added Date</a></li>
+        <li><a class="dropdown-item" data-sort="updated">Updated Date</a></li>
+        <li><a class="dropdown-item" data-sort="task_merit">Merit</a></li>
+      </ul>
+    </div>
+  
+    <!-- Search Bar -->
+    <div class="flex-grow-1 position-relative">
+      <form id="searchForm">
+        <input type="text" id="searchInput" class="form-control form-control-sm search-input" placeholder="Search tasks...">
+        <!-- Search btn Icon -->
+        <button type="submit" id="searchButton" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
+          <i class="fas fa-search search-icon"></i>
+        </button>
+      </form>
+    </div>
+  </div>

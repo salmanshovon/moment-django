@@ -193,3 +193,14 @@ class CreateCategoryView(View):
             form.save()
             return redirect('category_list')
         return render(request, 'create_category.html', {'form': form}) # Re-render form with errors
+
+
+@method_decorator(login_required(login_url="signin"), name="dispatch")
+class ImportTaskView(View):
+    template_name = "tasks/import_tasks.html"
+
+    def get(self, request, *args, **kwargs):
+        categories = TaskCategory.get_categories(user=request.user)
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return render(request, self.template_name, {"categories": categories})
+        return render(request, "dashbase.html")
