@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <style>
+        /* Custom styles for the ribbon and progress bar */
+        .ribbon {
+            background-color: #f8f9fa;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .time {
+            font-size: 2rem;
+            font-weight: bold;
+            position: relative;
+            display: inline-block;
+        }
+
+        .ampm-badge {
+            font-size: 0.8rem;
+            padding: 4px 6px;
+            position: absolute;
+            top: -8px;
+            right: -25px;
+        }
+
+
+        .date {
+            font-size: 18px;
+            color: #6c757d;
+        }
+
+        .card {
+            margin-top: 20px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .last-task, .upcoming-task {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .current-task {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #0d6efd;
+            width: 50%; /* Adjust dynamically based on elapsed time */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar and Sidebar (assumed to be already present) -->
+
+    <!-- Ribbon for Time, Day, and Date -->
+    <div class="ribbon text-center position-relative">
+        <div class="container position-relative">
+            <div class="time position-relative d-inline-block">
+                <span id="currentTime">00:00:00</span>
+                <span id="ampm" class="badge bg-secondary position-absolute ampm-badge">AM</span>
+            </div>
+            <div class="day-date">
+                <span id="currentDay">Monday</span>, <span id="currentDate">February 10, 2025</span>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Card for Tasks -->
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="task-container">
+                    <div class="last-task text-start">
+                        <small>Last Task:</small><br>
+                        <span id="lastTask">Completed Task</span>
+                    </div>
+                    <div class="current-task text-center">
+                        <span id="currentTask">Current Task</span>
+                    </div>
+                    <div class="upcoming-task text-end">
+                        <small>Upcoming:</small><br>
+                        <span id="upcomingTask">Upcoming Task</span>
+                    </div>
+                </div>
+                <div class="progress-bar mt-3">
+                    <div class="progress" id="taskProgress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fab-container">
+        <!-- Floating Action Button -->
+        <button class="fab btn btn-primary rounded-circle p-0" id="fab">
+            <span class="plus fs-3">+</span>
+        </button>
+        <!-- Options -->
+        <div class="options">
+            <button class="option btn btn-primary mb-2" <a href="{% url 'create_task' %}"
+            onclick="$(document).trigger('contentUpdated', ['{% url 'create_task' %}', '#new-content', true]); return false;">Add a task</button>
+            <button class="option btn btn-primary mb-2">Add Reminder</button>
+            <button class="option btn btn-primary">Add Day</button>
+        </div>
+    </div>
+
+    <script>
+
+    (function () {
+
+        const routine_url = "{% url 'routine_view' %}";
+        let allTskRtn = [];
+
+        // Fetch routine using AJAX
+        function fetchRoutine(paramValue, callback) {
+            console.log('fetching routine')
+            $.ajax({
+                url: routine_url,
+                method: "GET",
+                data: { param: paramValue }, // Pass param value dynamically
+                dataType: "json",
+                success: function (data) {
+                    allTskRtn = [];
+                    // Check if the response contains tasks
+                    if (data !== 3 && data.tasks && data.tasks.length > 0) {
+                        allTskRtn = [...data.tasks];
+                        routine_date = data.updated_at;
+                    } else {
+                        showMessage('No tasks added!', 'info');
+                    }
+
+                    // Invoke the callback function after `fetchRoutine` completes
+                    if (callback) {
+                        callback();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching routine:", error);
+                }
+            });
+        }
+
+        // Fetch routine and update task display
+        fetchRoutine(true, function () {
+            updateTaskDisplay(allTskRtn);
+        });
+
+        // Function to update time, day, and date elements
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            // Convert to 12-hour format
+            hours = hours % 12 || 12;
+            hours = String(hours).padStart(2, '0');
+
+            try {
+                const timeElement = document.getElementById('currentTime');
+                if (timeElement) {
+                    timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+            } catch (error) {
+                // Pass silently
+            }
+
+            try {
+                const ampmElement = document.getElementById('ampm');
+                if (ampmElement) {
+                    ampmElement.textContent = ampm;
+                }
+            } catch (error) {
+                // Pass silently
+            }
+
+            try {
+                const dayElement = document.getElementById('currentDay');
+                const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                if (dayElement) {
+                    dayElement.textContent = days[now.getDay()];
+                }
+            } catch (error) {
+                // Pass silently
+            }
+
+            try {
+                const dateElement = document.getElementById('currentDate');
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                if (dateElement) {
+                    dateElement.textContent = now.toLocaleDateString('en-US', options);
+                }
+            } catch (error) {
+                // Pass silently
+            }
+        }
+
+        // Call updateTime() at regular intervals (e.g., every second)
+        setInterval(updateTime, 1000);
+        updateTime(); // Initial call
+
+        // Function to update task display from array
+        function updateTaskDisplay(tasks) {
+            if (!tasks || tasks.length === 0) {
+                try {
+                    document.getElementById('lastTask').textContent = "No Previous Task";
+                    document.getElementById('currentTask').textContent = "No Current Task";
+                    document.getElementById('upcomingTask').textContent = "No Upcoming Task";
+                    document.getElementById('taskProgress').style.width = `0%`;
+                } catch (error) {
+                    // Pass silently
+                }
+                return;
+            }
+
+            const now = new Date();
+            let currentTaskIndex = -1;
+
+            // Find the current task based on the current time
+            for (let i = 0; i < tasks.length; i++) {
+                const taskStartTime = new Date(tasks[i].start_time);
+                const taskEndTime = new Date(taskStartTime.getTime() + tasks[i].duration * 1000);
+
+                if (now >= taskStartTime && now <= taskEndTime) {
+                    currentTaskIndex = i;
+                    break;
+                }
+            }
+
+            // If no current task is found, set the current task to the next upcoming task
+            if (currentTaskIndex === -1) {
+                for (let i = 0; i < tasks.length; i++) {
+                    const taskStartTime = new Date(tasks[i].start_time);
+                    if (now < taskStartTime) {
+                        currentTaskIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // If no tasks are found, set all to "No Task"
+            if (currentTaskIndex === -1) {
+                try {
+                    document.getElementById('lastTask').textContent = "No Previous Task";
+                    document.getElementById('currentTask').textContent = "No Current Task";
+                    document.getElementById('upcomingTask').textContent = "No Upcoming Task";
+                    document.getElementById('taskProgress').style.width = `0%`;
+                } catch (error) {
+                    // Pass silently
+                }
+                return;
+            }
+
+            // Populate the tasks
+            try {
+                document.getElementById('currentTask').textContent = tasks[currentTaskIndex].title;
+
+                if (currentTaskIndex > 0) {
+                    document.getElementById('lastTask').textContent = tasks[currentTaskIndex - 1].title;
+                } else {
+                    document.getElementById('lastTask').textContent = "No Previous Task";
+                }
+
+                if (currentTaskIndex < tasks.length - 1) {
+                    document.getElementById('upcomingTask').textContent = tasks[currentTaskIndex + 1].title;
+                } else {
+                    document.getElementById('upcomingTask').textContent = "No Upcoming Task";
+                }
+            } catch (error) {
+                // Pass silently
+            }
+
+            // Update the progress bar
+            function updateProgress() {
+                const now = new Date();
+                const taskStartTime = new Date(tasks[currentTaskIndex].start_time);
+                const taskEndTime = new Date(taskStartTime.getTime() + tasks[currentTaskIndex].duration * 1000);
+
+                if (now >= taskStartTime && now <= taskEndTime) {
+                    const elapsedSeconds = (now - taskStartTime) / 1000;
+                    const progress = (elapsedSeconds / tasks[currentTaskIndex].duration) * 100;
+
+                    try {
+                        document.getElementById('taskProgress').style.width = `${Math.min(progress, 100)}%`;
+                    } catch (error) {
+                        // Pass silently
+                    }
+                } else if (now > taskEndTime) {
+                    // Move to the next task if the current task is completed
+                    currentTaskIndex++;
+                    if (currentTaskIndex < tasks.length) {
+                        updateTaskDisplay(tasks); // Recursively update the display
+                    } else {
+                        try {
+                            document.getElementById('taskProgress').style.width = `100%`;
+                            document.getElementById('currentTask').textContent = "Routine Completed";
+                            document.getElementById('upcomingTask').textContent = "";
+                        } catch (error) {
+                            // Pass silently
+                        }
+                        clearInterval(progressInterval);
+                    }
+                }
+            }
+
+            updateProgress(); // Initial call
+            const progressInterval = setInterval(updateProgress, 1000);
+        }
+
+        document.getElementById('fab').addEventListener('click', function() {
+            const fab = this;
+            const plus = fab.querySelector('.plus');
+            const options = document.querySelector('.options');
+
+            // Toggle spin class on the button
+            fab.classList.toggle('spin');
+
+            // Toggle the visibility of the options
+            options.classList.toggle('show-options');
+        });
+    })();
+    </script>
+</body>
+
+<style>
+/* Custom styles for the FAB and options */
+.fab-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999; /* Ensure it's above other content */
+}
+
+.fab {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.fab:hover {
+    background-color: #0b5ed7 !important; /* Darker shade for hover */
+}
+
+.plus {
+    transition: transform 0.3s ease;
+}
+
+.options {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option {
+    width: 150px;
+    text-align: left;
+    padding: 10px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+/* Spin animation for the FAB */
+.spin {
+    transform: rotate(135deg);
+}
+
+/* Show options when the button is clicked */
+.show-options {
+    display: flex;
+}
+
+
+</style>
+</html>
