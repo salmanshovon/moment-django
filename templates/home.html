@@ -238,11 +238,12 @@
                 if (elapsedTime >= 100) {
                     currentIndex++;
                     if (currentIndex < allTskRtn.length) {
+                        displayTaskByIndex(allTskRtn, currentIndex);
+                        updateProgress(0);
+                    } else {
                         startFlag = false;
                         displayTaskByIndex(allTskRtn, currentIndex);
-                    } else {
-                        displayTaskByIndex(allTskRtn, -1);
-                        updateProgress(0);
+                        updateProgress(100);
                     }
                 } else {
                     updateProgress(elapsedTime);
@@ -328,10 +329,13 @@
     };
 
     function displayTaskByIndex(allTskRtn, index) {
-        if (index === -1) {
-            updateTask("Nothing...", "Completed", "Nothing...");
+        // Case when there are no more tasks or an invalid index (-1 or out of bounds)
+        if (index === -1 || index >= allTskRtn.length) {
+            let lastTask = index > 0 ? allTskRtn[index - 1].title : "Nothing...";
+            updateTask(lastTask, "Completed", "Nothing...");
             currentTaskStartTime = null;
             currentTaskDuration = null;
+            updateProgress(100);
             return;
         }
 
@@ -349,9 +353,10 @@
         }
 
         currentTaskStartTime = new Date(allTskRtn[index].start_time);
-        currentTaskDuration = allTskRtn[index].duration * 60; // Convert seconds to seconds
+        currentTaskDuration = allTskRtn[index].duration * 60; // Convert minutes to seconds
         updateTask(lastTask, currentTask, upcomingTask);
     }
+
 
     document.getElementById('fab').addEventListener('click', function() {
         const fab = this;
