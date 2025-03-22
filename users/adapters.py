@@ -1,6 +1,4 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-# from allauth.account.utils import user_username
-# from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 import random
 import string

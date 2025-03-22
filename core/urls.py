@@ -22,9 +22,15 @@ import os
 
 load_dotenv()
 
+
+def root_redirect(request):
+    if request.user.is_authenticated:
+        return redirect('home')  # Redirect to home if logged in
+    return redirect('signin')  # Redirect to signin if not logged in
+
 urlpatterns = [
     path(os.getenv('ADMIN_URL'), admin.site.urls),
-    path('', RedirectView.as_view(url=reverse_lazy('signin'), permanent=True), name='root_redirect'),
+    path('', RedirectView.as_view(url=reverse_lazy('home'), permanent=True), name='root_redirect'),
     path("accounts/", include("allauth.urls")),
     path('users/', include('users.urls')),
     path('task/', include('tasks.urls')),
