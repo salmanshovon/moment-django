@@ -1,34 +1,100 @@
 <style>
-      /* Custom CSS for Search Bar and Sort Button */
+  /* Container for the checkbox and title */
+  .title-wrapper {
+    display: flex;
+    align-items: center; /* Vertically center the items */
+  }
+
+  /* Checkbox container */
+  .task-selector-container {
+    display: inline-block;
+    margin-right: 10px; /* Space between checkbox and title */
+    padding-bottom: 9px;
+  }
+
+  /* Checkbox styling */
+  .task-selector {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .task-title {
+    display: flex;
+    align-items: center;
+    /* Align icon and text vertically */
+    gap: 8px;
+    /* Space between icon and text */
+    font-size: 18px;
+    /* Adjust font size */
+    font-weight: 600;
+    /* Make the title bold */
+    color: #333;
+    /* Darker text for better readability */
+    margin-bottom: 12px;
+    /* Add space below the title */
+  }
+
+  .title-icon {
+    font-size: 20px;
+    /* Slightly larger icon */
+    color: #002752;
+    /* Icon color matching your theme */
+  }
+
+  .title-text {
+    flex: 1;
+    /* Allow text to take remaining space */
+  }
+
+  /* Custom CSS for Search Bar and Sort Button */
   .search-bar {
-    flex-grow: 1; /* Ensures the search bar takes up remaining space */
-    position: relative; /* Required for absolute positioning of the button */
+    flex-grow: 1;
+    /* Ensures the search bar takes up remaining space */
+    position: relative;
+    /* Required for absolute positioning of the button */
   }
 
   .search-bar input {
-    width: 100%; /* Full width */
-    padding-right: 2rem; /* Space for the search icon */
-    background-color: #ffffff; /* White background */
-    color: #495057; /* Dark text */
-    border: 1px solid #e0e0e0; /* Light border */
+    width: 100%;
+    /* Full width */
+    padding-right: 2rem;
+    /* Space for the search icon */
+    background-color: #ffffff;
+    /* White background */
+    color: #495057;
+    /* Dark text */
+    border: 1px solid #e0e0e0;
+    /* Light border */
   }
 
   /* Custom styles for the search button */
   .search-button {
-    background-color: #e9ecef; /* Match the default Bootstrap input background color */
-    border: 1px solid #e0e0e0; /* Remove the border */
-    padding: 0.25rem 0.5rem; /* Adjust padding to match the input */
-    color: #6c757d; /* Match the icon color to the input placeholder color */
-    transition: background-color 0.2s, color 0.2s; /* Smooth hover effect */
-    position: absolute; /* Position the button absolutely within the search bar */
-    top: 50%; /* Center vertically */
-    right: 1px; /* Adjust horizontal position */
-    transform: translateY(-50%); /* Fine-tune vertical centering */
+    background-color: #e9ecef;
+    /* Match the default Bootstrap input background color */
+    border: 1px solid #e0e0e0;
+    /* Remove the border */
+    padding: 0.25rem 0.5rem;
+    /* Adjust padding to match the input */
+    color: #6c757d;
+    /* Match the icon color to the input placeholder color */
+    transition: background-color 0.2s, color 0.2s;
+    /* Smooth hover effect */
+    position: absolute;
+    /* Position the button absolutely within the search bar */
+    top: 50%;
+    /* Center vertically */
+    right: 1px;
+    /* Adjust horizontal position */
+    transform: translateY(-50%);
+    /* Fine-tune vertical centering */
   }
 
   .search-button:hover {
-    background-color: #dee2e6; /* Slightly darker background on hover */
-    color: #495057; /* Slightly darker icon color on hover */
+    background-color: #dee2e6;
+    /* Slightly darker background on hover */
+    color: #495057;
+    /* Slightly darker icon color on hover */
   }
 
 
@@ -37,36 +103,548 @@
     flex-shrink: 0;
     /* Prevents the sort button from shrinking */
   }
+
+  .task-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .task-container {
+      flex-direction: column;
+    }
+  }
+
+  /* General Scrollbar Styling (WebKit) */
+  .task-list::-webkit-scrollbar {
+    width: 8px;
+    /* Adjust width as needed */
+  }
+
+  .task-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Light background for the track */
+    border-radius: 4px;
+  }
+
+  .task-list::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Medium gray for the thumb */
+    border-radius: 4px;
+  }
+
+  .task-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Darker gray on hover */
+  }
+
+  /* Firefox Scrollbar Styling (Limited) */
+  .task-list {
+    scrollbar-width: thin;
+    /* For Firefox */
+    scrollbar-color: #888 #f1f1f1;
+    /* Thumb and track colors */
+  }
+
+  .outerbox {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    /* Ensure both outerboxes take equal space */
+    gap: 2px;
+    /* Add spacing between the header and task list */
+  }
+
+  .task-list {
+    flex: 1;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    max-height: calc(100dvh - 33dvh);
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .task-list h3 {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    /* Stay above the scrolling content */
+    margin: 0;
+    /* Remove default margin */
+    background-color: inherit;
+    /* Inherit background color from parent */
+    padding: 0;
+    /* Remove default padding */
+  }
+
+  .task-list h3 .fs-4 {
+    background-color: rgb(141, 11, 11);
+    /* Or rgb(61, 38, 190) for the other header */
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 0;
+    /* Remove default margin */
+    display: block;
+    /* Ensure the div behaves as a block element */
+  }
+
+  .task-card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 0.975rem;
+    background-color: var(--task-bg-color);
+  }
+
+  .task-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  }
+
+
+  .task-card .details {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #6c757d;
+  }
+
+  .task-card .details .separator {
+    width: 1px;
+    height: 0.75rem;
+    background-color: #e0e0e0;
+  }
+
+  @media (max-width: 768px) {
+    .task-card .details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .task-card .details .separator {
+      display: none;
+    }
+
+    .task-list {
+      max-height: 65dvh;
+    }
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  .badgex {
+    font-size: 0.625rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .badgex.Low {
+    background-color: #228B22;
+    /* Darker Green */
+    color: #ffffff;
+  }
+
+  .badgex.Medium {
+    background-color: #FFD700;
+    /* Darker Yellow/Gold */
+    color: #000000;
+    /* Black text for better contrast */
+  }
+
+  .badgex.High {
+    background-color: #FF8C00;
+    /* Darker Orange/Dark Goldenrod */
+    color: #ffffff;
+  }
+
+  .badgex.Critical {
+    background-color: #DC143C;
+    /* Darker Red/Crimson */
+    color: #ffffff;
+  }
+
+  .badgex.Urgent {
+    background-color: #8B0000;
+    /* Very Dark Red/Dark Red */
+    color: #ffffff;
+  }
+
+  /* Buttons */
+
+  .task-actions {
+    display: flex;
+    /* Use Flexbox for layout */
+    justify-content: space-between;
+    /* Push buttons to the left and counter to the right */
+    align-items: center;
+    /* Vertically center the items */
+    padding: 10px;
+    /* Add some padding for spacing */
+    border-top: 1px solid #e0e0e0;
+    /* Optional: Add a border at the top */
+    background-color: #f9f9f9;
+    /* Optional: Add a light background */
+  }
+
+  .task-actions .btn {
+    margin-right: 10px;
+    /* Add spacing between buttons */
+  }
+
+  #taskCounter {
+    font-weight: bold;
+    /* Make the counter text bold */
+    color: #333;
+    /* Set the text color */
+  }
+
+
 </style>
 
 <!-- Search Bar and Sort Button -->
 <div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
 
-    <!-- Sort Button with Dropdown -->
-    <div class="dropdown">
-      <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="sortDropdown"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        Sort by: Priority
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="sortDropdown">
-        <li><a class="dropdown-item" data-sort="priority">Priority</a></li>
-        <li><a class="dropdown-item" data-sort="title">Title</a></li>
-        <li><a class="dropdown-item" data-sort="due_date">Due Date</a></li>
-        <li><a class="dropdown-item" data-sort="duration">Duration</a></li>
-        <li><a class="dropdown-item" data-sort="added">Added Date</a></li>
-        <li><a class="dropdown-item" data-sort="updated">Updated Date</a></li>
-        <li><a class="dropdown-item" data-sort="task_merit">Merit</a></li>
-      </ul>
+  <!-- Sort Button with Dropdown -->
+  <div class="dropdown">
+    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="sortDropdown"
+      data-bs-toggle="dropdown" aria-expanded="false">
+      Sort by: Priority
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+      <li><a class="dropdown-item" data-sort="priority">Priority</a></li>
+      <li><a class="dropdown-item" data-sort="title">Title</a></li>
+      <li><a class="dropdown-item" data-sort="due_date">Due Date</a></li>
+      <li><a class="dropdown-item" data-sort="duration">Duration</a></li>
+      <li><a class="dropdown-item" data-sort="added">Added Date</a></li>
+      <li><a class="dropdown-item" data-sort="updated">Updated Date</a></li>
+      <li><a class="dropdown-item" data-sort="task_merit">Merit</a></li>
+    </ul>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="flex-grow-1 position-relative">
+    <form id="searchForm">
+      <input type="text" id="searchInput" class="form-control form-control-sm search-input"
+        placeholder="Search tasks...">
+      <!-- Search btn Icon -->
+      <button type="submit" id="searchButton"
+        class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
+              <i class="fas fa-search search-icon"></i>
+            </button>
+    </form>
+  </div>
+</div>
+<div class="task-container">
+  <div class="outerbox flex-column">
+    <h3>
+      <div class='fs-4'
+        style='text-align: center; background-color: rgb(141, 11, 11); color: white; padding: 10px; border-radius: 8px;'>
+        Useful Tasks to Import
+      </div>
+    </h3>
+    <div class="task-list">
+      <div id="tasks"></div>
     </div>
-  
-    <!-- Search Bar -->
-    <div class="flex-grow-1 position-relative">
-      <form id="searchForm">
-        <input type="text" id="searchInput" class="form-control form-control-sm search-input" placeholder="Search tasks...">
-        <!-- Search btn Icon -->
-        <button type="submit" id="searchButton" class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
-          <i class="fas fa-search search-icon"></i>
-        </button>
-      </form>
+    <!-- Buttons and Counter -->
+    <div class="task-actions">
+      <div style="display: flex; gap: 10px;">
+        <button id="addSelectedBtn" class="btn btn-primary">Add Selected</button>
+        <button id="cancelBtn" class="btn btn-outline-secondary">Cancel</button>
+      </div>
+      <span id="taskCounter">Selected: 0</span>
     </div>
   </div>
+</div>
+
+
+<script>
+  // Wrap your script logic in a function
+  function initializeTaskManager() {
+    // Fetch tasks from the backend
+    fetchTasks();
+
+    // Function to fetch tasks
+    async function fetchTasks(query = '') {
+      try {
+        // Build the URL with the query parameter if provided
+        const url = query ? `{% url "task_list" %}?q=${encodeURIComponent(query)}` : '{% url "task_list" %}';
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // Add authentication token if required
+            // 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch tasks');
+        }
+
+        const tasks = await response.json();
+        renderTasks(tasks); // Render the tasks in the UI
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    }
+
+    function renderTasks(tasks) {
+      const tasksContainer = document.querySelector('#tasks');
+
+      // Clear existing tasks
+      tasksContainer.innerHTML = '';
+
+      // Render tasks or "No Task Here" message
+      if (tasks.length > 0) {
+        tasks.forEach(task => {
+          const taskCard = createTaskCard(task); // Create the task card element
+          // const taskCardClone = taskCard.cloneNode(true); // Clone the task card for desktop
+
+          // Attach the onclick event handler to the cloned task card
+          // taskCardClone.onclick = () => showTaskDetail(task.id);
+
+          // tasksContainer.appendChild(taskCardClone); // Append clone to desktop
+          tasksContainer.appendChild(taskCard); // Append original to mobile
+        });
+      } else {
+        const noTaskMessage = document.createElement('div');
+        noTaskMessage.textContent = 'No Task Here';
+        noTaskMessage.style.textAlign = 'center';
+        noTaskMessage.style.color = '#888';
+        noTaskMessage.style.padding = '1rem';
+
+        tasksContainer.appendChild(noTaskMessage); // Append to tasks container
+      }
+    }
+
+
+
+    function createTaskCard(task) {
+      const taskCard = document.createElement('div');
+      taskCard.className = `task-card task-${task.id}`;
+
+      // Add a checkbox for selection
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'task-selector';
+      checkbox.value = task.id; // Set the value to the task ID
+
+
+      // Wrap the checkbox in a container for styling
+      const checkboxContainer = document.createElement('div');
+      checkboxContainer.className = 'task-selector-container';
+      checkboxContainer.appendChild(checkbox);
+
+      // Task Title with Icon and Checkbox
+      const title = document.createElement('h4');
+      title.className = 'task-title';
+
+      // Create a wrapper for the checkbox and title
+      const titleWrapper = document.createElement('div');
+      titleWrapper.className = 'title-wrapper';
+      titleWrapper.appendChild(checkboxContainer);
+      titleWrapper.appendChild(title);
+
+
+      // Add the title icon and text
+      title.innerHTML += `
+          <span class="title-icon"><i class="bi bi-card-heading"></i></span>
+          <span class="title-text">${task.title}</span>
+      `;
+
+      // Add the rest of the task card content
+      if (task.color) {
+        const darkerColor = darkenHexColor(task.color, 0.1);
+        taskCard.style.setProperty('--task-bg-color', task.color);
+        taskCard.style.setProperty('--task-dark-bg-color', darkerColor);
+      }
+
+      // Task Details Container
+      const details = document.createElement('div');
+      details.className = 'details';
+
+      // Duration with Icon
+      const duration = document.createElement('span');
+      duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`;
+
+      // Category with Icon
+      const category = document.createElement('span');
+      category.innerHTML = `<i class="bi bi-tag"></i> ${task.category ? task.category : 'Uncategorized'}`;
+
+      // Frequency Interval with Icon
+      const frequencyInterval = document.createElement('span');
+      frequencyInterval.innerHTML = `<i class="bi bi-calendar-repeat"></i> Repeats every ${task.frequency_interval} days`;
+
+      // Priority Badge with Icon
+      const priorityBadge = document.createElement('span');
+      priorityBadge.className = `badgex ${getPriorityLabel(task.priority)}`;
+      priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`;
+      priorityBadge.style.marginLeft = 'auto';
+
+      // Append elements to details
+      details.appendChild(duration);
+      details.appendChild(createSeparator());
+      details.appendChild(category);
+      details.appendChild(createSeparator());
+      details.appendChild(frequencyInterval);
+      details.appendChild(createSeparator());
+      details.appendChild(priorityBadge);
+
+      // Append elements to task card
+      taskCard.appendChild(titleWrapper);
+      // taskCard.appendChild(title);
+      taskCard.appendChild(details);
+
+      checkbox.onclick = (e) => {
+        e.stopPropagation(); // Prevent the card's onclick event from firing
+        handleTaskSelection(task.id, checkbox.checked); // Handle selection logic
+      };
+
+      // Add onclick event to the task card (excluding the checkbox)
+      taskCard.onclick = (e) => {
+        if (!e.target.classList.contains('task-selector')) {
+          showTaskDetail(task.id);
+        }
+      };
+
+      return taskCard;
+    }
+
+    // Function to create a separator
+    function createSeparator() {
+      const separator = document.createElement('div');
+      separator.className = 'separator';
+      return separator;
+    }
+
+    // Dark color for dark theme background
+    function darkenHexColor(hex, factor) {
+      // Remove the '#' if it exists
+      hex = hex.replace(/^#/, '');
+
+      // Parse the HEX into RGB components
+      let r = parseInt(hex.slice(0, 2), 16) / 255;
+      let g = parseInt(hex.slice(2, 4), 16) / 255;
+      let b = parseInt(hex.slice(4, 6), 16) / 255;
+
+      // Convert RGB to HSL
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0; // achromatic
+      } else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      // Adjust lightness to make the color darker
+      l = l * factor;
+
+      // Slightly increase saturation to make the color richer
+      s = Math.min(s * 1.2, 1); // Limit saturation to 1 to avoid oversaturation
+
+      // Convert HSL back to RGB
+      let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      let p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+
+      // Convert RGB back to HEX
+      r = Math.round(r * 255);
+      g = Math.round(g * 255);
+      b = Math.round(b * 255);
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).padStart(6, '0')}`;
+    }
+
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+
+    // Function to get priority label
+    function getPriorityLabel(priority) {
+      switch (priority) {
+        case 1:
+          return 'Low';
+        case 2:
+          return 'Medium';
+        case 3:
+          return 'High';
+        case 4:
+          return 'Urgent';
+        case 5:
+          return 'Critical';
+        default:
+          return '';
+      }
+    }
+
+    function formatDuration(minutes) {
+      if (minutes === null || minutes === undefined) {
+        return "Duration: N/A"; // Handle cases where duration is not available
+      }
+
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+
+      const formattedHours = String(hours).padStart(2, '0');
+      const formattedMinutes = String(remainingMinutes).padStart(2, '0');
+      if (formattedHours === `00`) {
+        return `Duration: ${formattedMinutes} Minutes`;
+      } else {
+        return `Duration: ${formattedHours} hr ${formattedMinutes} min`;
+      }
+
+    }
+
+    const selectedTasks = new Set(); // Track selected task IDs
+    const taskCounter = document.getElementById('taskCounter');
+
+    function handleTaskSelection(taskId, isSelected) {
+      if (isSelected) {
+        selectedTasks.add(taskId); // Add task ID to the set
+      } else {
+        selectedTasks.delete(taskId); // Remove task ID from the set
+      }
+      taskCounter.textContent = `Selected: ${selectedTasks.size}`;
+    }
+
+    function showTaskDetail(){
+      console.log('Task is clicked');
+    }
+  };
+  initializeTaskManager();
+</script>

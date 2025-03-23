@@ -20,7 +20,7 @@ class PublicTask(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     priority = models.IntegerField(choices=PRIORITY_CHOICES, default=1)
-    category = models.ForeignKey("TaskCategory", on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey("PublicTaskCategory", on_delete=models.SET_NULL, blank=True, null=True)
     task_merit = models.IntegerField(blank=True, null=True)  # Merit score for the task
 
     duration = models.IntegerField(default=20) #default duration of a task is 20 minutes if not specified...
