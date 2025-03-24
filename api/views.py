@@ -190,19 +190,27 @@ class PublicTaskListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-
-        # Get the base queryset filtered by the logged-in user and active tasks
+        # Get the base queryset
         queryset = PublicTask.objects.all()
+        
+        # Get titles of tasks to exclude (user's repetitive active tasks)
+        exclude_titles = Task.objects.filter(
+            user=self.request.user,
+            is_repetitive=True,  # Fixed typo: was 'is_repeptitive'
+        ).values_list('title', flat=True)  # Get just the titles
 
-        # Check if a search query is provided
+        # Exclude tasks with matching titles
+        if exclude_titles:
+            queryset = queryset.exclude(title__in=exclude_titles)
+
+        # Handle search query
         search_query = self.request.query_params.get('q', None)
         if search_query:
-            # Filter tasks based on the search query
             queryset = queryset.filter(
-                Q(title__icontains=search_query) |  # Search by title
-                Q(description__icontains=search_query)  # Search by description
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query)
             )
-
+                
         return queryset.order_by('title')
     
 class BulkCreateTasksFromPublicTasks(APIView):
@@ -211,5 +219,5 @@ class BulkCreateTasksFromPublicTasks(APIView):
         serializer = PublicTaskToTaskSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             tasks = serializer.save()
-            return Response({"message": f"{len(tasks)} tasks created successfully."}, status=status.HTTP_201_CREATED)
+            return Response({"message": f"{len(tasks)} tasks added successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

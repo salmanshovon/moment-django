@@ -97,13 +97,6 @@
     /* Slightly darker icon color on hover */
   }
 
-
-
-  .dropdown {
-    flex-shrink: 0;
-    /* Prevents the sort button from shrinking */
-  }
-
   .task-container {
     display: flex;
     gap: 1rem;
@@ -304,6 +297,7 @@
     /* Optional: Add a border at the top */
     background-color: #f9f9f9;
     /* Optional: Add a light background */
+    border-radius: 8px;
   }
 
   .task-actions .btn {
@@ -319,63 +313,180 @@
   }
 
 
+  /* Dark Theme Styles */
+  body.dark-theme {
+    background-color: #121212;
+    /* Dark background */
+    color: #e0e0e0;
+    /* Light text */
+  }
+
+  /* Dark Theme */
+  body.dark-theme .search-input {
+    background-color: #333; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    border: 1px solid #444; /* Dark border */
+  }
+
+  body.dark-theme .search-button {
+    background-color: #444; /* Darker background for dark mode */
+    color: #e0e0e0; /* Light icon color for dark mode */
+    border: #444;
+  }
+
+  body.dark-theme .search-button:hover {
+    background-color: #555; /* Slightly lighter background on hover */
+    color: #ffffff; /* Brighter icon color on hover */
+  }
+
+  body.dark-theme .search-input::placeholder {
+    color: #e0e0e0;
+    /* White or light-colored placeholder text */
+    opacity: 1;
+    /* Ensure full opacity for consistent visibility */
+  }
+
+  body.dark-theme .task-card {
+      background-color: var(--task-dark-bg-color);
+  }
+
+  /* Dark Theme for Separator */
+  body.dark-theme .task-card .details .separator {
+    background-color: #555;
+    /* Darker separator */
+  }
+
+  body.dark-theme .task-card:hover {
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.55);
+  }
+
+  /* Dark Theme for Buttons */
+  body.dark-theme .btn-primary {
+    background-color: #0056b3; /* Keep primary button color */
+    color: #ffffff; /* Light text */
+  }
+
+  body.dark-theme .btn-primary:hover {
+    background-color: #004085; /* Darker hover color */
+  }
+
+  body.dark-theme .btn-outline-secondary {
+    border-color: #6c757d; /* Keep border color */
+    color: #e0e0e0; /* Keep text color */
+  }
+
+  body.dark-theme .btn-outline-secondary:hover {
+    background-color: #6c757d; /* Keep hover background color */
+    color: #ffffff; /* Light text */
+  }
+
+  /* Dark Theme for Task List */
+  body.dark-theme .task-list {
+    background-color: #222;
+    /* Dark background */
+    border-color: #444;
+    /* Darker border */
+  }
+
+  /* Dark Theme for Task Details */
+  body.dark-theme .task-detail {
+    background-color: #333;
+    /* Dark background */
+    color: #e0e0e0;
+    /* Light text */
+  }
+
+  /* Dark Theme for Separator */
+  body.dark-theme .task-card .details .separator {
+    background-color: #555;
+    /* Darker separator */
+  }
+
+  body.dark-theme .task-list .details {
+    color: #e0e0e0;
+  }
+
+  /* Dark Theme for Task Title */
+  body.dark-theme .task-title {
+    color: #e0e0e0;
+    /* Light text */
+  }
+
+  body.dark-theme .title-icon {
+    color: #e0e0e0;
+  }
+
+  /* Dark Theme for Overlay */
+  body.dark-theme .overlay {
+    background: rgba(0, 0, 0, 0.7);
+    /* Darker overlay */
+  }
+
+  /* Dark Theme for Scrollbar */
+  body.dark-theme .task-list::-webkit-scrollbar-track {
+    background: #444;
+    /* Dark track */
+  }
+
+  body.dark-theme .task-list::-webkit-scrollbar-thumb {
+    background: #666;
+    /* Light thumb */
+  }
+
+  body.dark-theme .task-list {
+    scrollbar-color: #666 #444;
+    /* Thumb and track colors for Firefox */
+  }
+
+  body.dark-theme .task-actions {
+    background-color: #353535;
+  }
+
+  body.dark-theme #taskCounter {
+    color: #e0e0e0;
+  }
+
+
 </style>
+<div class="container p-0 shadow-sm rounded" style="max-width: 800px;">
+  <!-- Search Bar-->
+  <div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
 
-<!-- Search Bar and Sort Button -->
-<div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
-
-  <!-- Sort Button with Dropdown -->
-  <div class="dropdown">
-    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="sortDropdown"
-      data-bs-toggle="dropdown" aria-expanded="false">
-      Sort by: Priority
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
-      <li><a class="dropdown-item" data-sort="priority">Priority</a></li>
-      <li><a class="dropdown-item" data-sort="title">Title</a></li>
-      <li><a class="dropdown-item" data-sort="due_date">Due Date</a></li>
-      <li><a class="dropdown-item" data-sort="duration">Duration</a></li>
-      <li><a class="dropdown-item" data-sort="added">Added Date</a></li>
-      <li><a class="dropdown-item" data-sort="updated">Updated Date</a></li>
-      <li><a class="dropdown-item" data-sort="task_merit">Merit</a></li>
-    </ul>
-  </div>
-
-  <!-- Search Bar -->
-  <div class="flex-grow-1 position-relative">
-    <form id="searchForm">
-      <input type="text" id="searchInput" class="form-control form-control-sm search-input"
-        placeholder="Search tasks...">
-      <!-- Search btn Icon -->
-      <button type="submit" id="searchButton"
-        class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
-              <i class="fas fa-search search-icon"></i>
-            </button>
-    </form>
-  </div>
-</div>
-<div class="task-container">
-  <div class="outerbox flex-column">
-    <h3>
-      <div class='fs-4'
-        style='text-align: center; background-color: rgb(141, 11, 11); color: white; padding: 10px; border-radius: 8px;'>
-        Useful Tasks to Import
-      </div>
-    </h3>
-    <div class="task-list">
-      <div id="tasks"></div>
+    <!-- Search Bar -->
+    <div class="flex-grow-1 position-relative">
+      <form id="searchForm">
+        <input type="text" id="searchInput" class="form-control form-control-sm search-input"
+          placeholder="Search tasks...">
+        <!-- Search btn Icon -->
+        <button type="submit" id="searchButton"
+          class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
+                <i class="fas fa-search search-icon"></i>
+              </button>
+      </form>
     </div>
-    <!-- Buttons and Counter -->
-    <div class="task-actions">
-      <div style="display: flex; gap: 10px;">
-        <button id="addSelectedBtn" class="btn btn-primary">Add Selected</button>
-        <button id="cancelBtn" class="btn btn-outline-secondary">Cancel</button>
+  </div>
+  <div class="task-container">
+    <div class="outerbox flex-column">
+      <h3>
+        <div class='fs-4'
+          style='text-align: center; background-color: rgb(141, 11, 11); color: white; padding: 10px; border-radius: 8px;'>
+          Useful Tasks to Import
+        </div>
+      </h3>
+      <div class="task-list">
+        <div id="tasks"></div>
       </div>
-      <span id="taskCounter">Selected: 0</span>
+      <!-- Buttons and Counter -->
+      <div class="task-actions">
+        <div style="display: flex; gap: 10px;">
+          <button id="addSelectedBtn" class="btn btn-primary">Add Selected</button>
+          <button id="cancelBtn" class="btn btn-outline-secondary">Cancel</button>
+        </div>
+        <span id="taskCounter">Selected: 0</span>
+      </div>
     </div>
   </div>
 </div>
-
 
 <script>
   // Wrap your script logic in a function
@@ -691,14 +802,18 @@
         console.log('Server Response:', data);
 
         // Handle success (e.g., show a success message)
-        showMessage(`Successfully created ${data.message}`, 'success');
+        showMessage(`${data.message}`, 'success');
 
         // Clear the selected tasks after successful creation
         selectedTasks.clear();
+        const query = searchInput.value.trim(); // Get the search query
+        fetchTasks(query); // Fetch tasks with the search query
         taskCounter.textContent = `Selected: ${selectedTasks.size}`;
+
+        
       } catch (error) {
         console.error('Error:', error);
-        alert('Failed to create tasks. Please try again.');
+        showMessage('Failed to create tasks. Please try again.', 'error');
       }
     }
   };

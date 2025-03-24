@@ -99,8 +99,14 @@
     #repetitive-tasks, #one-time-tasks {
         overflow-y: auto;
         flex: 1;
-        max-height: calc(100dvh - 700px);
+        max-height: calc(100dvh - 710px);
     }
+
+    /* .task-counter {
+        font-size: 0.85rem;
+        margin-left: 10px;
+        color:#e0e0e0 !important;
+    } */
 
     #misc-tasks {
         min-height: 80px; /* Or any smaller height you prefer */
@@ -478,7 +484,7 @@
         <div class="col-5 h-100">
             <div class="tasks h-100">
                 <div class="task-category">
-                    <p class="task-category-title one-time">One-time Tasks</p>
+                    <div class="task-category-title one-time">One-time Tasks</div>
                     <ul id="one-time-tasks" class="task-list" data-type="onetime">
                         <li class="task-item" draggable="true" data-id="1" data-item-type="onetime">Task A</li>
                         <li class="task-item" draggable="true" data-id="2" data-item-type="onetime">Task B</li>
