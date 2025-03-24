@@ -632,6 +632,9 @@
 
     const selectedTasks = new Set(); // Track selected task IDs
     const taskCounter = document.getElementById('taskCounter');
+    const addSelectedBtn = document.getElementById('addSelectedBtn');
+    // Attach the function to the "Add Selected" button
+    addSelectedBtn.addEventListener('click', sendSelectedTasksToServer);
 
     function handleTaskSelection(taskId, isSelected) {
       if (isSelected) {
@@ -657,6 +660,47 @@
       const query = searchInput.value.trim(); // Get the search query
       fetchTasks(query); // Fetch tasks with the search query
     });
+
+    // Async function to send selected task IDs to the server
+    async function sendSelectedTasksToServer() {
+      if (selectedTasks.size === 0) {
+        showMessage('No Task Selected!', 'error');
+        return;
+      }
+
+      const payload = {
+        public_task_ids: Array.from(selectedTasks), // Convert Set to Array
+      };
+      const csrftoken = getCSRFToken();
+
+      try {
+        const response = await fetch('{% url "import_tasks" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Server Response:', data);
+
+        // Handle success (e.g., show a success message)
+        showMessage(`Successfully created ${data.message}`, 'success');
+
+        // Clear the selected tasks after successful creation
+        selectedTasks.clear();
+        taskCounter.textContent = `Selected: ${selectedTasks.size}`;
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to create tasks. Please try again.');
+      }
+    }
   };
   initializeTaskManager();
 </script>

@@ -696,12 +696,6 @@
 
 
     (function () {
-        function getCSRFToken() {
-            return document.cookie
-                .split('; ')
-                .find(row => row.startsWith('csrftoken='))
-                ?.split('=')[1];
-        }
 
         // Function to delete task
         async function delTask(taskId) {

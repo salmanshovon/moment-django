@@ -1,8 +1,10 @@
 from rest_framework import serializers
-from tasks.models import Task, PublicTask
+from tasks.models import Task, PublicTask, TaskCategory
 from routines.models import Routine, Notification
 from django.utils import timezone
-from users.models import UserSettings
+from users.models import UserSettings, Profile
+import pytz
+from datetime import timedelta
 
 
 class TaskDetails(serializers.ModelSerializer):
@@ -207,3 +209,53 @@ class NotificationUpdateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Either is_read or is_generated must be provided.")
 
         return data
+    
+
+class PublicTaskToTaskSerializer(serializers.Serializer):
+    public_task_ids = serializers.ListField(child=serializers.IntegerField())
+
+    def create(self, validated_data):
+        public_task_ids = validated_data['public_task_ids']
+
+        # Fetch the user and their categories in one query
+        user = self.context['request'].user
+        user_categories = TaskCategory.get_categories(user)
+        user_categories_dict = {cat['title']: cat['id'] for cat in user_categories}
+
+        # Fetch all PublicTask objects in one query
+        public_tasks = PublicTask.objects.filter(id__in=public_task_ids).select_related('category')
+
+        profile = Profile.objects.filter(user=user).first()
+        user_tz = pytz.timezone(profile.user_timezone) if profile.user_timezone else pytz.UTC
+        
+
+        # Calculate tomorrow's date
+        tomorrow = timezone.localtime(timezone.now(), user_tz).date() + timedelta(days=1)
+
+
+        tasks_to_create = []
+        for public_task in public_tasks:
+            category_title = public_task.category.title if public_task.category else None
+            category_id = user_categories_dict.get(category_title) if category_title else None
+
+            task_data = {
+                'user': user,
+                'title': public_task.title,
+                'description': public_task.description,
+                'priority': public_task.priority,
+                'category_id': category_id,
+                'task_merit': public_task.task_merit,
+                'duration': public_task.duration,
+                'is_repetitive': public_task.is_repetitive,
+                'frequency_interval': public_task.frequency_interval,
+                'notification_days': public_task.notification_days,
+                'due_date': tomorrow,  # Set due_date as tomorrow
+                'is_active': True,
+                'in_routine': False,
+            }
+
+            tasks_to_create.append(Task(**task_data))
+
+        # Bulk create all tasks in one query
+        Task.objects.bulk_create(tasks_to_create)
+        return tasks_to_create

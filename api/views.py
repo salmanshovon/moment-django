@@ -4,7 +4,7 @@ from django.db.models import Q
 from rest_framework.response import Response
 from tasks.models import Task, PublicTask
 from routines.models import Routine, Notification
-from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer, PublicTaskList
+from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer, PublicTaskList, PublicTaskToTaskSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -204,3 +204,12 @@ class PublicTaskListAPIView(generics.ListAPIView):
             )
 
         return queryset.order_by('title')
+    
+class BulkCreateTasksFromPublicTasks(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        serializer = PublicTaskToTaskSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            tasks = serializer.save()
+            return Response({"message": f"{len(tasks)} tasks created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

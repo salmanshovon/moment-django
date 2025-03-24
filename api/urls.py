@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView, NotificationsView, NotificationUpdateView, PublicTaskListAPIView
+from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView, NotificationsView, NotificationUpdateView, PublicTaskListAPIView, BulkCreateTasksFromPublicTasks
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -15,4 +15,5 @@ urlpatterns = [
     path('notification/', NotificationsView.as_view(), name='get_notifications'),
     path('noti-update/', NotificationUpdateView.as_view(), name='update_notification'),
     path('pub-task-list/', PublicTaskListAPIView.as_view(), name='pub_task_list'),
+    path('import-tasks/', BulkCreateTasksFromPublicTasks.as_view(), name='import_tasks'),
 ]
