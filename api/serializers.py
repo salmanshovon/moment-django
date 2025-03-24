@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tasks.models import Task
+from tasks.models import Task, PublicTask
 from routines.models import Routine, Notification
 from django.utils import timezone
 from users.models import UserSettings
@@ -63,6 +63,33 @@ class TaskList(serializers.ModelSerializer):
         if obj.category:
             if not obj.category.is_removed:  # Ignore removed public categories
                 return getattr(obj.category.category, 'color', obj.category.custom_color or '#FFFFFF')
+        return '#FFFFFF'  # Default color if no category is found
+    
+class PublicTaskList(serializers.ModelSerializer):
+    category = serializers.SerializerMethodField()
+    color = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PublicTask
+        fields = [
+            'id', 'title', 'priority', 'category', 'duration', 'is_repetitive', 'frequency_interval', 'color', 'task_merit', 
+            'notification_days', 'description'
+        ]
+
+    def get_category(self, obj):
+        """
+        Returns the category title if the task has a category.
+        """
+        if obj.category:
+            return obj.category.title
+        return None  # If no category is assigned
+
+    def get_color(self, obj):
+        """
+        Returns the category color if the task has a category, otherwise returns a default color.
+        """
+        if obj.category:
+            return obj.category.color or '#FFFFFF'  # Use category color or default to white
         return '#FFFFFF'  # Default color if no category is found
     
 

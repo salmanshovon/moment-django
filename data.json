@@ -1,0 +1,408 @@
+[
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Morning Meditation",
+            "description": "Start the day with 10 minutes of meditation to clear your mind.",
+            "priority": 1,
+            "category": 7, 
+            "task_merit": 5,
+            "duration": 10,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Daily Exercise",
+            "description": "Engage in 30 minutes of physical activity to stay fit.",
+            "priority": 2,
+            "category": 5,  
+            "task_merit": 8,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Plan Weekly Budget",
+            "description": "Review and plan your weekly budget to manage finances effectively.",
+            "priority": 3,
+            "category": 4,  
+            "task_merit": 7,
+            "duration": 20,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Family Dinner Planning",
+            "description": "Plan and prepare a family dinner to spend quality time together.",
+            "priority": 2,
+            "category": 3,  
+            "task_merit": 6,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Write Daily Journal",
+            "description": "Reflect on your day by writing in a journal for 15 minutes.",
+            "priority": 1,
+            "category": 7,  
+            "task_merit": 6,
+            "duration": 15,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Review Work Emails",
+            "description": "Check and respond to work emails to stay updated.",
+            "priority": 3,
+            "category": 9, 
+            "task_merit": 7,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Weekly Grocery Shopping",
+            "description": "Plan and purchase groceries for the week.",
+            "priority": 2,
+            "category": 2, 
+            "task_merit": 5,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Call a Friend",
+            "description": "Reach out to a friend or family member to maintain social connections.",
+            "priority": 1,
+            "category": 8,  
+            "task_merit": 6,
+            "duration": 20,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Organize Workspace",
+            "description": "Clean and organize your workspace for better productivity.",
+            "priority": 2,
+            "category": 6,  
+            "task_merit": 7,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Read a Book",
+            "description": "Spend 30 minutes reading a book for personal growth.",
+            "priority": 1,
+            "category": 5,  
+            "task_merit": 6,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Pay Monthly Bills",
+            "description": "Review and pay all monthly bills to avoid late fees.",
+            "priority": 3,
+            "category": 4,  
+            "task_merit": 8,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 3
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Plan Family Outing",
+            "description": "Organize a family outing or activity for the weekend.",
+            "priority": 2,
+            "category": 3,  
+            "task_merit": 7,
+            "duration": 20,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 2
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Practice a New Skill",
+            "description": "Spend 30 minutes learning or practicing a new skill.",
+            "priority": 1,
+            "category": 5,  
+            "task_merit": 7,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Weekly Work Review",
+            "description": "Review your work progress and plan for the upcoming week.",
+            "priority": 3,
+            "category": 9, 
+            "task_merit": 8,
+            "duration": 45,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Meal Prep for the Week",
+            "description": "Prepare meals for the week to save time and eat healthily.",
+            "priority": 2,
+            "category": 2,  
+            "task_merit": 7,
+            "duration": 90,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Attend a Social Event",
+            "description": "Participate in a social event to connect with others.",
+            "priority": 1,
+            "category": 8, 
+            "task_merit": 6,
+            "duration": 120,
+            "is_repetitive": true,
+            "frequency_interval": 14,
+            "notification_days": 2
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Declutter Living Space",
+            "description": "Spend 30 minutes decluttering and organizing your living space.",
+            "priority": 2,
+            "category": 6,  
+            "task_merit": 7,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 14,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Write a Blog Post",
+            "description": "Spend an hour writing a blog post to share your thoughts.",
+            "priority": 1,
+            "category": 1, 
+            "task_merit": 8,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Review Investment Portfolio",
+            "description": "Review and adjust your investment portfolio monthly.",
+            "priority": 3,
+            "category": 4, 
+            "task_merit": 8,
+            "duration": 45,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 3
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Family Game Night",
+            "description": "Organize a family game night to bond and have fun.",
+            "priority": 2,
+            "category": 3, 
+            "task_merit": 7,
+            "duration": 90,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Practice Gratitude",
+            "description": "Spend 10 minutes writing down things you are grateful for.",
+            "priority": 1,
+            "category": 7, 
+            "task_merit": 6,
+            "duration": 10,
+            "is_repetitive": true,
+            "frequency_interval": 1,
+            "notification_days": 0
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Update Resume",
+            "description": "Update your resume with recent achievements and skills.",
+            "priority": 3,
+            "category": 9,  
+            "task_merit": 7,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 2
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Deep Clean Kitchen",
+            "description": "Deep clean the kitchen to maintain hygiene and organization.",
+            "priority": 2,
+            "category": 2, 
+            "task_merit": 6,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 14,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Host a Dinner Party",
+            "description": "Plan and host a dinner party for friends or family.",
+            "priority": 2,
+            "category": 8,  
+            "task_merit": 7,
+            "duration": 120,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 3
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Create a Vision Board",
+            "description": "Spend an hour creating a vision board for your goals.",
+            "priority": 1,
+            "category": 1,  
+            "task_merit": 7,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Review Monthly Goals",
+            "description": "Review and adjust your monthly goals for personal and professional growth.",
+            "priority": 3,
+            "category": 6, 
+            "task_merit": 8,
+            "duration": 30,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 2
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Volunteer in the Community",
+            "description": "Spend time volunteering for a cause you care about.",
+            "priority": 2,
+            "category": 8,
+            "task_merit": 7,
+            "duration": 120,
+            "is_repetitive": true,
+            "frequency_interval": 30,
+            "notification_days": 3
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Plan a Creative Project",
+            "description": "Spend time planning a creative project or hobby.",
+            "priority": 1,
+            "category": 1,
+            "task_merit": 7,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 7,
+            "notification_days": 1
+        }
+    },
+    {
+        "model": "tasks.PublicTask",
+        "fields": {
+            "title": "Review Health Insurance",
+            "description": "Review and update your health insurance plan annually.",
+            "priority": 3,
+            "category": 4, 
+            "task_merit": 7,
+            "duration": 60,
+            "is_repetitive": true,
+            "frequency_interval": 365,
+            "notification_days": 30
+        }
+    }
+]

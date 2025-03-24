@@ -2,9 +2,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
-from tasks.models import Task
+from tasks.models import Task, PublicTask
 from routines.models import Routine, Notification
-from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer
+from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer, PublicTaskList
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -183,3 +183,24 @@ class NotificationUpdateView(generics.GenericAPIView):
             notification.save()
 
         return Response({"message": "Notifications updated successfully."}, status=status.HTTP_200_OK)
+    
+
+class PublicTaskListAPIView(generics.ListAPIView):
+    serializer_class = PublicTaskList
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+
+        # Get the base queryset filtered by the logged-in user and active tasks
+        queryset = PublicTask.objects.all()
+
+        # Check if a search query is provided
+        search_query = self.request.query_params.get('q', None)
+        if search_query:
+            # Filter tasks based on the search query
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |  # Search by title
+                Q(description__icontains=search_query)  # Search by description
+            )
+
+        return queryset.order_by('title')

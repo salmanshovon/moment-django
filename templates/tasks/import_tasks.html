@@ -387,7 +387,7 @@
     async function fetchTasks(query = '') {
       try {
         // Build the URL with the query parameter if provided
-        const url = query ? `{% url "task_list" %}?q=${encodeURIComponent(query)}` : '{% url "task_list" %}';
+        const url = query ? `{% url "pub_task_list" %}?q=${encodeURIComponent(query)}` : '{% url "pub_task_list" %}';
 
         const response = await fetch(url, {
           method: 'GET',
@@ -645,6 +645,18 @@
     function showTaskDetail(){
       console.log('Task is clicked');
     }
+
+    // search button function
+    // Get the form and input elements
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+
+    // Attach event listener to the form
+    searchForm.addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent the form from submitting the traditional way
+      const query = searchInput.value.trim(); // Get the search query
+      fetchTasks(query); // Fetch tasks with the search query
+    });
   };
   initializeTaskManager();
 </script>
