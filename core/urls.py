@@ -36,4 +36,5 @@ urlpatterns = [
     path('task/', include('tasks.urls')),
     path('api/', include('api.urls')),
     path('routine/', include('routines.urls')),
+    path('root/', include('root.urls')),
 ]

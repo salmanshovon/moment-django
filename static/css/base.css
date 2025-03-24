@@ -184,6 +184,15 @@ body {
     text-align: center; /* Centers the text */
 }
 
+/* Style for the "Already have an account? Sign In" text */
+.terms-text {
+    margin-top: 15px; /* Adds spacing from the button */
+    font-size: 14px; /* Adjusts text size */
+    color: #666; /* Subtle gray color */
+    text-align: center; /* Centers the text */
+}
+
+
 /* Style for the "Sign In" link */
 .signin-text a {
     color: #4a90e2; /* Matches your theme */

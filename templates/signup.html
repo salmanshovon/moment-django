@@ -62,14 +62,22 @@
 </form>
 <p class="signin-text">
     Already have an account? <a href="{% url 'signin' %}">Sign In</a>
-        <!-- Google Sign-In Button with Logo -->
+</p>
+
+<!-- Google Sign-In Button with Logo -->
 <div class="google-signin-container">
     {% load socialaccount %}
     <a href="{% provider_login_url 'google' %}" class="google-signin-button">
         <span>Sign in with Google</span>
     </a>
 </div>
+
+<!-- Terms and Conditions Notice -->
+<p class="terms-text">
+    By creating an account, you acknowledge that you have read and agree to our  
+    <a href="{% url 'terms&conditions' %}">Terms and Conditions</a>.
 </p>
+
 
 <script>
 // JavaScript to toggle password visibility
