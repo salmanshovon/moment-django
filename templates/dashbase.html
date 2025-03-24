@@ -189,7 +189,7 @@
             background: #ffffff;
             padding: 1.5rem;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
             z-index: 999;
             font-size: 0.975rem;
             width: 80vw; /* Set width to 80% of the viewport width */
@@ -518,9 +518,9 @@ body.dark-theme .dropdown-item:hover {
 
 /* Dark Theme for Warning Display */
 body.dark-theme .warningdiv {
-    background-color: #1e1e1e; /* Dark background for warning dialog */
+    background-color: #333; /* Dark background for warning dialog */
     color: #ffffff; /* Light text */
-    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1); /* Light shadow */
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.5); /* Light shadow */
 }
 
 /* Dark Theme for Text and Icons */
@@ -590,6 +590,22 @@ body.dark-theme .spinner {
 }
 
 </style>
+
+<script>
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        document.addEventListener('DOMContentLoaded', function() {
+            navigator.serviceWorker.register('{% static "js/sw.js" %}')
+            .then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+</script>
+
 </head>
 <body>
 
