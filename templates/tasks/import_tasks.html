@@ -234,6 +234,23 @@
     }
   }
 
+  .task-detail {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    font-size: 0.975rem;
+    width: 80vw;
+    /* Set width to 80% of the viewport width */
+    max-width: 500px;
+    /* Optional: set a maximum width */
+  }
+
   .overlay {
     position: fixed;
     top: 0;
@@ -480,7 +497,10 @@
       <div class="task-actions">
         <div style="display: flex; gap: 10px;">
           <button id="addSelectedBtn" class="btn btn-primary">Add Selected</button>
-          <button id="cancelBtn" class="btn btn-outline-secondary">Cancel</button>
+          <a href="{% url 'view_task' %}" class="btn btn-outline-secondary ajax-nav" style="text-decoration: none;"
+              onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
+              Cancel
+          </a>
         </div>
         <span id="taskCounter">Selected: 0</span>
       </div>
@@ -488,10 +508,17 @@
   </div>
 </div>
 
+<!-- Task Detail Overlay -->
+<div class="overlay" id="overlay" style="display: none;"></div>
+<div class="task-detail" id="taskDetail" style="display: none;">
+</div>
+
 <script>
+
   // Wrap your script logic in a function
   function initializeTaskManager() {
     // Fetch tasks from the backend
+    let tasksData = [];
     fetchTasks();
 
     // Function to fetch tasks
@@ -514,6 +541,8 @@
         }
 
         const tasks = await response.json();
+        tasksData = [...tasks];
+        console.log(tasksData);
         renderTasks(tasks); // Render the tasks in the UI
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -756,8 +785,67 @@
       taskCounter.textContent = `Selected: ${selectedTasks.size}`;
     }
 
-    function showTaskDetail(){
-      console.log('Task is clicked');
+    // Function to show task detail
+    async function showTaskDetail(taskId) {
+      try {
+        // Find the task in the local tasksData array
+        const taskDetail = tasksData.find(task => task.id === taskId);
+        
+        if (!taskDetail) {
+          throw new Error('Task not found');
+        }
+
+        renderTaskDetail(taskDetail);
+      } catch (error) {
+        console.error('Error fetching task details:', error);
+      }
+    }
+
+    // Function to render task detail
+    function renderTaskDetail(task) {
+      const overlay = document.getElementById('overlay');
+      const taskDetailContainer = document.getElementById('taskDetail');
+
+      // Clear existing content
+      taskDetailContainer.innerHTML = '';
+
+      // Create and append elements
+      const title = document.createElement('h4');
+      title.innerHTML = `<i class="bi bi-card-heading"></i> ${task.title}`; // Icon for title
+
+      const duration = document.createElement('p');
+      duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+
+      const category = document.createElement('p');
+      category.innerHTML = `<i class="bi bi-tag"></i> Category: ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
+
+      const priority = document.createElement('p');
+      priority.innerHTML = `<i class="bi bi-exclamation-circle"></i> Priority: ${getPriorityLabel(task.priority)}`; // Icon for priority
+
+      const frequency = document.createElement('p');
+      frequency.innerHTML = `<i class="bi bi-calendar-event"></i> Frequency: ${task.frequency_interval === 1 ? 'Daily' : `Repeats every ${task.frequency_interval ? task.frequency_interval : 'Undefined'} days`}`;
+
+      const description = document.createElement('p');
+      description.innerHTML = `<i class="bi bi-card-text"></i> Description: ${task.description || 'No description'}`; // Icon for description
+
+      // Only Okay button
+      const okayButton = document.createElement('button');
+      okayButton.className = 'btn btn-primary';
+      okayButton.innerHTML = `<i class="bi bi-check-circle"></i> Okay`; // Icon for Okay button
+      okayButton.onclick = closeTaskDetail;
+
+      // Append elements to task detail container
+      taskDetailContainer.appendChild(title);
+      taskDetailContainer.appendChild(duration);
+      taskDetailContainer.appendChild(category);
+      taskDetailContainer.appendChild(priority);
+      taskDetailContainer.appendChild(frequency);
+      taskDetailContainer.appendChild(description);
+      taskDetailContainer.appendChild(okayButton);
+
+      // Show overlay and task detail
+      overlay.style.display = 'block';
+      taskDetailContainer.style.display = 'block';
     }
 
     // search button function
@@ -799,7 +887,6 @@
         }
 
         const data = await response.json();
-        console.log('Server Response:', data);
 
         // Handle success (e.g., show a success message)
         showMessage(`${data.message}`, 'success');
@@ -810,11 +897,21 @@
         fetchTasks(query); // Fetch tasks with the search query
         taskCounter.textContent = `Selected: ${selectedTasks.size}`;
 
-        
+
       } catch (error) {
         console.error('Error:', error);
         showMessage('Failed to create tasks. Please try again.', 'error');
       }
+    }
+
+    // Function to close task detail
+    function closeTaskDetail() {
+      const overlay = document.getElementById('overlay');
+      const taskDetailContainer = document.getElementById('taskDetail');
+
+      // Hide overlay and task detail
+      overlay.style.display = 'none';
+      taskDetailContainer.style.display = 'none';
     }
   };
   initializeTaskManager();

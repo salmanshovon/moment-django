@@ -362,6 +362,26 @@
 
     /* Dark Theme Styles */
 
+  /* Dark Theme for Buttons */
+    body.dark-theme .btn-primary {
+        background-color: #0056b3; /* Keep primary button color */
+        color: #ffffff; /* Light text */
+    }
+
+    body.dark-theme .btn-primary:hover {
+        background-color: #004085; /* Darker hover color */
+    }
+
+    body.dark-theme .btn-outline-secondary {
+        border-color: #6c757d; /* Keep border color */
+        color: #e0e0e0; /* Keep text color */
+    }
+
+    body.dark-theme .btn-outline-secondary:hover {
+        background-color: #6c757d; /* Keep hover background color */
+        color: #ffffff; /* Light text */
+    }
+
     body.dark-theme .tasks, body.dark-theme .schedule {
         background:rgba(73, 73, 73, 0.5);
         box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
@@ -436,6 +456,31 @@
         border-color: #888; /* Highlight on focus */
         outline: none;
         box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark Theme Scrollbar Styling */
+    body.dark-theme #repetitive-tasks,
+    body.dark-theme #one-time-tasks,
+    body.dark-theme .scroll-container {
+        scrollbar-color: #555 #2d2d2d; /* Dark thumb and track */
+    }
+
+    body.dark-theme #repetitive-tasks::-webkit-scrollbar-track,
+    body.dark-theme #one-time-tasks::-webkit-scrollbar-track,
+    body.dark-theme .scroll-container::-webkit-scrollbar-track {
+        background: #2d2d2d; /* Dark background for the track */
+    }
+
+    body.dark-theme #repetitive-tasks::-webkit-scrollbar-thumb,
+    body.dark-theme #one-time-tasks::-webkit-scrollbar-thumb,
+    body.dark-theme .scroll-container::-webkit-scrollbar-thumb {
+        background: #555; /* Medium dark gray for the thumb */
+    }
+
+    body.dark-theme #repetitive-tasks::-webkit-scrollbar-thumb:hover,
+    body.dark-theme #one-time-tasks::-webkit-scrollbar-thumb:hover,
+    body.dark-theme .scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #777; /* Lighter gray on hover for better visibility */
     }
     
 
@@ -521,6 +566,7 @@
 <!-- Task Detail Overlay -->
 <div class="overlay" id="overlay" style="display: none;"></div>
 <div class="task-detail" id="taskDetail" style="display: none;"></div>
+<div class="passBoard" id="passBoard" style="display: none;"></div>
 
 
 <script>
@@ -1376,8 +1422,8 @@ $(document).ready(function () {
                     newItem = xx[0];
 
                     // Append the new item to #misc-tasks (instead of body)
-                    const miscTasksContainer = document.getElementById("misc-tasks");
-                    miscTasksContainer.appendChild(newItem);
+                    const passBoard = document.getElementById("passBoard");
+                    passBoard.appendChild(newItem);
 
                     // Add the "dragging" class to the new item
                     newItem.classList.add("dragging");
