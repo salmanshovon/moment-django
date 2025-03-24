@@ -47,7 +47,7 @@ class TaskAdmin(admin.ModelAdmin):
         'due_date',
     )
 
-    # Fields to search in the admin panel
+    # # Fields to search in the admin panel
     search_fields = (
         'title',
         'user__username',  # Search by username
@@ -59,7 +59,7 @@ class TaskAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
     # Date hierarchy for easy navigation by date
-    date_hierarchy = 'created_at'
+    # date_hierarchy = 'created_at'
 
     # Group fields in the edit form
     fieldsets = (
