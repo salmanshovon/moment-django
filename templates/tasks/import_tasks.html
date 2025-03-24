@@ -315,6 +315,7 @@
     background-color: #f9f9f9;
     /* Optional: Add a light background */
     border-radius: 8px;
+    margin-top: 10px;
   }
 
   .task-actions .btn {
@@ -542,7 +543,6 @@
 
         const tasks = await response.json();
         tasksData = [...tasks];
-        console.log(tasksData);
         renderTasks(tasks); // Render the tasks in the UI
       } catch (error) {
         console.error('Error fetching tasks:', error);
