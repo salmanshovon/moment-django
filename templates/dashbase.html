@@ -592,17 +592,26 @@ body.dark-theme .spinner {
 </style>
 
 <script>
-    // Service Worker Registration
     if ('serviceWorker' in navigator) {
-        document.addEventListener('DOMContentLoaded', function() {
-            navigator.serviceWorker.register('{% static "js/sw.js" %}')
-            .then(function(registration) {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(function(err) {
-                console.log('ServiceWorker registration failed: ', err);
-            });
+      // Register immediately (don't wait for DOMContentLoaded)
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('{% static "js/sw.js" %}', { 
+          scope: '/'  // Explicitly set scope to root
+        })
+        .then(registration => {
+          console.log('SW registered (scope:', registration.scope + ')');
+          
+          // Track SW state changes (debugging)
+          if (registration.installing) {
+            registration.installing.onstatechange = () => {
+              console.log('SW state:', registration.installing.state);
+            };
+          }
+        })
+        .catch(err => {
+          console.error('SW registration failed:', err);
         });
+      });
     }
 </script>
 
