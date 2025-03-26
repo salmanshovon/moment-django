@@ -221,3 +221,36 @@ class BulkCreateTasksFromPublicTasks(APIView):
             tasks = serializer.save()
             return Response({"message": f"{len(tasks)} tasks added successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+#For irrigation (Temporary)
+from .serializers import IrrigateBasicSerializer
+from routines.models import Irrigate
+
+class IrrigateSettingsAPI(generics.RetrieveAPIView):
+    """API to serve only time and command fields and update update_time on each request"""
+    serializer_class = IrrigateBasicSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_object(self):
+        obj, _ = Irrigate.objects.get_or_create(pk=1)
+        obj.update_time = timezone.now()  # Update the timestamp
+        obj.save(update_fields=['update_time'])  # Save only the update_time field
+        return obj
+
+class NodeMCUAckAPI(APIView):
+    """API for NodeMCU to send acknowledgment"""
+    permission_classes = [permissions.AllowAny]
+    def post(self, request):
+        irrigate = Irrigate.objects.filter(pk=1).first()
+        if not irrigate:
+            return Response({"status": "error", "message": "No irrigation settings found"}, status=404)
+        
+        # Update action_time and reset command
+        irrigate.action_time = timezone.now()
+        irrigate.command = False
+        irrigate.save()
+        
+        return Response({"status": "success", "message": "Acknowledgment received"})
+    
+# ------------------------------------------------------------------------------------------temporary zone ends------------------------------

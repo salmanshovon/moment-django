@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline | Connection Required</title>
+    <title>Offline | MOMENT by Aranya IT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
         body {
@@ -51,6 +51,12 @@
             font-weight: 600;
         }
         
+        .brand {
+            color: #4285f4;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
         .text-muted {
             color: #7f8c8d;
             margin-bottom: 1.5rem;
@@ -70,23 +76,45 @@
             border: none;
             cursor: pointer;
             margin-top: 0.5rem;
+            height: 1rem;
         }
         
         .retry-btn:hover {
             background-color: #3367d6;
             transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .retry-btn i {
             font-size: 1rem;
             color: white;
-            margin-right: 0.5rem;
+            margin-right: 8px;
+            vertical-align: middle;
+            position: relative;
+            top: 8px;
         }
         
         .footer {
             margin-top: 2rem;
             font-size: 0.85rem;
             color: #95a5a6;
+        }
+        
+        .logo {
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .logo .company {
+            color: #4285f4;
+        }
+        
+        .logo .product {
+            color: #34a853;
         }
         
         @media (max-width: 480px) {
@@ -100,12 +128,17 @@
 <body>
     <div class="offline-container">
         <div class="offline-alert">
+            <div class="logo">
+                <span class="company">Aranya IT</span> 
+                <span> | </span>
+                <span class="product">MOMENT</span>
+            </div>
             <i class="bi bi-wifi-off"></i>
             <h3>You're offline</h3>
             <p class="text-muted">We can't connect to the internet. Please check your network connection.</p>
             <a href="{% url 'root' %}" class="retry-btn" onclick="window.location.reload()">
                 <i class="bi bi-arrow-clockwise"></i>
-                Retry Connection
+                <span>Retry Connection</span>
             </a>
         </div>
         <div class="footer">

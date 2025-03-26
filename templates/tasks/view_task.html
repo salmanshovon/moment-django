@@ -574,11 +574,14 @@
 </div>
 
 <!-- Mobile Tab View -->
+ <!-- onclick="showTab('onetime')" -->
+ <!-- onclick="showTab('repetitive') -->
 <div class="tab-view">
-  <div class="tab-buttons">
-    <button onclick="showTab('onetime')" class="active">One-Time Tasks</button>
-    <button onclick="showTab('repetitive')">Repetitive Tasks</button>
+    <div class="tab-buttons">
+      <button data-tab="one-time" class="active">One-Time Tasks</button>
+      <button data-tab="repetitive">Repetitive Tasks</button>
   </div>
+
   <div id="mobile-onetime-tab" class="task-list"></div>
   <div id="mobile-repetitive-tab" class="task-list" style="display: none;"></div>
 </div>
@@ -1034,27 +1037,30 @@
 
     // Tab switching functionality
     function showTab(tabName) {
-      const repetitiveTab = document.getElementById('mobile-repetitive-tab');
-      const oneTimeTab = document.getElementById('mobile-onetime-tab');
-      const tabButtons = document.querySelectorAll('.tab-buttons button');
+        const repetitiveTab = document.getElementById('mobile-repetitive-tab');
+        const oneTimeTab = document.getElementById('mobile-onetime-tab');
+        const tabButtons = document.querySelectorAll('.tab-buttons button');
 
-      if (tabName === 'repetitive') {
-        repetitiveTab.style.display = 'block';
-        oneTimeTab.style.display = 'none';
-        tabButtons[1].classList.add('active');
-        tabButtons[0].classList.remove('active');
-      } else if (tabName === 'onetime') {
-        repetitiveTab.style.display = 'none';
-        oneTimeTab.style.display = 'block';
-        tabButtons[1].classList.remove('active');
-        tabButtons[0].classList.add('active');
-      }
+        if (tabName === 'repetitive') {
+            repetitiveTab.style.display = 'block';
+            oneTimeTab.style.display = 'none';
+        } else if (tabName === 'one-time') {
+            repetitiveTab.style.display = 'none';
+            oneTimeTab.style.display = 'block';
+        }
+
+        // Update active button state
+        tabButtons.forEach(button => {
+            button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
+        });
     }
+
 
     // Attach tab switching event listeners
     document.querySelectorAll('.tab-buttons button').forEach(button => {
-      button.addEventListener('click', () => showTab(button.getAttribute('onclick').match(/'(\w+)'/)[1]));
+        button.addEventListener('click', () => showTab(button.getAttribute('data-tab')));
     });
+
 
 
     // search button function

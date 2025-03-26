@@ -1,5 +1,5 @@
 // Service Worker with enhanced offline support for Django
-const CACHE_NAME = 'moment-v3';
+const CACHE_NAME = 'django-app-v3';
 const OFFLINE_URL = '/offline/';
 const CORE_ASSETS = [
   '/',
@@ -10,10 +10,10 @@ const CORE_ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(CORE_ASSETS))
-      .then(() => self.skipWaiting())
-      .catch(err => {})
-  );
+      .then(cache => {
+        return cache.addAll(CORE_ASSETS);
+      })
+      .then(() => self.skipWaiting()))
 });
 
 // Activate - Clean up old caches
@@ -28,30 +28,38 @@ self.addEventListener('activate', event => {
         })
       );
     })
-    .then(() => self.clients.claim())
+    .then(() => {
+      return self.clients.claim();
+    })
   );
 });
 
 // Fetch - Network first with cache fallback
 self.addEventListener('fetch', event => {
+  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
   const requestUrl = new URL(event.request.url);
 
+  // Handle API requests separately
   if (isApiRequest(event.request)) {
     event.respondWith(handleApiRequest(event.request));
     return;
   }
 
+  // Handle HTML pages (including offline fallback)
   if (isHtmlRequest(event.request)) {
     event.respondWith(
       fetch(event.request)
         .then(response => cacheThenReturn(event.request, response))
-        .catch(() => caches.match(OFFLINE_URL))
+        .catch(() => {
+          return caches.match(OFFLINE_URL);
+        })
     );
     return;
   }
 
+  // Default cache-first strategy for static assets
   event.respondWith(
     caches.match(event.request)
       .then(cached => cached || fetchAndCache(event.request))

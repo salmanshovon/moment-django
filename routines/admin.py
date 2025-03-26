@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RoutineTemplate, Routine, Reflection, Archive, Notification
+from .models import RoutineTemplate, Routine, Reflection, Archive, Notification, Irrigate
 
 @admin.register(RoutineTemplate)
 class RoutineTemplateAdmin(admin.ModelAdmin):
@@ -44,3 +44,30 @@ class NotificationAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at')
         }),
     )
+
+
+@admin.register(Irrigate)
+class IrrigateAdmin(admin.ModelAdmin):
+    list_display = ('time', 'command', 'action_time', 'update_time')
+    list_filter = ('command', 'action_time')
+    search_fields = ('time',)
+    list_editable = ('command',)
+    readonly_fields = ('update_time',)
+    actions = ['toggle_command']
+
+    fieldsets = (
+        ('Irrigation Settings', {
+            'fields': ('time', 'command')
+        }),
+        ('Timestamps', {
+            'fields': ('action_time', 'update_time'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def toggle_command(self, request, queryset):
+        """Custom admin action to toggle command status"""
+        for obj in queryset:
+            obj.command = not obj.command
+            obj.save()
+    toggle_command.short_description = "Toggle selected irrigation commands"

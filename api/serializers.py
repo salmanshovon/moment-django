@@ -6,6 +6,8 @@ from users.models import UserSettings, Profile
 import pytz
 from datetime import timedelta
 
+from routines.models import Irrigate
+
 
 class TaskDetails(serializers.ModelSerializer):
 
@@ -259,3 +261,12 @@ class PublicTaskToTaskSerializer(serializers.Serializer):
         # Bulk create all tasks in one query
         Task.objects.bulk_create(tasks_to_create)
         return tasks_to_create
+    
+
+#Temporary 2 serializers for irrigation:
+class IrrigateBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Irrigate
+        fields = ['time', 'command']
+
+# ----------------------------------------------------------temporary zone ends------------------------------

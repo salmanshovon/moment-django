@@ -142,3 +142,15 @@ class Archive(models.Model):
 
     def __str__(self):
         return f"Archived Task: {self.task_title} by {self.user.username}"
+    
+class Irrigate(models.Model):
+    time = models.IntegerField(help_text="Duration of irrigation in minutes")
+    command = models.BooleanField(default=False, help_text="On/Off command for irrigation")
+    update_time = models.DateTimeField(default=timezone.now, help_text="When the record was last updated")
+    action_time = models.DateTimeField(default=timezone.now, help_text="When the irrigation was actually performed")
+
+    def __str__(self):
+        return f"Irrigation for {self.time} mins at {self.action_time}"
+
+    class Meta:
+        ordering = ['-action_time']
