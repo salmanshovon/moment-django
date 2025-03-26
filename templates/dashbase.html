@@ -593,25 +593,34 @@ body.dark-theme .spinner {
 
 <script>
     if ('serviceWorker' in navigator) {
-      // Register immediately (don't wait for DOMContentLoaded)
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('{% static "js/sw.js" %}', { 
-          scope: '/'  // Explicitly set scope to root
-        })
-        .then(registration => {
-          console.log('SW registered (scope:', registration.scope + ')');
-          
-          // Track SW state changes (debugging)
-          if (registration.installing) {
-            registration.installing.onstatechange = () => {
-              console.log('SW state:', registration.installing.state);
-            };
-          }
-        })
-        .catch(err => {
-          console.error('SW registration failed:', err);
-        });
-      });
+        // Check if the context is secure
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                            window.location.hostname === '127.0.0.1';
+        const isHttps = window.location.protocol === 'https:';
+    
+        console.log("Checking if service worker can be registered...");
+        console.log("Is localhost:", isLocalhost);
+        console.log("Is HTTPS:", isHttps);
+
+        if (isHttps || isLocalhost) {
+            window.addEventListener('load', () => {
+                console.log("Window loaded. Attempting to register service worker.");
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }) 
+                .then(reg => {
+                    console.log('SW registered! Scope:', reg.scope);
+                    console.log("Service Worker Registration Object:", reg);
+                })
+                .catch(err => {
+                    console.error('SW failed:', err);
+                    console.error("Service Worker Registration Error:", err);
+                });
+            });
+        } else {
+            console.warn('ServiceWorker requires HTTPS (or localhost).');
+            console.warn("Service Worker Registration Blocked due to insecure context.");
+        }
+    } else {
+        console.warn('Service workers are not supported by this browser.');
     }
 </script>
 
