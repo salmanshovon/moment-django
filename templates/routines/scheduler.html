@@ -102,11 +102,10 @@
         max-height: calc(100dvh - 710px);
     }
 
-    /* .task-counter {
-        font-size: 0.85rem;
-        margin-left: 10px;
-        color:#e0e0e0 !important;
-    } */
+    .schedule-header {
+        font-size: 1.2rem; /* Adjust to match h5 size */
+        line-height: 1; /* Match h5's line height */
+    }
 
     #misc-tasks {
         min-height: 80px; /* Or any smaller height you prefer */
@@ -483,18 +482,217 @@
     body.dark-theme .scroll-container::-webkit-scrollbar-thumb:hover {
         background: #777; /* Lighter gray on hover for better visibility */
     }
-    
 
+    .panel-toggle-ribbon {
+        display: none;
+    }
+
+/* Mobile styles (applies to screens smaller than 768px) */
+@media (max-width: 767.98px) {
+  /* Override container padding for mobile */
+  .container-x {
+    padding: 0 !important;
+    overflow-x: hidden;
+    min-width: 300px !important;
+  }
+  
+  /* Make left section full width and override any min-width */
+  .col-md-7 {
+    width: 100% !important;
+    min-width: 200px !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .scroll-container{
+    height: calc(100dvh - 250px);
+  }
+  
+  /* Right section styling - initially hidden */
+  .col-md-5 {
+    position: fixed !important;
+    right: -100%;
+    top: 0;
+    height: 100vh !important;
+    width: 80% !important; /* Adjust width of slide-out panel */
+    background: white;
+    z-index: 998;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    padding: 1rem;
+    top: 61px !important;
+    height: calc(100dvh - 66px) !important;
+  }
+  
+  /* Ribbon to toggle right panel */
+  .panel-toggle-ribbon {
+    display: block;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #6c757d;
+    color: white;
+    padding: 10px 5px;
+    border-radius: 5px 0 0 5px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  
+  /* When panel is active */
+  .panel-active .col-md-5 {
+    right: 0 !important;
+  }
+  
+  /* Adjust schedule section height */
+  .schedule {
+    height: calc(100dvh - 100px) !important; /* Adjust based on your header height */
+  }
+  
+  /* Remove any horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  .schedule-header {
+    display: none;
+  }
+
+  .time-column {
+    width: 62px; 
+  }
+
+}
+    
+@media (max-width: 768px) {
+    .task-item .details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .task-item .details .separator {
+      display: none;
+    }
+  }
+
+
+/* Mobile Action Buttons Overlay */
+.mobile-actions-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1100;
+}
+
+.mobile-actions-container {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    transition: all 0.3s ease-out;
+}
+
+.mobile-actions-container.spread {
+    width: 150px;
+    height: 150px;
+}
+
+.mobile-action-btn {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: none;
+    font-size: 18px;
+    transition: all 0.3s ease-out;
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.mobile-action-btn.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.mobile-action-btn.up {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+}
+
+.mobile-action-btn.up.visible {
+    transform: translateX(-50%) scale(1);
+}
+
+.mobile-action-btn.down {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+}
+
+.mobile-action-btn.down.visible {
+    transform: translateX(-50%) scale(1);
+}
+
+.mobile-action-btn.left {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scale(0.5);
+}
+
+.mobile-action-btn.left.visible {
+    transform: translateY(-50%) scale(1);
+}
+
+.mobile-action-btn.right {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) scale(0.5);
+}
+
+.mobile-action-btn.right.visible {
+    transform: translateY(-50%) scale(1);
+}
+
+.mobile-action-btn.center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: #007bff;
+    color: white;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
 </style>
+
 </head>
 <body>
 <div class="container-x p-1">
     <div class="row h-100 g-2">
         <!-- Schedule Section (Left) -->
-        <div class="col-7 h-100 d-flex">
+        <div class="col-12 col-md-7 d-flex">
             <div class="schedule h-100 d-flex flex-column">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h5 class="mb-0">Task Scheduler</h5>
+                    <div class="schedule-header mb-0">Task Scheduler</div>
                     <div class="d-flex align-items-center">
                         <div class="ms-3">
                             <span>For&nbsp;</span>
@@ -527,7 +725,7 @@
         
 
         <!-- Tasks Section (Right) -->
-        <div class="col-5 h-100">
+        <div class="col-12 col-md-5 h-100">
             <div class="tasks h-100">
                 <div class="task-category">
                     <div class="task-category-title one-time">One-time Tasks</div>
@@ -812,9 +1010,26 @@ $(document).ready(function () {
                         // Append the task item to the schedule list
                         $("#schedule-list").append(taskItem);
 
-                        // Attach double-click event listener to the task item
-                        taskItem.on("click", function () {
-                            showTaskDetail(task.id, src, taskItem[0]); // Use task_id to show details
+                        // Attach click event listener to the task item
+                        taskItem.on('click', function(e) {
+                            console.log('taskItemClicked')
+                            // Check if device is mobile (touch device)
+                            const isMobile = window.innerWidth <= 768;
+                            
+                            if (!isMobile) {
+                                // Desktop behavior - always show details
+                                showTaskDetail(task.id, src, taskItem[0]);
+                                return;
+                            }
+                            
+                            // Mobile behavior - show action buttons
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Determine if item is in schedule list or tasks container
+                            const isInSchedule = this.closest('#schedule-list') !== null;
+                            
+                            showMobileActionButtons(task.id, src, this, isInSchedule);
                         });
                     });
                     // Call updateTimeSlots to generate time slots after adding tasks
@@ -881,9 +1096,26 @@ $(document).ready(function () {
                         $("#one-time-tasks").append(taskItem);
                     }
 
-                    // Attach double-click event listener to the task item
-                    taskItem.on("click", function () {
-                        showTaskDetail(task.id, 'tsk', taskItem[0]);
+                    // Attach click event listener to the task item
+                    taskItem.on('click', function(e) {
+                        console.log('taskItemClicked')
+                        // Check if device is mobile (touch device)
+                        const isMobile = window.innerWidth <= 768;
+                        
+                        if (!isMobile) {
+                            // Desktop behavior - always show details
+                            showTaskDetail(task.id, 'tsk', taskItem[0]);
+                            return;
+                        }
+                        
+                        // Mobile behavior - show action buttons
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Determine if item is in schedule list or tasks container
+                        const isInSchedule = this.closest('#schedule-list') !== null;
+                        
+                        showMobileActionButtons(task.id, 'tsk', this, isInSchedule);
                     });
                 });
             },
@@ -899,9 +1131,27 @@ $(document).ready(function () {
             const id = task.id;
             const taskItem = createMiscTask(task, id, "y");
             $("#misc-tasks").append(taskItem);
-            taskItem.on("click", function () {
-                showTaskDetail(task.id, 'msc', taskItem[0]);
-            })
+            // Attach click event listener to the task item
+            taskItem.on('click', function(e) {
+                console.log('taskItemClicked')
+                // Check if device is mobile (touch device)
+                const isMobile = window.innerWidth <= 768;
+                
+                if (!isMobile) {
+                    // Desktop behavior - always show details
+                    showTaskDetail(task.id, 'msc', this);
+                    return;
+                }
+                
+                // Mobile behavior - show action buttons
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Determine if item is in schedule list or tasks container
+                const isInSchedule = this.closest('#schedule-list') !== null;
+                
+                showMobileActionButtons(task.id, 'msc', this, isInSchedule);
+            });
         })
     }
 
@@ -1433,6 +1683,7 @@ $(document).ready(function () {
                     newItem.onclick = function () {
                         showTaskDetail(newId, 'msc', newItem);
                     }
+                    
 
                     // Keep the original item visible
                     event.target.style.opacity = "1";
@@ -1493,7 +1744,8 @@ $(document).ready(function () {
 
         // Duration with Icon
         const duration = document.createElement('span');
-        duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+        duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`;
+        duration.style.marginRight = 'auto';
         
         // Badges Container (for category and priority)
         const badgesContainer = document.createElement('div');
@@ -1675,7 +1927,233 @@ $(document).ready(function () {
 
         event.target.value = value;
     };
+
+
+    function setupTaskPanelToggle() {
+        const toggleRibbon = document.createElement('div');
+        toggleRibbon.className = 'panel-toggle-ribbon';
+        toggleRibbon.textContent = 'Tasks';
+
+        const container = document.getElementById('new-content'); 
+        if (container) {
+            container.appendChild(toggleRibbon);
+        } else {
+            console.warn('Element with ID "new-content" not found.');
+        }
+
+        toggleRibbon.addEventListener('click', function() {
+            document.body.classList.toggle('panel-active');
+            this.textContent = document.body.classList.contains('panel-active') ? 'Close' : 'Tasks';
+        });
+    }
+
+
+    function showMobileActionButtons(taskId, type, element, isInSchedule) {
+        console.log('showing mobile action button');
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-actions-overlay';
+
+        // Create actions container
+        const container = document.createElement('div');
+        container.className = 'mobile-actions-container';
+
+        // Position container directly over the clicked element
+        const rect = element.getBoundingClientRect();
+        container.style.left = `${rect.left + rect.width / 2 - 70}px`;
+        container.style.top = `${rect.top + rect.height / 2 - 70}px`;
+
+        // Create center button
+        const centerBtn = document.createElement('button');
+        centerBtn.className = 'mobile-action-btn center';
+        centerBtn.dataset.action = 'details';
+        centerBtn.textContent = '...';
+
+        // Create directional buttons
+        const upBtn = document.createElement('button');
+        upBtn.className = 'mobile-action-btn up';
+        upBtn.dataset.action = 'up';
+        upBtn.textContent = '↑';
+
+        const downBtn = document.createElement('button');
+        downBtn.className = 'mobile-action-btn down';
+        downBtn.dataset.action = 'down';
+        downBtn.textContent = '↓';
+
+        const directionBtn = document.createElement('button');
+        directionBtn.className = `mobile-action-btn ${isInSchedule ? 'right' : 'left'}`;
+        directionBtn.dataset.action = isInSchedule ? 'right' : 'left';
+        directionBtn.textContent = isInSchedule ? '→' : '←';
+
+        // Add buttons to container
+        if (!(type === 'msc' && !isInSchedule)) { // only add up and down when not msc and not in schedule
+            container.appendChild(upBtn);
+            container.appendChild(downBtn);
+        }
+        container.appendChild(directionBtn);
+        container.appendChild(centerBtn);
+
+        // Add to DOM
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+
+        // Trigger animation after a small delay
+        setTimeout(() => {
+            container.classList.add('spread');
+            if (!(type === 'msc' && !isInSchedule)) {
+                upBtn.classList.add('visible');
+                downBtn.classList.add('visible');
+            }
+            directionBtn.classList.add('visible');
+        }, 10);
+
+        // Handle button clicks
+        const handleAction = (action) => {
+            switch (action) {
+                case 'up':
+                    moveTaskUp(element);
+                    break;
+                case 'down':
+                    moveTaskDown(element);
+                    break;
+                case 'left':
+                    overlay.remove();
+                    moveTaskLeft(element);
+                    break;
+                case 'right':
+                    overlay.remove();
+                    moveTaskRight(element);
+                    break;
+                case 'details':
+                    overlay.remove();
+                    showTaskDetail(taskId, type, element);
+                    break;
+            }
+        };
+
+        // Add event listeners
+        centerBtn.addEventListener('click', () => handleAction('details'));
+        if (!(type === 'msc' && !isInSchedule)) {
+            upBtn.addEventListener('click', () => handleAction('up'));
+            downBtn.addEventListener('click', () => handleAction('down'));
+        }
+        directionBtn.addEventListener('click', () => handleAction(isInSchedule ? 'right' : 'left'));
+
+        // Close overlay when clicking outside
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) {
+                // Reverse animation before removing
+                container.classList.remove('spread');
+                if (!(type === 'msc' && !isInSchedule)) {
+                    upBtn.classList.remove('visible');
+                    downBtn.classList.remove('visible');
+                }
+                directionBtn.classList.remove('visible');
+
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }
+        });
+    }
+
+    function moveTaskUp(element) {
+        const parent = element.parentElement;
+        if (!parent) return;
+        
+        const prevElement = element.previousElementSibling;
+        if (prevElement) {
+            parent.insertBefore(element, prevElement);
+            updateTimeSlots();
+        }
+    }
+
+    function moveTaskDown(element) {
+        const parent = element.parentElement;
+        if (!parent) return;
+        
+        const nextElement = element.nextElementSibling;
+        if (nextElement) {
+            parent.insertBefore(nextElement, element);
+            updateTimeSlots();
+        }
+    }
+
+    function moveTaskRight(element) {
+        // If it's a misc task, destroy it
+        if (element.dataset.itemType === 'misc') {
+            const taskIdToRemove = parseInt(element.dataset.id);
+            allMscRtn = allMscRtn.filter(task => task.id !== taskIdToRemove);
+            element.remove();
+            updateTimeSlots();
+            return;
+        }
+        
+        // Determine destination list based on task type
+        const destinationId = element.dataset.itemType === 'one-time' ? 
+            'one-time-tasks' : 'repetitive-tasks';
+        const destination = document.getElementById(destinationId);
+        
+        // Remove from schedule and add to appropriate list
+        element.remove();
+        destination.appendChild(element);
+        updateTimeSlots();
+    }
+
+    function moveTaskLeft(element) {
+        const scheduleList = document.getElementById('schedule-list');
+        
+        // If it's a misc task, we need to clone it from misc-tasks
+        if (element.dataset.itemType === 'misc') {
+            const taskId = element.dataset.id;
+            const task = allMisc.find(t => t.id == taskId);
+            
+            if (task) {
+                // Create new ID and clone
+                const newId = Date.now();
+                const newTask = createMiscTask(task, newId, 'x')[0];
+                
+                // Add to schedule
+                scheduleList.appendChild(newTask);
+                makeDraggable(newTask);
+                
+                // Add to allMscRtn
+                allMscRtn.push({...task, id: newId});
+                
+                // Attach click event listener to the task item
+                $(newTask).on('click', function(e) {
+                    console.log('taskItemClicked')
+                    // Check if device is mobile (touch device)
+                    const isMobile = window.innerWidth <= 768;
+                    
+                    if (!isMobile) {
+                        // Desktop behavior - always show details
+                        showTaskDetail(newId, 'msc', this);
+                        return;
+                    }
+                    
+                    // Mobile behavior - show action buttons
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Determine if item is in schedule list or tasks container
+                    const isInSchedule = this.closest('#schedule-list') !== null;
+                    
+                    showMobileActionButtons(newId, 'msc', this, isInSchedule);
+                });
+            }
+        } else {
+            // For non-misc tasks, just move to schedule
+            element.remove();
+            scheduleList.appendChild(element);
+        }
+        
+        updateTimeSlots();
+    }
+
+    setupTaskPanelToggle();
 });
+
 
 </script>
 {% load static %}

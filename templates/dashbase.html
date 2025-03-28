@@ -53,290 +53,290 @@
     scrollbar-color: #888 #f1f1f1; /* Thumb and track colors */
 }
 
-        /* Loading Screen Styles */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .loading-content {
-            text-align: center;
-        }
-        #loading-logo {
-            width: 100px;
-            height: auto;
-            animation: pulse 1.5s infinite;
-        }
-        #loading-text {
-            margin-top: 20px;
-            font-size: 24px;
-            color: #333;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+/* Loading Screen Styles */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.loading-content {
+    text-align: center;
+}
+#loading-logo {
+    width: 100px;
+    height: auto;
+    animation: pulse 1.5s infinite;
+}
+#loading-text {
+    margin-top: 20px;
+    font-size: 24px;
+    color: #333;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
 
-        /* Footer Styles */
-        .footer {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            background-color: white !important; /* Add this line */
-        }
-        .footer img {
-            vertical-align: middle;
-        }
-    </style>
-    <style>
-        /* Spinning Animation */
-        .spinner-container {
-            display: flex;
-            justify-content: center; /* Horizontally center */
-            align-items: center;     /* Vertically center */
-            height: 100%;           /* Take up the full height of its parent */
-            width: 100%;            /* Take up the full width of its parent */
-            position: relative;     /* Ensure it stays within the bounds of its parent */
-            margin-top: 3rem;
-        }
-        .spinner {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 8px solid rgba(0, 0, 0, 0.1);
-            border-top: 8px solid #0077ff;
-            box-shadow: 0 0 15px #0077ff;
-            animation: spin 3s linear infinite, glow 3s ease-in-out infinite alternate;
-        }
+/* Footer Styles */
+.footer {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    background-color: white !important; /* Add this line */
+}
+.footer img {
+    vertical-align: middle;
+}
+</style>
+<style>
+    /* Spinning Animation */
+    .spinner-container {
+        display: flex;
+        justify-content: center; /* Horizontally center */
+        align-items: center;     /* Vertically center */
+        height: 100%;           /* Take up the full height of its parent */
+        width: 100%;            /* Take up the full width of its parent */
+        position: relative;     /* Ensure it stays within the bounds of its parent */
+        margin-top: 3rem;
+    }
+    .spinner {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 8px solid rgba(0, 0, 0, 0.1);
+        border-top: 8px solid #0077ff;
+        box-shadow: 0 0 15px #0077ff;
+        animation: spin 3s linear infinite, glow 3s ease-in-out infinite alternate;
+    }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes glow {
-            0% { box-shadow: 0 0 15px #0077ff; }
-            100% { box-shadow: 0 0 30px #0077ff; }
-        }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes glow {
+        0% { box-shadow: 0 0 15px #0077ff; }
+        100% { box-shadow: 0 0 30px #0077ff; }
+    }
 
-        /* Color Palette */
-        :root {
-            --primary-color: #4e73df;
-            --sidebar-bg: #2c3e50;
-            --sidebar-text: #ecf0f1;
-            --navbar-bg: #ffffff;
-            --navbar-text: #2c3e50;
-            --hover-bg: #34495e;
-        }
+    /* Color Palette */
+    :root {
+        --primary-color: #4e73df;
+        --sidebar-bg: #2c3e50;
+        --sidebar-text: #ecf0f1;
+        --navbar-bg: #ffffff;
+        --navbar-text: #2c3e50;
+        --hover-bg: #34495e;
+    }
 
-        body {
-            background-color: #f8f9fa;
-            padding-top: 60px;
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none; /* Standard syntax */
-        }
+    body {
+        background-color: #f8f9fa;
+        padding-top: 60px;
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+/Edge */
+        user-select: none; /* Standard syntax */
+    }
 
-        /* for the background image */
-        .img-background {
-            position: fixed; /* Stays in place as the user scrolls */
-            top: 0;
-            left: 0;
-            width: 100dvw; /* Full viewport width */
-            height: 100vh; /* Full viewport height */
-            background-size: contain; /* Ensures the whole image fits inside the div */
-            background-position: center; /* Centers the image */
-            background-repeat: no-repeat; /* Prevents the image from repeating */
-            z-index: -1; /* Places it behind all content */
-            margin-left: 145px;
-        }
-
-
-        .img-background::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.3); /* Black overlay with 50% opacity */
-        }
-
-        .cblogo {
-            margin-left: 330px;
-        }
-
-        /* Warning Display */
-        .warningdiv {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #ffffff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            font-size: 0.975rem;
-            width: 80vw; /* Set width to 80% of the viewport width */
-            max-width: 500px; /* Optional: set a maximum width */
-        }
-
-        /* Sidebar */
-        .sidebar {
-            height: calc(100dvh - 66px);
-            width: 230px;
-            position: fixed;
-            top: 66px;
-            left: 0;
-            background-color: var(--sidebar-bg);
-            transition: 0.3s;
-            z-index: 1000;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .sidebar.collapsed {
-            width: 0;
-        }
-
-        .sidebar .nav-link {
-            padding: 10px 15px;
-            color: var(--sidebar-text);
-            display: flex;
-            align-items: center;
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 10px;
-        }
-
-        .sidebar .nav-link:hover {
-            background-color: var(--hover-bg);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 230px;
-            padding: 20px;
-            transition: 0.3s;
-        }
-
-        .main-content.collapsed {
-            margin-left: 0;
-        }
-
-        /* Navbar */
-        .navbar {
-            background-color: var(--navbar-bg);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        .navbar .notification-btn {
-            background: none;
-            border: none;
-            color: var(--navbar-text);
-            font-size: 1.2rem;
-            position: relative;
-            margin-right: 20px;
-        }
-
-        .navbar .notification-btn .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            font-size: 0.8rem;
-            padding: 3px 6px;
-            display: inline-block; /* Make sure the default display is inline-block */
-        }
-
-        .parent-link {
-            display: block;  /* Makes it behave like a full-width link */
-            padding: 10px 15px;  /* Adds spacing for a larger click area */
-            cursor: pointer;  /* Makes it look clickable */
-            color: #ffffff; /* Adjust color as needed */
-            text-decoration: none;  /* Removes default underline */
-            width: 100%;  /* Ensures full width */
-        }
-
-        /* CSS for expanding child list */
-        .child-list {
-            display: none; /* Initially hide the children */
-            padding-left: 20px; /* Indent the children */
-            transition: all 0.3s ease; /* Optional: Smooth transition */
-        }
-
-        .has-children > a::after { /* Down arrow icon */
-            content: "\f107";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            margin-left: 5px;
-            transition: transform 0.3s ease; /* Smooth rotation */
-        }
-
-        .has-children > a.active::after { /* Rotate icon when active */
-            transform: rotate(180deg);
-        }
+    /* for the background image */
+    .img-background {
+        position: fixed; /* Stays in place as the user scrolls */
+        top: 0;
+        left: 0;
+        width: 100dvw; /* Full viewport width */
+        height: 100vh; /* Full viewport height */
+        background-size: contain; /* Ensures the whole image fits inside the div */
+        background-position: center; /* Centers the image */
+        background-repeat: no-repeat; /* Prevents the image from repeating */
+        z-index: -1; /* Places it behind all content */
+        margin-left: 145px;
+    }
 
 
-        /* Profile Picture Styling */
-        .profile-pic {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border: 2px solid #ddd;
-        }
+    .img-background::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.3); /* Black overlay with 50% opacity */
+    }
 
-        .profile-pic-lg {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border: 3px solid #ddd;
-            margin-bottom: 10px;
-        }
+    .cblogo {
+        margin-left: 330px;
+    }
 
-        /* Dropdown Styling */
-        .dropdown-menu {
-            min-width: 200px;
-            border-radius: 8px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Soft shadow */
-        }
+    /* Warning Display */
+    .warningdiv {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        font-size: 0.975rem;
+        width: 80vw; /* Set width to 80% of the viewport width */
+        max-width: 500px; /* Optional: set a maximum width */
+    }
 
-        .dropdown-item {
-            padding: 10px 15px;
-            transition: background 0.3s ease-in-out;
-        }
+    /* Sidebar */
+    .sidebar {
+        height: calc(100dvh - 66px);
+        width: 230px;
+        position: fixed;
+        top: 66px;
+        left: 0;
+        background-color: var(--sidebar-bg);
+        transition: 0.3s;
+        z-index: 1000;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 
-        .dropdown-item:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
+    .sidebar.collapsed {
+        width: 0;
+    }
 
-        .dropdown-item i {
-            font-size: 16px;
-        }
+    .sidebar .nav-link {
+        padding: 10px 15px;
+        color: var(--sidebar-text);
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 10px;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: var(--hover-bg);
+    }
+
+    /* Main Content */
+    .main-content {
+        margin-left: 230px;
+        padding: 20px;
+        transition: 0.3s;
+    }
+
+    .main-content.collapsed {
+        margin-left: 0;
+    }
+
+    /* Navbar */
+    .navbar {
+        background-color: var(--navbar-bg);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    .navbar .notification-btn {
+        background: none;
+        border: none;
+        color: var(--navbar-text);
+        font-size: 1.2rem;
+        position: relative;
+        margin-right: 20px;
+    }
+
+    .navbar .notification-btn .badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        font-size: 0.8rem;
+        padding: 3px 6px;
+        display: inline-block; /* Make sure the default display is inline-block */
+    }
+
+    .parent-link {
+        display: block;  /* Makes it behave like a full-width link */
+        padding: 10px 15px;  /* Adds spacing for a larger click area */
+        cursor: pointer;  /* Makes it look clickable */
+        color: #ffffff; /* Adjust color as needed */
+        text-decoration: none;  /* Removes default underline */
+        width: 100%;  /* Ensures full width */
+    }
+
+    /* CSS for expanding child list */
+    .child-list {
+        display: none; /* Initially hide the children */
+        padding-left: 20px; /* Indent the children */
+        transition: all 0.3s ease; /* Optional: Smooth transition */
+    }
+
+    .has-children > a::after { /* Down arrow icon */
+        content: "\f107";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        margin-left: 5px;
+        transition: transform 0.3s ease; /* Smooth rotation */
+    }
+
+    .has-children > a.active::after { /* Rotate icon when active */
+        transform: rotate(180deg);
+    }
+
+
+    /* Profile Picture Styling */
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+    .profile-pic-lg {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border: 3px solid #ddd;
+        margin-bottom: 10px;
+    }
+
+    /* Dropdown Styling */
+    .dropdown-menu {
+        min-width: 200px;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    }
+
+    .dropdown-item {
+        padding: 10px 15px;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .dropdown-item i {
+        font-size: 16px;
+    }
 
 
     /* Floating Message Container */
@@ -736,8 +736,8 @@ body.dark-theme .spinner {
             <li class="nav-item has-children">
                 <a class="nav-link parent-link"><i class="fas fa-calendar-alt"></i>Routine</a>
                 <ul class="nav flex-column child-list">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'scheduler' %}">View Schedule</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'scheduler' %}">Create New Schedule</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'scheduler' %}">View Timeline</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'scheduler' %}">Manage Schedule</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Schedule Templates</a></li>
                 </ul>
             </li>
