@@ -60,7 +60,7 @@ class Notification(models.Model):
         Returns:
             QuerySet: A QuerySet containing all notifications for the user, ordered by date_time in descending order.
         """
-        return cls.objects.filter(user=user).order_by('-date_time')
+        return cls.objects.filter(user=user).order_by('date_time')
     
     @staticmethod
     def create_or_update_notifications(user, tasks):
