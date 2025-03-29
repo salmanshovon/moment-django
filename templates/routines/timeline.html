@@ -1,0 +1,613 @@
+<style>
+.scroll-container {
+    height: calc(100dvh - 100px);
+    overflow-y: auto;
+}
+
+.timeline-container {
+    display: flex;
+    /* height: 1440px; */
+    position: relative;
+    margin-top: 20px;
+}
+
+.time-marker-column {
+    width: 65px;
+    position: relative;
+}
+
+.tasks-container li {
+    list-style-type: none; /* Kills ::marker */
+}
+
+.time-marker {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: right;
+    padding-right: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+.timeline-area {
+    flex-grow: 1;
+    position: relative;
+    border-left: 1px solid #eee;
+}
+
+.timeline-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-left: 2px solid #3498db;
+    z-index: 1;
+}
+
+.tasks-container {
+    position: relative;
+    height: 100%;
+    z-index: 2;
+}
+
+.task-item.timeline-view {
+    position: absolute;
+    width: calc(100% - 20px);
+    left: 10px;
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: white;
+    border-left: 3px solid var(--task-color, #3498db);
+    overflow: hidden;
+    min-height: 30px; /* Minimum height */
+    /* max-height: 180px; */
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+}
+
+
+.task-item .task-title {
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        /* Align icon and text vertically */
+        gap: 8px;
+        /* Space between icon and text */
+        font-size: 12px;
+        /* Adjust font size */
+        font-weight: 600;
+        /* Darker text for better readability */
+        margin-bottom: 8px;
+        /* Add space below the title */
+    }
+
+    .task-item.one-time {
+        background-color: rgb(55, 92, 172);
+    }
+
+    .task-item.repetitive {
+        background-color: rgb(114, 31, 80);
+    }
+
+    .task-item.misc {
+        background-color: rgb(150, 150, 150);
+    }
+
+    #current-time-marker {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: red;
+        z-index: 10;
+        transition: top 0.5s linear;
+    }
+
+
+    /* NEW */
+
+/* Base panel styles */
+.timeline-control-panel {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 250px;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    z-index: 999;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Closed state styles */
+.timeline-control-panel.panel-closed {
+    transform: translateX(100%) translateY(-50%);
+}
+
+/* Ribbon to toggle right panel */
+.panel-toggle-ribbon {
+    display: block;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #6c757d;
+    color: white;
+    padding: 10px 5px;
+    border-radius: 5px 0 0 5px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.panel-toggle-ribbon:hover {
+    background: #34495e;
+    padding-right: 20px;
+}
+
+/* When panel is open, move ribbon to match */
+.timeline-control-panel:not(.panel-closed) + .panel-toggle-ribbon,
+body.panel-active .panel-toggle-ribbon {
+    right: 250px;
+}
+
+/* Panel header styles */
+.panel-header {
+    padding: 15px;
+    background: #2c3e50;
+    color: white;
+    position: relative;
+}
+
+.panel-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.close-panel {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* Panel content styles */
+.panel-content {
+    padding: 15px;
+}
+
+.panel-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+}
+
+.filter-option {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-option input {
+    margin-right: 8px;
+}
+
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zoom-controls button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+    .timeline-control-panel {
+        width: 280px;
+        top: calc(100dvh / 3);
+        height: auto; /* Adjust height to account for top position */
+        transform: translateX(0);
+    }
+    
+    .timeline-control-panel:not(.panel-closed) {
+        transform: translateX(0);
+    }
+    
+    .panel-toggle-ribbon {
+        top: calc(50% + 37.5px); /* Center relative to the panel space */
+        transform: translateY(-50%);
+        z-index: 999; /* Ensure it's above the panel */
+    }
+    
+    .timeline-control-panel:not(.panel-closed) + .panel-toggle-ribbon {
+        right: 280px;
+        top: calc(50% + 37.5px); /* Maintain same vertical position */
+        transform: translateY(-50%);
+    }
+}
+</style>
+<div class="scroll-container">
+    <div class="timeline-container">
+        <!-- Time markers on the left -->
+        <div class="time-marker-column">
+            <!-- These will be generated dynamically in JS -->
+        </div>
+        
+        <!-- Timeline area where tasks will be placed -->
+        <div class="timeline-area">
+            <div class="timeline-line"></div>
+            <div class="tasks-container"></div>
+            <div id="current-time-marker"></div> <!-- Current Time Indicator -->
+        </div>
+        
+    </div>
+</div>
+<!-- Floating Control Panel -->
+<div class="timeline-control-panel panel-closed">
+    <div class="panel-header">
+        <div class="panel-title">Control Panel</div>
+        <button class="close-panel">&times;</button>
+    </div>
+    
+    <div class="panel-content">
+        <div class="panel-section">
+            <div class="section-title">Filter Tasks</div>
+            <div class="filter-option">
+                <input type="checkbox" id="show-one-time" checked>
+                <label for="show-one-time">One-time Tasks</label>
+            </div>
+            <div class="filter-option">
+                <input type="checkbox" id="show-repetitive" checked>
+                <label for="show-repetitive">Repetitive Tasks</label>
+            </div>
+            <div class="filter-option">
+                <input type="checkbox" id="show-misc" checked>
+                <label for="show-misc">Miscellaneous</label>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-title">Zoom Level</div>
+            <div class="zoom-controls">
+                <button class="zoom-out">-</button>
+                <span class="zoom-level">100%</span>
+                <button class="zoom-in">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Ribbon -->
+<div class="panel-toggle-ribbon">Options</div>
+
+<script>
+    $(document).ready(function () {
+        const timeline_url = "{% url 'timeline_api' %}";
+        let allTskRtn = [];
+        let pixelFactor = 1; // 1 pixel = 1 minute initially
+
+        // Fetch routine using AJAX (returns a promise)
+        async function fetchRoutine() {
+            try {
+                const response = await $.ajax({
+                    url: timeline_url,
+                    method: "GET",
+                    dataType: "json",
+                });
+
+                // Check if the response contains tasks
+                if (response !== 3 && response && response.length > 0) {
+                    return response;
+                } else {
+                    showMessage('No tasks added!', 'info');
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error fetching routine:", error);
+                return [];
+            }
+        };
+
+        
+        async function populate() {
+            allTskRtn = await fetchRoutine(); // Wait for the data to be fetched
+            renderTimeline();
+            updateCurrentTimeMarker(true);
+            setInterval(updateCurrentTimeMarker, 60000); // Update every 60 seconds
+        }
+
+        function renderTimeline() {
+            const container = document.querySelector('.timeline-container');
+            const timeMarkers = document.querySelector('.time-marker-column');
+            const tasksContainer = document.querySelector('.tasks-container');
+
+            tasksContainer.innerHTML = '';
+            timeMarkers.innerHTML = '';
+
+            const uniqueDates = new Set(allTskRtn.map(task => task.start_time.split(' ')[0]));
+            const totalMinutes = uniqueDates.size > 1 ? 2880 : 1440;
+            container.style.height = `${totalMinutes * pixelFactor}px`;
+
+            renderTimeMarkers(timeMarkers, totalMinutes);
+            renderTasks(tasksContainer);
+        }
+
+        function renderTimeMarkers(timeMarkers, totalMinutes) {
+            for (let minutes = 0; minutes < totalMinutes; minutes += 15) {
+                const timeMarker = document.createElement('div');
+                timeMarker.className = 'time-marker';
+                const markerHeight = 20;
+                timeMarker.style.top = `${(minutes - markerHeight / 2) * pixelFactor}px`;
+
+                const hour = Math.floor(minutes / 60) % 24;
+                const minute = minutes % 60;
+                const isMidnight = hour === 0 && minute === 0;
+
+                if (isMidnight) {
+                    const dayLabel = minutes < 1440 ? " (Today)" : " (Tomorrow)";
+                    timeMarker.textContent = `12:00 AM${dayLabel}`;
+                    timeMarker.classList.add('midnight-marker');
+                } else if (minute === 0) {
+                    const displayHour = hour % 12 || 12;
+                    const amPm = hour < 12 ? 'AM' : 'PM';
+                    timeMarker.textContent = `${displayHour}:00 ${amPm}`;
+                    timeMarker.classList.add('hour-marker');
+                } else {
+                    timeMarker.textContent = '-';
+                    timeMarker.classList.add('quarter-marker');
+                }
+
+                timeMarkers.appendChild(timeMarker);
+            }
+        }
+
+        function renderTasks(tasksContainer) {
+            allTskRtn.forEach(task => {
+                const taskItem = $("<li></li>")
+                    .addClass("task-item timeline-view")
+                    .attr("data-id", task.id);
+
+                if (task.is_task) {
+                    taskItem.addClass(task.is_repetitive ? "repetitive" : "one-time");
+                } else {
+                    taskItem.addClass("misc");
+                }
+
+                const title = document.createElement('h5');
+                title.className = 'task-title';
+                title.innerHTML = `
+                    <span class="title-icon"><i class="bi bi-card-heading"></i></span>
+                    <span class="title-text">${task.title}</span>
+                `;
+
+                const startTime = parseTime(task.start_time);
+                let height = task.duration;
+                const minHeight = 15;
+                const maxHeight = 60;
+
+                if (height < minHeight) height = minHeight;
+
+                taskItem.css({
+                    "top": `${startTime * pixelFactor}px`,
+                    "height": `${height * pixelFactor}px`
+                });
+
+                taskItem.append(title);
+                $(".tasks-container").append(taskItem);
+            });
+        }
+
+        function parseTime(isoTimeString) {
+            const inputDate = new Date(isoTimeString);
+            const today = new Date();
+            const midnightToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+            const diffInMinutes = Math.floor((inputDate - midnightToday) / (1000 * 60));
+            return diffInMinutes;
+        }
+
+        function updateCurrentTimeMarker(scrollOnLoad = false) {
+            const marker = document.getElementById('current-time-marker');
+            const minutesSinceMidnight = parseTime(new Date().toISOString());
+            marker.style.top = `${minutesSinceMidnight * pixelFactor}px`;
+            if (scrollOnLoad) {
+                marker.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+        populate();
+
+        function setupPanelControls() {
+            const controlPanel = document.querySelector('.timeline-control-panel');
+            const toggleRibbon = document.querySelector('.panel-toggle-ribbon');
+            const closeButton = document.querySelector('.close-panel');
+
+            // Initialize panel state
+            function initPanelState() {
+                if (window.innerWidth <= 768) {
+                    // Mobile - start closed
+                    controlPanel.classList.add('panel-closed');
+                    controlPanel.classList.remove('panel-hoverable');
+                    toggleRibbon.textContent = 'Options';
+                } else {
+                    // Desktop - start with hover behavior
+                    controlPanel.classList.add('panel-hoverable');
+                    controlPanel.classList.add('panel-closed');
+                    toggleRibbon.textContent = 'Options';
+                }
+            }
+
+            // Toggle panel visibility
+            function togglePanel() {
+                const wasClosed = controlPanel.classList.contains('panel-closed');
+                controlPanel.classList.toggle('panel-closed');
+                toggleRibbon.textContent = wasClosed ? 'Close' : 'Options';
+                
+                // On mobile, disable hover effects when manually toggled
+                if (window.innerWidth <= 768) {
+                    controlPanel.classList.remove('panel-hoverable');
+                }
+            }
+
+            // Handle hover behavior for desktop
+            function setupHoverBehavior() {
+                if (window.innerWidth > 768) {
+                    controlPanel.classList.add('panel-hoverable');
+                    
+                    controlPanel.addEventListener('mouseenter', function() {
+                        if (this.classList.contains('panel-hoverable')) {
+                            this.classList.remove('panel-closed');
+                            toggleRibbon.textContent = 'Close';
+                        }
+                    });
+
+                    controlPanel.addEventListener('mouseleave', function() {
+                        if (this.classList.contains('panel-hoverable')) {
+                            this.classList.add('panel-closed');
+                            toggleRibbon.textContent = 'Options';
+                        }
+                    });
+                }
+            }
+
+            // Handle window resize
+            function handleResize() {
+                if (window.innerWidth <= 768) {
+                    // Mobile - disable hover behavior
+                    controlPanel.classList.remove('panel-hoverable');
+                    // Ensure text is correct
+                    if (controlPanel.classList.contains('panel-closed')) {
+                        toggleRibbon.textContent = 'Options';
+                    } else {
+                        toggleRibbon.textContent = 'Close';
+                    }
+                } else {
+                    // Desktop - enable hover behavior
+                    controlPanel.classList.add('panel-hoverable');
+                    // Ensure panel is in closed state for hover to work
+                    controlPanel.classList.add('panel-closed');
+                    toggleRibbon.textContent = 'Options';
+                }
+            }
+
+            // Initialize
+            initPanelState();
+            setupHoverBehavior();
+            
+            // Event listeners
+            toggleRibbon.addEventListener('click', togglePanel);
+            
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    controlPanel.classList.add('panel-closed');
+                    toggleRibbon.textContent = 'Options';
+                });
+            }
+
+            window.addEventListener('resize', handleResize);
+        }
+
+        setupPanelControls();
+
+        // Get all filter checkboxes
+        const oneTimeCheckbox = document.getElementById('show-one-time');
+        const repetitiveCheckbox = document.getElementById('show-repetitive');
+        const miscCheckbox = document.getElementById('show-misc');
+
+        // Function to filter tasks based on checkbox states
+        function filterTasks() {
+            const showOneTime = oneTimeCheckbox.checked;
+            const showRepetitive = repetitiveCheckbox.checked;
+            const showMisc = miscCheckbox.checked;
+
+            // Get all task items
+            const taskItems = document.querySelectorAll('.task-item');
+
+            taskItems.forEach(item => {
+                if (item.classList.contains('one-time')) {
+                    item.style.display = showOneTime ? '' : 'none';
+                } else if (item.classList.contains('repetitive')) {
+                    item.style.display = showRepetitive ? '' : 'none';
+                } else if (item.classList.contains('misc')) {
+                    item.style.display = showMisc ? '' : 'none';
+                }
+            });
+        }
+
+        // Add event listeners to all checkboxes
+        [oneTimeCheckbox, repetitiveCheckbox, miscCheckbox].forEach(checkbox => {
+            checkbox.addEventListener('change', filterTasks);
+        });
+
+        function setupZoomControls() {
+            const zoomOutBtn = document.querySelector(".zoom-out");
+            const zoomInBtn = document.querySelector(".zoom-in");
+            const zoomLevelSpan = document.querySelector(".zoom-level");
+            
+            let zoomFactor = 1; // Default zoom factor
+            const minZoom = 1;
+            const maxZoom = 4;
+            
+            function updateZoomDisplay() {
+                zoomLevelSpan.textContent = `${zoomFactor * 100}%`;
+            }
+            
+            zoomInBtn.addEventListener("click", function () {
+                if (zoomFactor < maxZoom) {
+                    zoomFactor += 1;
+                    regenerateTimeline(zoomFactor);
+                    updateZoomDisplay();
+                }
+            });
+            
+            zoomOutBtn.addEventListener("click", function () {
+                if (zoomFactor > minZoom) {
+                    zoomFactor -= 1;
+                    regenerateTimeline(zoomFactor);
+                    updateZoomDisplay();
+                }
+            });
+            
+            updateZoomDisplay(); // Initialize display
+        }
+
+        // Example usage to regenerate timeline with a different pixel factor
+        function regenerateTimeline(factor) {
+            pixelFactor = factor;
+            renderTimeline();
+            updateCurrentTimeMarker();
+        }
+
+        // Initial filter application
+        filterTasks();
+        setupZoomControls();
+    });
+</script>
+
+{% load static %}
+<script src="{% static 'js/dash_check.js' %}"></script>

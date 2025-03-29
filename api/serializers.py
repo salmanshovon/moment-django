@@ -102,6 +102,8 @@ class UserSettingsSerializer(serializers.ModelSerializer):
         model = UserSettings
         fields = ['sort']
 
+
+
 class RoutineSerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -42,17 +42,21 @@ class Command(BaseCommand):
 
                 # Delete notifications older than 36 hours in batches
                 while True:
-                    # Fetch IDs of notifications to delete
-                    notification_ids = Notification.objects.filter(
-                        user=user,
-                        date_time__lt=user_36_hours_ago
-                    ).values_list('id', flat=True)[:BATCH_SIZE]
+                    # Fetch IDs without slicing in the same query
+                    notification_ids = list(
+                        Notification.objects.filter(user=user, date_time__lt=user_36_hours_ago)
+                        .order_by('id')  # Ensure deterministic ordering
+                        .values_list('id', flat=True)
+                    )  
 
                     if not notification_ids:
-                        break  # Exit the loop if no more notifications to delete
+                        break  # Exit loop if no notifications found
+
+                    # Only delete a batch at a time
+                    batch_to_delete = notification_ids[:BATCH_SIZE]
 
                     # Delete the notifications in the current batch
-                    deleted_count, _ = Notification.objects.filter(id__in=notification_ids).delete()
+                    deleted_count, _ = Notification.objects.filter(id__in=batch_to_delete).delete()
                     deleted_notifications_count += deleted_count
 
                 for task in tasks:

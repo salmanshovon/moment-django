@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView, NotificationsView, NotificationUpdateView, PublicTaskListAPIView, BulkCreateTasksFromPublicTasks
+from .views import TimelineView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path('noti-update/', NotificationUpdateView.as_view(), name='update_notification'),
     path('pub-task-list/', PublicTaskListAPIView.as_view(), name='pub_task_list'),
     path('import-tasks/', BulkCreateTasksFromPublicTasks.as_view(), name='import_tasks'),
+    path('timeline-view/', TimelineView.as_view(), name='timeline_api'),
     # temporary irrigation:
     path('ir-get/', IrrigateSettingsAPI.as_view(), name='irrigation-settings'),
     path('ir-put/', NodeMCUAckAPI.as_view(), name='nodemcu-ack'),

@@ -135,11 +135,12 @@ def get_timezone_from_ip(request):
     if ip is None:
         return None  # No IP found
 
+
     try:
         geo = GeoIP2()
         timezone = geo.city(ip).get("time_zone")
         return timezone
-    except Exception:
+    except Exception as e:
         return None  # GeoIP lookup failed
 
 

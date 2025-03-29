@@ -8,6 +8,7 @@ from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineS
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
+from itertools import chain
 
 
 class SchedulerTasksView(generics.ListAPIView):
@@ -149,6 +150,24 @@ class RoutineDetailView(APIView):
         else:
             return Response(3, status=200)  # Return null in JSON format
 
+class TimelineView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user  # Get the authenticated user
+        today = timezone.now().date()
+        tomorrow = today + timezone.timedelta(days=1)
+
+        # Fetch routines for today and tomorrow
+        routines = Routine.objects.filter(user=user, for_date__in=[today, tomorrow])
+
+        # Serialize the routines
+        if routines.exists():
+            tasks = list(chain.from_iterable(routine.tasks for routine in routines))
+            # serializer = TimelineSerializer(routines, many=True)
+            return Response(tasks, status=200)
+        else:
+            return Response([], status=200)  # Return an empty list if no routines exist
 
 class NotificationsView(generics.ListAPIView):
     serializer_class = NotificationSerializer

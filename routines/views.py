@@ -12,3 +12,12 @@ class SchedulerView(View):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return render(request, self.template_name)
         return render(request, "dashbase.html")
+    
+@method_decorator(login_required(login_url="signin"), name="dispatch")
+class TimelineView(View):
+    template_name = 'routines/timeline.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return render(request, self.template_name)
+        return render(request, "dashbase.html")

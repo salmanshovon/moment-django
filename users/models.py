@@ -60,7 +60,8 @@ def update_timezone_on_login(sender, request, user, **kwargs):
     # Check if the user has a profile
     if hasattr(user, 'profile'):
         # Get the user's timezone from IP
-        user_timezone = get_timezone_from_ip(request) or "UTC"  # Default to UTC if not found
+        user_timezone = get_timezone_from_ip(request) or "Asia/Dhaka"  # Default to UTC if not found
+        print(f'User TimeZone: {user_timezone}')
         
         # Update the user's timezone in their profile
         user.profile.user_timezone = user_timezone
