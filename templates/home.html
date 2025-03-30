@@ -621,7 +621,7 @@
 
         if (index > 0) {
             lastTask = allTskRtn[index - 1].title;
-            lastTime = allTskRtn[index].start_time;
+            lastTime = calculateEndTime(allTskRtn[index -1].start_time, allTskRtn[index - 1].duration);
         }
 
         if (index + 1 < allTskRtn.length) {
@@ -638,6 +638,18 @@
 
         updateElapsedAndRemaining();
         updateTask(lastTask, currentTask, upcomingTask, allTskRtn[index].duration, priority, category, formatTime(0), formatTime(currentTaskDuration), lastTime, nextTime);
+    }
+
+    // Function to calculate end time
+    function calculateEndTime(start_time, duration) {
+        // Convert start_time to a Date object
+        const startTime = new Date(start_time);
+
+        // Add duration in milliseconds (duration * 60 * 1000)
+        const endTime = new Date(startTime.getTime() + duration * 60 * 1000);
+
+        // Convert endTime back to ISO format
+        return endTime.toISOString();
     }
 
     // Function to format time
