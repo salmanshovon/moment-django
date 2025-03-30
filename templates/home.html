@@ -95,7 +95,7 @@
 }
 
 .time-elapsed i {
-    color: #247940;
+    color: #179742;
 }
 
 .time-remaining i {
@@ -117,7 +117,7 @@
     align-items: center;
     gap: 5px;
     padding: 5px 10px;
-    background-color: #e9ecef;
+    /* background-color: #e9ecef; */
     border-radius: 5px;
 }
 
@@ -137,8 +137,7 @@
 }
 
 /* ============== Task Sections Styles ============== */
-.upcoming-task-section,
-.last-task-section {
+.upcoming-task-section {
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 12px 15px;
@@ -173,6 +172,8 @@
 
 .last-task-section {
     background-color: #e8f4ff;
+    border-radius: 8px;
+    padding: 12px 15px;
 }
 
 /* ============== Statistics List Styles ============== */
@@ -254,6 +255,91 @@
     }
 }
 
+/* DARK THEME */
+
+body.dark-theme .card{
+    background-color: #202020;
+    color: white;
+}
+
+body.dark-theme .time {
+    color: #f8f9fa;
+}
+
+body.dark-theme .day-date {
+    color:#e9ecef
+}
+
+body.dark-theme .current-task {
+    color: #f8f8f8
+}
+
+body.dark-theme .task-timing {
+    color: #e9ecef;
+}
+
+body.dark-theme .time-elapsed,
+body.dark-theme .time-remaining {
+    background-color: #212529;
+}
+
+body.dark-theme .time-elapsed i {
+    color: #14e65a
+}
+
+body.dark-theme .task-meta {
+    color: #e9ecef
+}
+
+body.dark-theme .task-meta span {
+    background-color: #212529;
+}
+
+body.dark-theme .progress-bar {
+    background-color: #6c757d;
+}
+
+body.dark-theme .upcoming-task-section {
+    background-color: #68727a;
+}
+body.dark-theme .last-task-section {
+    background-color: #415f79;
+}
+
+body.dark-theme .section-header {
+    color: #e9ecef
+}
+
+body.dark-theme .last-end-time,
+body.dark-theme .next-time {
+    color: #e8f4ff
+}
+
+body.dark-theme .task-content {
+    color: #e0e0e0; /* Light gray for dark theme text */
+}
+
+
+/* ============== Statistics List Styles ============== */
+
+body.dark-theme .stat-item {
+    background-color: #363636; /* Darker background for items */
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05); /* Adjusted shadow for dark theme */
+}
+
+body.dark-theme .stat-item:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); /* Adjusted hover shadow */
+}
+
+
+body.dark-theme .stat-icon {
+    background-color: #4a4a4a; /* Darker background for icon */
+    color: #90caf9; /* Lighter blue for dark theme */
+}
+
+body.dark-theme .stat-number {
+    color: #f5f5f5; /* Lighter text for numbers */
+}
 
     </style>
 </head>
@@ -606,7 +692,7 @@
         if (index === -1 || index >= allTskRtn.length) {
             let lastTask = index > 0 ? allTskRtn[index - 1].title : "Nothing...";
             let lastTime = index > 0 ? calculateEndTime(allTskRtn[index - 1].start_time,allTskRtn[index - 1].duration) : "--"
-            updateTask(lastTask, "Completed", "Nothing...", "N/A", "N/A", "N/A", "N/A", "N/A",lastTime,"--");
+            updateTask(lastTask, "Completed", "Nothing...", "--", "--", "--", "--", "--",lastTime,"--");
             currentTaskStartTime = null;
             currentTaskDuration = null;
             updateProgress(100);
@@ -633,9 +719,14 @@
         currentTaskStartTime = new Date(allTskRtn[index].start_time);
         currentTaskDuration = allTskRtn[index].duration * 60; // Convert minutes to seconds
 
-        
-        const priority = allTskRtn[index].priority;
-        const category = allTskRtn[index].category;
+        let priority, category;
+        if (allTskRtn[index].is_task) {
+            priority = allTskRtn[index].priority;
+            category = allTskRtn[index].category;
+        } else {
+            priority = "--";
+            category = 'Misc'
+        }
 
         updateElapsedAndRemaining();
         updateTask(lastTask, currentTask, upcomingTask, allTskRtn[index].duration, priority, category, formatTime(0), formatTime(currentTaskDuration), lastTime, nextTime);
@@ -691,8 +782,8 @@
     }
 
     function formatDuration(minutes) {
-      if (minutes === null || minutes === undefined) {
-        return "Duration: N/A"; // Handle cases where duration is not available
+      if (minutes === null || minutes === undefined || minutes === "--") {
+        return "--"; // Handle cases where duration is not available
       }
 
       const hours = Math.floor(minutes / 60);
@@ -722,7 +813,7 @@
             case 1:
                 return "Low";
             default:
-                return "Unknown";
+                return "--";
         }
     }
 

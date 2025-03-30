@@ -9,6 +9,8 @@ from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from itertools import chain
+import pytz
+
 
 
 class SchedulerTasksView(generics.ListAPIView):
@@ -131,11 +133,14 @@ class RoutineDetailView(APIView):
         user = request.user  # Assuming the user is authenticated
         param = request.GET.get('param', 'true')  # Get param as a string
         
+        profile = self.request.user.profile
+        user_tz = pytz.timezone(profile.user_timezone) if profile.user_timezone else pytz.UTC
+        
         # Determine the target date based on the 'param' value
         if param == 'true':
-            target_date = timezone.now().date()  # Today's date
+            target_date = timezone.localtime(timezone.now(), user_tz).date()
         elif param == 'false':
-            target_date = timezone.now().date() + timezone.timedelta(days=1)  # Tomorrow's date
+            target_date = timezone.localtime(timezone.now(), user_tz).date() + timezone.timedelta(days=1)  # Tomorrow's date
         else:
             # Handle invalid 'param' values
             raise ValueError("Invalid 'param' value. It must be 'true' or 'false'.")
@@ -155,7 +160,9 @@ class TimelineView(APIView):
 
     def get(self, request):
         user = request.user  # Get the authenticated user
-        today = timezone.now().date()
+        profile = self.request.user.profile
+        user_tz = pytz.timezone(profile.user_timezone) if profile.user_timezone else pytz.UTC
+        today = timezone.localtime(timezone.now(), user_tz).date()
         tomorrow = today + timezone.timedelta(days=1)
 
         # Fetch routines for today and tomorrow

@@ -361,6 +361,10 @@
 
     /* Dark Theme Styles */
 
+    body.dark-theme .col-md-5 {
+        background-color: black;
+    }
+
   /* Dark Theme for Buttons */
     body.dark-theme .btn-primary {
         background-color: #0056b3; /* Keep primary button color */
@@ -494,6 +498,7 @@
     padding: 0 !important;
     overflow-x: hidden;
     min-width: 300px !important;
+    border-radius: 8px !important;
   }
   
   /* Make left section full width and override any min-width */
@@ -1556,9 +1561,9 @@ $(document).ready(function () {
         minutesInput.value = minutes;
 
         durationContainer.appendChild(hoursInput);
-        durationContainer.appendChild(document.createTextNode('h '));
+        durationContainer.appendChild(document.createTextNode(' hr '));
         durationContainer.appendChild(minutesInput);
-        durationContainer.appendChild(document.createTextNode('m'));
+        durationContainer.appendChild(document.createTextNode(' min'));
         durationContainer.style.marginBottom = '15px';
         durationContainer.style.marginTop = '15px';
 

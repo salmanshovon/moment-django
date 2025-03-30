@@ -252,6 +252,7 @@ body.panel-active .panel-toggle-ribbon {
         transform: translateY(-50%);
     }
 }
+
 </style>
 <div class="scroll-container">
     <div class="timeline-container">
@@ -356,8 +357,15 @@ body.panel-active .panel-toggle-ribbon {
             tasksContainer.innerHTML = '';
             timeMarkers.innerHTML = '';
 
-            const uniqueDates = new Set(allTskRtn.map(task => task.start_time.split(' ')[0]));
-            const totalMinutes = uniqueDates.size > 1 ? 2880 : 1440;
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const uniqueDatesCount = new Set(
+                allTskRtn.map(task => 
+                    new Date(task.start_time).toLocaleDateString('en-US', { timeZone: userTimeZone })
+                )
+            ).size;
+            console.log(uniqueDatesCount);
+            const totalMinutes = uniqueDatesCount > 1 ? 2880 : 1440;
             container.style.height = `${totalMinutes * pixelFactor}px`;
 
             renderTimeMarkers(timeMarkers, totalMinutes);
