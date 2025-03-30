@@ -507,8 +507,8 @@
                 if (elapsedTime >= 100) {
                     currentIndex++;
                     displayTaskByIndex(allTskRtn, currentIndex);
+                    populateStatistics(allTskRtn, currentIndex);
                     if (currentIndex < allTskRtn.length) {
-                        populateStatistics(allTskRtn, currentIndex)
                         updateProgress(0);
                     } else {
                         startFlag = false;
@@ -605,7 +605,8 @@
         // Case when there are no more tasks or an invalid index (-1 or out of bounds)
         if (index === -1 || index >= allTskRtn.length) {
             let lastTask = index > 0 ? allTskRtn[index - 1].title : "Nothing...";
-            updateTask(lastTask, "Completed", "Nothing...", "N/A", "N/A", "N/A", "N/A", "N/A","--","--");
+            let lastTime = index > 0 ? calculateEndTime(allTskRtn[index - 1].start_time,allTskRtn[index - 1].duration) : "--"
+            updateTask(lastTask, "Completed", "Nothing...", "N/A", "N/A", "N/A", "N/A", "N/A",lastTime,"--");
             currentTaskStartTime = null;
             currentTaskDuration = null;
             updateProgress(100);
@@ -621,7 +622,7 @@
 
         if (index > 0) {
             lastTask = allTskRtn[index - 1].title;
-            lastTime = calculateEndTime(allTskRtn[index -1].start_time, allTskRtn[index - 1].duration);
+            lastTime = calculateEndTime(allTskRtn[index - 1].start_time, allTskRtn[index - 1].duration);
         }
 
         if (index + 1 < allTskRtn.length) {
@@ -745,6 +746,7 @@
         // Calculate tasksOver and tasksUpcoming using currentIndex
         tasksOver = currentIndex; // Number of tasks completed (up to current index)
         tasksUpcoming = totalTasks - currentIndex - 1; // Remaining tasks after current index
+        if (tasksUpcoming === -1){ tasksUpcoming = 0;}
 
         document.getElementById('totalTasks').textContent = totalTasks;
         document.getElementById('oneTimeTasks').textContent = oneTimeTasks;
