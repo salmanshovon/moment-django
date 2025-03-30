@@ -538,6 +538,7 @@ body.dark-theme .stat-number {
                     populateStatistics(allTskRtn, currentIndex);
                 } else {
                     showMessage('No tasks added!', 'info');
+                    populateStatistics([],0);
                 }
                 if (callback) {
                     callback();
