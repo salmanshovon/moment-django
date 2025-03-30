@@ -1167,6 +1167,14 @@ $(document).ready(function () {
         })
     }
 
+    function formatLocalDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 03, 04, etc.
+        const day = String(date.getDate()).padStart(2, '0'); // 01, 02, ..., 31
+        return `${year}-${month}-${day}`; // "2025-03-31" (local date, no timezone)
+    }
+
+
     // POST request to save the schedule
 
     document.getElementById('saveButton').addEventListener('click', function(event) {
@@ -1178,13 +1186,12 @@ $(document).ready(function () {
         const today = new Date();
         let forDate;
 
-        // Determine the for_date based on the selected date
         if (selectedDate === 'today') {
-            forDate = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+            forDate = formatLocalDate(today); // "2025-03-31" (even if UTC is 30-3-2025)
         } else if (selectedDate === 'tomorrow') {
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
-            forDate = tomorrow.toISOString().split('T')[0];
+            forDate = formatLocalDate(tomorrow); // "2025-04-01" (local date)
         } else {
             console.error('Invalid date selection.');
             return;

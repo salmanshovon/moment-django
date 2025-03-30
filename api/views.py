@@ -117,6 +117,7 @@ class RoutineCreateUpdateView(generics.CreateAPIView):
         """
         Override the create method to return a custom success response.
         """
+        print(request.data)
         response = super().create(request, *args, **kwargs)
         return Response(
             {"message": "Routine saved successfully!", "routine": response.data},
