@@ -7,112 +7,384 @@
     <!-- Bootstrap 5 CSS -->
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <style>
-        /* Custom styles for the ribbon and progress bar */
-        .ribbon {
-            background-color: #f8f9fa;
-            padding: 15px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
+/* ============== Base Styles ============== */
+.outermost-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-y: auto;
+    max-height: calc(100dvh - 100px);
+}
 
-        .time {
-            font-size: 2rem;
-            font-weight: bold;
-            position: relative;
-            display: inline-block;
-        }
+/* ============== Combined Task Card Styles ============== */
+.task-card {
+    padding-top: 0;
+    border-radius: 12px;
+}
 
-        .ampm-badge {
-            font-size: 0.8rem;
-            padding: 4px 6px;
-            position: absolute;
-            top: -8px;
-            right: -25px;
-        }
+.ribbon-container {
+    padding: 15px 20px 10px;
+    position: relative;
+}
+
+.ribbon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+    margin: 10px 20px;
+}
+
+/* ============== Time Ribbon Styles ============== */
+.time {
+    font-size: 2rem;
+    font-weight: bold;
+    position: relative;
+    display: inline-block;
+    color: #212529;
+}
+
+.ampm-badge {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+    position: absolute;
+    /* top: -8px; */
+    /* right: -25px; */
+    background-color: #6c757d;
+    color: white;
+    border-radius: 4px;
+}
+
+.day-date {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* ============== Current Task Styles ============== */
+/* Current Task Styles */
+.current-task {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.task-timing {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin: 12px 0;
+    font-size: 14px;
+    color: #495057;
+}
+
+.time-elapsed,
+.time-remaining {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+.time-ramaining {
+    margin-left: auto;
+}
+.time-elapsed {
+    margin-right: auto;
+}
+
+.time-elapsed i {
+    color: #247940;
+}
+
+.time-remaining i {
+    color: #dc3545;
+}
+
+.task-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6c757d;
+    flex-wrap: wrap;
+}
+
+.task-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+}
+
+/* ============== Progress Bar Styles ============== */
+.progress-bar {
+    height: 10px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, #0d6efd, #0b5ed7);
+    transition: width 0.5s ease;
+}
+
+/* ============== Task Sections Styles ============== */
+.upcoming-task-section,
+.last-task-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px 15px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.section-header i {
+    font-size: 16px;
+}
+
+.last-duration,
+.next-time {
+    margin-left: auto;
+    font-weight: 500;
+    color: #495057;
+}
 
 
-        .date {
-            font-size: 18px;
-            color: #6c757d;
-        }
+.task-content {
+    font-size: 16px;
+    font-weight: 500;
+    color: #212529;
+}
 
-        .card {
-            margin-top: 20px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+.last-task-section {
+    background-color: #e8f4ff;
+}
 
-        .task-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+/* ============== Statistics List Styles ============== */
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-        .last-task, .upcoming-task {
-            font-size: 14px;
-            color: #6c757d;
-        }
+.stat-item {
+    padding: 12px 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
 
-        .current-task {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-        }
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-        .progress-bar {
-            height: 10px;
-            border-radius: 5px;
-            background-color: #e9ecef;
-            overflow: hidden;
-        }
+.stat-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
-        .progress {
-            height: 100%;
-            background-color: #0d6efd;
-             /* Adjust dynamically based on elapsed time */
-        }
+.stat-icon {
+    font-size: 20px;
+    color: #0d6efd;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e8f4ff;
+    border-radius: 50%;
+}
+
+.stat-number {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #212529;
+    margin-top: 2px;
+}
+
+/* ============== Responsive Layout ============== */
+@media (min-width: 768px) {
+    .outermost-container {
+        display: flex;
+        gap: 25px;
+        align-items: flex-start;
+    }
+    
+    .content-container {
+        flex: 2;
+    }
+    
+    .stats-container {
+        flex: 1;
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .outermost-container {
+        flex-direction: column;
+    }
+    
+    .stats-container {
+        margin-top: 25px;
+    }
+    
+    .task-meta {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+}
+
+
     </style>
 </head>
 <body>
     <!-- Navbar and Sidebar (assumed to be already present) -->
 
-    <!-- Ribbon for Time, Day, and Date -->
-    <div class="ribbon text-center position-relative">
-        <div class="container position-relative">
-            <div class="time position-relative d-inline-block">
-                <span id="currentTime">00:00:00</span>
-                <span id="ampm" class="badge bg-secondary position-absolute ampm-badge">AM</span>
-            </div>
-            <div class="day-date">
-                <span id="currentDay">Monday</span>, <span id="currentDate">February 10, 2025</span>
-            </div>
-        </div>
-    </div>
-    
-
-    <!-- Card for Tasks -->
-    <div class="container mt-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="task-container">
-                    <div class="last-task text-start">
-                        <small>Last Task:</small><br>
-                        <span id="lastTask">Completed Task</span>
+    <div class="outermost-container">
+        <!-- Main Content Container -->
+        <div class="content-container">
+            <!-- Combined Task Card with Time Ribbon -->
+            <div class="card task-card">
+                <!-- Time Ribbon Section -->
+                <div class="ribbon-container">
+                    <div class="ribbon text-center position-relative">
+                        <div class="time position-relative d-inline-block">
+                            <span id="currentTime">00:00:00</span>
+                            <span id="ampm" class="badge bg-secondary position-absolute ampm-badge">AM</span>
+                        </div>
+                        <div class="day-date">
+                            <span id="currentDay">Monday</span>, <span id="currentDate">February 10, 2025</span>
+                        </div>
                     </div>
+                    <div class="ribbon-divider"></div>
+                </div>
+                
+                <!-- Task Content Section -->
+                <div class="card-body">
+                    <!-- Current Task Section -->
                     <div class="current-task text-center">
-                        <span id="currentTask">Current Task</span>
+                        <span id="currentTask">Complete Project Documentation</span>
+                        <div class="task-meta">
+                            <span class="task-duration"><i class="bi bi-clock"></i> Duration: 2h 30m</span>
+                            <span class="task-priority"><i class="bi bi-exclamation-circle"></i> Priority: High</span>
+                            <span class="task-category"><i class="bi bi-tag"></i> Category: Work</span>
+                        </div>
+                        <div class="task-timing">
+                            <div class="time-elapsed">
+                                <i class="bi bi-clock-history"></i> 01:33:25
+                            </div>
+                            <div class="time-remaining">
+                                <i class="bi bi-alarm"></i> -00:12
+                            </div>
+                        </div>
                     </div>
-                    <div class="upcoming-task text-end">
-                        <small>Upcoming:</small><br>
-                        <span id="upcomingTask">Upcoming Task</span>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress-bar mt-3">
+                        <div class="progress" id="taskProgress"></div>
+                    </div>
+                    
+                    <!-- Upcoming Task Section -->
+                    <div class="upcoming-task-section mt-3">
+                        <div class="section-header">
+                            <i class="bi bi-arrow-up-circle"></i>
+                            <span>Upcoming</span>
+                            <span class="next-time">Starts at 12:03 PM</span>
+                        </div>
+                        <div class="task-content" id="upcomingTask">Finish project presentation</div>
+                    </div>
+                    
+                    <!-- Last Task Section -->
+                    <div class="last-task-section mt-3">
+                        <div class="section-header">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Completed</span>
+                            <span class="last-duration">Took 45m</span>
+                        </div>
+                        <div class="task-content" id="lastTask">Email team updates</div>
                     </div>
                 </div>
-                <div class="progress-bar mt-3">
-                    <div class="progress" id="taskProgress"></div>
+            </div>
+        </div>
+    
+        <!-- Statistics container -->
+        <div class="stats-container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="stats-list">
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <i class="bi bi-list-task stat-icon"></i>
+                                <div>
+                                    <small>Total Tasks</small>
+                                    <div class="stat-number" id="totalTasks">24</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <i class="bi bi-calendar-event stat-icon"></i>
+                                <div>
+                                    <small>One-Time Tasks</small>
+                                    <div class="stat-number" id="oneTimeTasks">15</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <i class="bi bi-arrow-repeat stat-icon"></i>
+                                <div>
+                                    <small>Repetitive Tasks</small>
+                                    <div class="stat-number" id="repetitiveTasks">9</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <i class="bi bi-check-circle stat-icon"></i>
+                                <div>
+                                    <small>Tasks Completed</small>
+                                    <div class="stat-number" id="tasksOver">18</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-info">
+                                <i class="bi bi-clock-history stat-icon"></i>
+                                <div>
+                                    <small>Tasks Upcoming</small>
+                                    <div class="stat-number" id="tasksUpcoming">6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <!-- Fab Container Part (Blue Button for task) -->
     <div class="fab-container">
         <!-- Floating Action Button -->
         <button class="fab btn btn-primary rounded-circle p-0" id="fab">
@@ -207,7 +479,7 @@
                 break;
             }
         }
-        if(currentIndex === -1 && allTskRtn.length > 0){
+        if (currentIndex === -1 && allTskRtn.length > 0) {
             currentIndex = 0;
         }
         return currentIndex;
@@ -217,10 +489,6 @@
         try {
             const timeElement = document.getElementById('currentTime');
             const ampmElement = document.getElementById('ampm');
-
-            // if (!timeElement || !ampmElement) {
-            //     throw new Error("DOM elements for time update not found.");
-            // }
 
             const now = new Date();
             let hours = now.getHours();
@@ -233,7 +501,7 @@
             timeElement.textContent = `${hours}:${minutes}:${seconds}`;
             ampmElement.textContent = ampm;
 
-            if (startFlag) {
+            if (startFlag && currentTaskStartTime && currentTaskDuration) {
                 const elapsedTime = ((now - currentTaskStartTime) / 1000) / currentTaskDuration * 100;
                 if (elapsedTime >= 100) {
                     currentIndex++;
@@ -247,6 +515,7 @@
                     }
                 } else {
                     updateProgress(elapsedTime);
+                    updateElapsedAndRemaining();
                 }
             }
         } catch (error) {
@@ -258,10 +527,6 @@
         try {
             const dayElement = document.getElementById('currentDay');
             const dateElement = document.getElementById('currentDate');
-
-            // if (!dayElement || !dateElement) {
-            //     throw new Error("DOM elements for date update not found.");
-            // }
 
             const now = new Date();
             const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -300,7 +565,7 @@
         clearDateTimer();
     }
 
-    function updateTask(lastTask, currentTask, upcomingTask) {
+    function updateTask(lastTask, currentTask, upcomingTask, duration, priority, category, elapsed, remaining) {
         try {
             document.getElementById('lastTask').textContent = lastTask;
         } catch (error) {
@@ -309,6 +574,11 @@
 
         try {
             document.getElementById('currentTask').textContent = currentTask;
+            document.querySelector('.task-duration').innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(duration)}`;
+            document.querySelector('.task-priority').innerHTML = `<i class="bi bi-exclamation-circle"></i> Priority: ${getPriorityLabel(priority)}`;
+            document.querySelector('.task-category').innerHTML = `<i class="bi bi-tag"></i> Category: ${category}`;
+            document.querySelector('.time-elapsed').innerHTML = `<i class="bi bi-clock-history"></i> ${elapsed}`;
+            document.querySelector('.time-remaining').innerHTML = `<i class="bi bi-alarm"></i> ${remaining}`;
         } catch (error) {
             // Pass silently
         }
@@ -332,7 +602,7 @@
         // Case when there are no more tasks or an invalid index (-1 or out of bounds)
         if (index === -1 || index >= allTskRtn.length) {
             let lastTask = index > 0 ? allTskRtn[index - 1].title : "Nothing...";
-            updateTask(lastTask, "Completed", "Nothing...");
+            updateTask(lastTask, "Completed", "Nothing...", "N/A", "N/A", "N/A", "N/A", "N/A");
             currentTaskStartTime = null;
             currentTaskDuration = null;
             updateProgress(100);
@@ -354,9 +624,67 @@
 
         currentTaskStartTime = new Date(allTskRtn[index].start_time);
         currentTaskDuration = allTskRtn[index].duration * 60; // Convert minutes to seconds
-        updateTask(lastTask, currentTask, upcomingTask);
+
+        
+        const priority = allTskRtn[index].priority;
+        const category = allTskRtn[index].category;
+
+        updateElapsedAndRemaining();
+        updateTask(lastTask, currentTask, upcomingTask, allTskRtn[index].duration, priority, category, formatTime(0), formatTime(currentTaskDuration));
     }
 
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function updateElapsedAndRemaining() {
+        if (startFlag && currentTaskStartTime && currentTaskDuration) {
+            const now = new Date();
+            const elapsedSeconds = (now - currentTaskStartTime) / 1000;
+            const remainingSeconds = currentTaskDuration - elapsedSeconds;
+            document.querySelector('.time-elapsed').innerHTML = `<i class="bi bi-clock-history"></i> ${formatTime(elapsedSeconds)}`;
+            document.querySelector('.time-remaining').innerHTML = `<i class="bi bi-alarm"></i> ${remainingSeconds > 0 ? "-" + formatTime(remainingSeconds) : formatTime(remainingSeconds)}`;
+        }
+    }
+
+    function formatDuration(minutes) {
+      if (minutes === null || minutes === undefined) {
+        return "Duration: N/A"; // Handle cases where duration is not available
+      }
+
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+
+      const formattedHours = String(hours).padStart(2, '0');
+      const formattedMinutes = String(remainingMinutes).padStart(2, '0');
+      if (formattedHours === `00`) {
+        return `Duration: ${formattedMinutes} Minutes`;
+      } else {
+        return `Duration: ${formattedHours}h ${formattedMinutes}m`;
+      }
+
+    }
+
+    // Function to get priority label based on priority value
+    function getPriorityLabel(priority) {
+        switch (priority) {
+            case 5:
+                return "Urgent";
+            case 4:
+                return "Critical";
+            case 3:
+                return "High";
+            case 2:
+                return "Medium";
+            case 1:
+                return "Low";
+            default:
+                return "Unknown";
+        }
+    }
 
     document.getElementById('fab').addEventListener('click', function() {
         const fab = this;

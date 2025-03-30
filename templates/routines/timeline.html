@@ -69,41 +69,41 @@
 
 
 .task-item .task-title {
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        /* Align icon and text vertically */
-        gap: 8px;
-        /* Space between icon and text */
-        font-size: 12px;
-        /* Adjust font size */
-        font-weight: 600;
-        /* Darker text for better readability */
-        margin-bottom: 8px;
-        /* Add space below the title */
-    }
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    /* Align icon and text vertically */
+    gap: 8px;
+    /* Space between icon and text */
+    font-size: 12px;
+    /* Adjust font size */
+    font-weight: 600;
+    /* Darker text for better readability */
+    margin-bottom: 8px;
+    /* Add space below the title */
+}
 
-    .task-item.one-time {
-        background-color: rgb(55, 92, 172);
-    }
+.task-item.one-time {
+    background-color: rgb(55, 92, 172);
+}
 
-    .task-item.repetitive {
-        background-color: rgb(114, 31, 80);
-    }
+.task-item.repetitive {
+    background-color: rgb(114, 31, 80);
+}
 
-    .task-item.misc {
-        background-color: rgb(150, 150, 150);
-    }
+.task-item.misc {
+    background-color: rgb(150, 150, 150);
+}
 
-    #current-time-marker {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: red;
-        z-index: 10;
-        transition: top 0.5s linear;
-    }
+#current-time-marker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: red;
+    z-index: 10;
+    transition: top 0.5s linear;
+}
 
 
     /* NEW */
@@ -337,10 +337,15 @@ body.panel-active .panel-toggle-ribbon {
 
         
         async function populate() {
+            // Clear any existing interval before setting a new one
+            if (currentTimeMarkerIntervalId) {
+                clearInterval(currentTimeMarkerIntervalId);
+            }
+
             allTskRtn = await fetchRoutine(); // Wait for the data to be fetched
             renderTimeline();
             updateCurrentTimeMarker(true);
-            setInterval(updateCurrentTimeMarker, 60000); // Update every 60 seconds
+            currentTimeMarkerIntervalId = setInterval(updateCurrentTimeMarker, 60000); // Update every 60 seconds
         }
 
         function renderTimeline() {
@@ -432,12 +437,22 @@ body.panel-active .panel-toggle-ribbon {
             return diffInMinutes;
         }
 
+        let currentTimeMarkerIntervalId; // Store the interval ID
+
         function updateCurrentTimeMarker(scrollOnLoad = false) {
-            const marker = document.getElementById('current-time-marker');
-            const minutesSinceMidnight = parseTime(new Date().toISOString());
-            marker.style.top = `${minutesSinceMidnight * pixelFactor}px`;
-            if (scrollOnLoad) {
-                marker.scrollIntoView({ behavior: "smooth", block: "center" });
+            try {
+                const marker = document.getElementById('current-time-marker');
+                const minutesSinceMidnight = parseTime(new Date().toISOString());
+                marker.style.top = `${minutesSinceMidnight * pixelFactor}px`;
+                if (scrollOnLoad) {
+                    marker.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            } catch (error) {
+                // If the element is not found, clear the interval
+                if (currentTimeMarkerIntervalId) {
+                    clearInterval(currentTimeMarkerIntervalId);
+                    currentTimeMarkerIntervalId = null; // Reset the interval ID
+                }
             }
         }
         populate();

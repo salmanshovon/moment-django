@@ -737,14 +737,14 @@
         <div class="col-12 col-md-5 h-100">
             <div class="tasks h-100">
                 <div class="task-category">
-                    <div class="task-category-title one-time">One-time Tasks</div>
+                    <div class="task-category-title one-time"><i class="bi bi-calendar-event"></i> One-time Tasks</div>
                     <ul id="one-time-tasks" class="task-list" data-type="onetime">
                         <li class="task-item" draggable="true" data-id="1" data-item-type="onetime">Task A</li>
                         <li class="task-item" draggable="true" data-id="2" data-item-type="onetime">Task B</li>
                     </ul>
                 </div>
                 <div class="task-category">
-                    <p class="task-category-title repetitive">Repetitive Tasks</p>
+                    <p class="task-category-title repetitive"><i class="bi bi-arrow-repeat"></i> Repetitive Tasks</p>
                     <ul id="repetitive-tasks" class="task-list" data-type="repetitive">
                         <li class="task-item" draggable="true" data-id="3" data-item-type="repetitive">Task X</li>
                         <li class="task-item" draggable="true" data-id="4" data-item-type="repetitive">Task Y</li>
@@ -1021,7 +1021,6 @@ $(document).ready(function () {
 
                         // Attach click event listener to the task item
                         taskItem.on('click', function(e) {
-                            console.log('taskItemClicked')
                             // Check if device is mobile (touch device)
                             const isMobile = window.innerWidth <= 768;
                             
@@ -1107,7 +1106,6 @@ $(document).ready(function () {
 
                     // Attach click event listener to the task item
                     taskItem.on('click', function(e) {
-                        console.log('taskItemClicked')
                         // Check if device is mobile (touch device)
                         const isMobile = window.innerWidth <= 768;
                         
@@ -1142,7 +1140,7 @@ $(document).ready(function () {
             $("#misc-tasks").append(taskItem);
             // Attach click event listener to the task item
             taskItem.on('click', function(e) {
-                console.log('taskItemClicked')
+                
                 // Check if device is mobile (touch device)
                 const isMobile = window.innerWidth <= 768;
                 
@@ -1338,7 +1336,7 @@ $(document).ready(function () {
       if (formattedHours === `00`) {
         return `${formattedMinutes} Minutes`;
       } else {
-        return `${formattedHours} hr ${formattedMinutes} min`;
+        return `${formattedHours}h ${formattedMinutes}m`;
       }
 
     }
@@ -1558,9 +1556,9 @@ $(document).ready(function () {
         minutesInput.value = minutes;
 
         durationContainer.appendChild(hoursInput);
-        durationContainer.appendChild(document.createTextNode(' hr '));
+        durationContainer.appendChild(document.createTextNode('h '));
         durationContainer.appendChild(minutesInput);
-        durationContainer.appendChild(document.createTextNode(' min'));
+        durationContainer.appendChild(document.createTextNode('m'));
         durationContainer.style.marginBottom = '15px';
         durationContainer.style.marginTop = '15px';
 
@@ -2136,7 +2134,7 @@ $(document).ready(function () {
                 
                 // Attach click event listener to the task item
                 $(newTask).on('click', function(e) {
-                    console.log('taskItemClicked')
+                    
                     // Check if device is mobile (touch device)
                     const isMobile = window.innerWidth <= 768;
                     

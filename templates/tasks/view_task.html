@@ -554,8 +554,8 @@
   <div class="outerbox flex-column">
     <h3>
       <div class='fs-4'
-        style='text-align: center; background-color: rgb(141, 11, 11); color: white; padding: 10px; border-radius: 8px;'>
-        Upcoming One-Time Tasks</div>
+        style='text-align: center; background-color: rgb(61, 38, 190); color: white; padding: 10px; border-radius: 8px;'>
+        <i class="bi bi-calendar-event"></i> Upcoming One-Time Tasks</div>
     </h3>
     <div class="task-list">
       <div id="onetime-tab"></div>
@@ -564,8 +564,8 @@
   <div class="outerbox flex-column">
     <h3>
       <div class='fs-4'
-        style='text-align: center; background-color: rgb(61, 38, 190); color: white; padding: 10px; border-radius: 8px;'>
-        Repetitive Tasks</div>
+        style='text-align: center; background-color: rgb(141, 11, 11); color: white; padding: 10px; border-radius: 8px;'>
+        <i class="bi bi-arrow-repeat"></i> Repetitive Tasks</div>
     </h3>
     <div class="task-list">
       <div id="repetitive-tab"></div>
@@ -578,8 +578,8 @@
  <!-- onclick="showTab('repetitive') -->
 <div class="tab-view">
     <div class="tab-buttons">
-      <button data-tab="one-time" class="active">One-Time Tasks</button>
-      <button data-tab="repetitive">Repetitive Tasks</button>
+      <button data-tab="one-time" class="active"><i class="bi bi-calendar-event"></i> One-Time Tasks</button>
+      <button data-tab="repetitive"><i class="bi bi-arrow-repeat"></i> Repetitive Tasks</button>
   </div>
 
   <div id="mobile-onetime-tab" class="task-list"></div>
@@ -857,7 +857,7 @@
       if (formattedHours === `00`) {
         return `Duration: ${formattedMinutes} Minutes`;
       } else {
-        return `Duration: ${formattedHours} hr ${formattedMinutes} min`;
+        return `Duration: ${formattedHours}h ${formattedMinutes}m`;
       }
 
     }
