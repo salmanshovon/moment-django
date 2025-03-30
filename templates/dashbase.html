@@ -841,9 +841,9 @@ body.dark-theme .spinner {
             return notificationIds;
         }
 
-        // Example function to update notifications
+        //function to update notifications
         async function updateNotifications(notificationIds) {
-            const url = '{% url 'update_notification' %}'; // Replace with your actual endpoint URL
+            const url = '{% url 'update_notification' %}'; 
             csrftoken = getCSRFToken();
             const payload = {
                 notification_ids: notificationIds,
@@ -1104,7 +1104,7 @@ body.dark-theme .spinner {
                 const notificationItem = generateNotificationHTML(notification);
 
                 // Append the generated HTML to the scrollable container
-                notificationScrollContainer.insertAdjacentHTML('beforeend', notificationItem);
+                notificationScrollContainer.insertAdjacentHTML('afterbegin', notificationItem);
 
                 // Increment the counter if the notification is not already generated
                 if (!notification.is_generated) {
@@ -1146,7 +1146,9 @@ body.dark-theme .spinner {
 
                 // Append the generated HTML to the dropdown
                 const notificationDropdown = document.querySelector('.notification-scroll');
-                notificationDropdown.insertAdjacentHTML('beforeend', notificationItem);
+                notificationDropdown.insertAdjacentHTML('beforebegin', notificationItem);
+
+                notificationDropdown.scrollTop = 0; // Auto-scroll to show the latest notification at the top
 
                 // Update the notification badge count
                 const notificationBadge = document.getElementById('notificationBadge');
