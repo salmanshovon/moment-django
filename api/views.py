@@ -117,7 +117,6 @@ class RoutineCreateUpdateView(generics.CreateAPIView):
         """
         Override the create method to return a custom success response.
         """
-        print(request.data)
         response = super().create(request, *args, **kwargs)
         return Response(
             {"message": "Routine saved successfully!", "routine": response.data},
@@ -190,7 +189,7 @@ class NotificationUpdateView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def patch(self, request, *args, **kwargs):
-        print(self.request.data)
+        # print(self.request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         notification_ids = serializer.validated_data['notification_ids']

@@ -35,7 +35,7 @@ class Notification(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    task = models.IntegerField(null=True, blank=True)  # Changed from ForeignKey to IntegerField
+    task = models.BigIntegerField(null=True, blank=True)  # Changed from ForeignKey to IntegerField
     title = models.CharField(max_length=255)
     message = models.TextField()
     date_time = models.DateTimeField()  # When the notification should be triggered
@@ -64,64 +64,57 @@ class Notification(models.Model):
     
     @staticmethod
     def create_or_update_notifications(user, tasks):
-        # Retrieve the user's profile
-        profile = Profile.objects.filter(user=user).first()
-
-        # Get the user's timezone from the profile, default to UTC if not set
-        user_tz = pytz.timezone(profile.user_timezone) if profile and profile.user_timezone else pytz.UTC
-
-        # Get the current time in the user's timezone
+        profile = Profile.objects.filter(user=user).values("user_timezone").first()
+        user_tz = pytz.timezone(profile["user_timezone"]) if profile and profile["user_timezone"] else pytz.UTC
         current_time = timezone.localtime(timezone.now(), user_tz)
 
-        # Fetch all notifications for the user in a single query
-        user_notifications = Notification.objects.filter(user=user)
+        # Fetch only necessary fields
+        user_notifications = Notification.objects.filter(user=user).values_list("task", "id", "date_time", "is_generated", "is_read")
         
-        # Create dictionary of existing notifications keyed by task ID
-        notifications_dict = {int(notification.task): notification 
-                            for notification in user_notifications 
-                            if notification.task is not None}
+        # Store existing notification tasks for quick lookup
+        notifications_dict = {str(task): (notif_id, date_time, is_generated, is_read) for task, notif_id, date_time, is_generated, is_read in user_notifications if task is not None}
 
         notifications_to_update = []
         notifications_to_create = []
 
         for task in tasks:
-            # Parse the task's start time
+            task_id = task.get('id')
+            if task_id is None:
+                continue
+            
+            task_id_str = str(task_id)
             task_start_time = datetime.fromisoformat(task['start_time'].replace('Z', '+00:00'))
             task_start_time = timezone.localtime(task_start_time, user_tz)
 
-            task_id = int(task.get('id'))  # Ensure this is an integer
-            notification = notifications_dict.get(task_id)
-            
-            if notification:
-                old_time = notification.date_time
-                notification.date_time = task_start_time
+            if task_id_str in notifications_dict:
+                notif_id, old_time, is_generated, is_read = notifications_dict[task_id_str]
 
-                if old_time < current_time and task_start_time > current_time:
-                    notification.is_generated = False
-                    notification.is_read = False
-
-                notifications_to_update.append(notification)
+                # Update only if the time has changed
+                if old_time != task_start_time:
+                    notifications_to_update.append(Notification(
+                        id=notif_id,
+                        date_time=task_start_time,
+                        is_generated=False if old_time < current_time and task_start_time > current_time else is_generated,
+                        is_read=False if old_time < current_time and task_start_time > current_time else is_read
+                    ))
             else:
-                notification_data = {
-                    'user': user,
-                    'task': task_id,
-                    'title': task['title'],
-                    'message': f"Reminder for {task['title']}",
-                    'date_time': task_start_time,
-                    'notification_type': 'reminder',
-                }
-                notifications_to_create.append(Notification(**notification_data))
+                notifications_to_create.append(Notification(
+                    user=user,
+                    task=task_id,
+                    title=task['title'],
+                    message=f"Reminder for {task['title']}",
+                    date_time=task_start_time,
+                    notification_type='reminder',
+                ))
 
-        # Bulk update existing notifications
+        # Perform bulk updates and inserts in a single query each
         if notifications_to_update:
-            Notification.objects.bulk_update(
-                notifications_to_update, 
-                ['date_time', 'is_generated', 'is_read']
-            )
+            Notification.objects.bulk_update(notifications_to_update, ['date_time', 'is_generated', 'is_read'])
 
-        # Bulk create new notifications
         if notifications_to_create:
             Notification.objects.bulk_create(notifications_to_create)
+
+
     
 class Reflection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
