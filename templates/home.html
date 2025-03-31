@@ -347,73 +347,64 @@ body.dark-theme .stat-number {
     <!-- Navbar and Sidebar (assumed to be already present) -->
 
     <div class="outermost-container">
-        <!-- Main Content Container -->
         <div class="content-container">
-            <!-- Combined Task Card with Time Ribbon -->
             <div class="card task-card">
-                <!-- Time Ribbon Section -->
                 <div class="ribbon-container">
                     <div class="ribbon text-center position-relative">
                         <div class="time position-relative d-inline-block">
-                            <span id="currentTime">00:00:00</span>
-                            <span id="ampm" class="badge bg-secondary position-absolute ampm-badge">AM</span>
+                            <span id="currentTime"></span>
+                            <span id="ampm" class="badge bg-secondary position-absolute ampm-badge"></span>
                         </div>
                         <div class="day-date">
-                            <span id="currentDay">Monday</span>, <span id="currentDate">February 10, 2025</span>
+                            <span id="currentDay"></span>, <span id="currentDate"></span>
                         </div>
                     </div>
                     <div class="ribbon-divider"></div>
                 </div>
                 
-                <!-- Task Content Section -->
                 <div class="card-body">
-                    <!-- Current Task Section -->
                     <div class="current-task text-center">
-                        <span id="currentTask">Complete Project Documentation</span>
+                        <span id="currentTask"></span>
                         <div class="task-meta">
-                            <span class="task-duration"><i class="bi bi-clock"></i> Duration: 2h 30m</span>
-                            <span class="task-priority"><i class="bi bi-exclamation-circle"></i> Priority: High</span>
-                            <span class="task-category"><i class="bi bi-tag"></i> Category: Work</span>
+                            <span class="task-duration"><i class="bi bi-clock"></i> Duration: </span>
+                            <span class="task-priority"><i class="bi bi-exclamation-circle"></i> Priority: </span>
+                            <span class="task-category"><i class="bi bi-tag"></i> Category: </span>
                         </div>
                         <div class="task-timing">
                             <div class="time-elapsed">
-                                <i class="bi bi-clock-history"></i> 01:33:25
+                                <i class="bi bi-clock-history"></i> 
                             </div>
                             <div class="time-remaining">
-                                <i class="bi bi-alarm"></i> -00:12
+                                <i class="bi bi-alarm"></i> 
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Progress Bar -->
                     <div class="progress-bar mt-3">
                         <div class="progress" id="taskProgress"></div>
                     </div>
                     
-                    <!-- Upcoming Task Section -->
                     <div class="upcoming-task-section mt-3">
                         <div class="section-header">
                             <i class="bi bi-arrow-up-circle"></i>
                             <span>Upcoming</span>
-                            <span class="next-time">Starts at 12:03 PM</span>
+                            <span class="next-time">Starts at </span>
                         </div>
-                        <div class="task-content" id="upcomingTask">Finish project presentation</div>
+                        <div class="task-content" id="upcomingTask"></div>
                     </div>
                     
-                    <!-- Last Task Section -->
                     <div class="last-task-section mt-3">
                         <div class="section-header">
                             <i class="bi bi-check-circle"></i>
                             <span>Completed</span>
-                            <span class="last-end-time">Took 45m</span>
+                            <span class="last-end-time">Took </span>
                         </div>
-                        <div class="task-content" id="lastTask">Email team updates</div>
+                        <div class="task-content" id="lastTask"></div>
                     </div>
                 </div>
             </div>
         </div>
-    
-        <!-- Statistics container -->
+        
         <div class="stats-container">
             <div class="card">
                 <div class="card-body">
@@ -423,7 +414,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-list-task stat-icon"></i>
                                 <div>
                                     <small>Total Tasks</small>
-                                    <div class="stat-number" id="totalTasks">24</div>
+                                    <div class="stat-number" id="totalTasks"></div>
                                 </div>
                             </div>
                         </div>
@@ -432,7 +423,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-calendar-event stat-icon"></i>
                                 <div>
                                     <small>One-Time Tasks</small>
-                                    <div class="stat-number" id="oneTimeTasks">15</div>
+                                    <div class="stat-number" id="oneTimeTasks"></div>
                                 </div>
                             </div>
                         </div>
@@ -441,7 +432,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-arrow-repeat stat-icon"></i>
                                 <div>
                                     <small>Repetitive Tasks</small>
-                                    <div class="stat-number" id="repetitiveTasks">9</div>
+                                    <div class="stat-number" id="repetitiveTasks"></div>
                                 </div>
                             </div>
                         </div>
@@ -450,7 +441,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-check-circle stat-icon"></i>
                                 <div>
                                     <small>Tasks Completed</small>
-                                    <div class="stat-number" id="tasksOver">18</div>
+                                    <div class="stat-number" id="tasksOver"></div>
                                 </div>
                             </div>
                         </div>
@@ -459,7 +450,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-clock-history stat-icon"></i>
                                 <div>
                                     <small>Tasks Upcoming</small>
-                                    <div class="stat-number" id="tasksUpcoming">6</div>
+                                    <div class="stat-number" id="tasksUpcoming"></div>
                                 </div>
                             </div>
                         </div>
@@ -784,7 +775,7 @@ body.dark-theme .stat-number {
 
     function formatDuration(minutes) {
       if (minutes === null || minutes === undefined || minutes === "--") {
-        return "--"; // Handle cases where duration is not available
+        return "Duration:--"; // Handle cases where duration is not available
       }
 
       const hours = Math.floor(minutes / 60);

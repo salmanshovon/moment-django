@@ -37,6 +37,13 @@ class SignInView(LoginView):
     template_name = 'signin.html'
     success_url = reverse_lazy('update_profile')
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return render(request, 'logged_out.html')
+        else:
+            return render(request, self.template_name)
+            
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
