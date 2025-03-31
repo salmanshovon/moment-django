@@ -58,7 +58,6 @@
     border-radius: 4px;
     padding: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    background: white;
     border-left: 3px solid var(--task-color, #3498db);
     overflow: hidden;
     min-height: 30px; /* Minimum height */
@@ -251,6 +250,17 @@ body.panel-active .panel-toggle-ribbon {
         top: calc(50% + 37.5px); /* Maintain same vertical position */
         transform: translateY(-50%);
     }
+}
+
+/* DARK THEME */
+
+body.dark-theme .timeline-control-panel {
+    color: #eee;
+    background-color: #34495e;
+}
+
+body.dark-theme .time-marker {
+    color: #eee
 }
 
 </style>

@@ -177,6 +177,20 @@
 }
 
 /* ============== Statistics List Styles ============== */
+
+.card-header {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #4a6cf7 0%, #3a5bd9 100%);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
 .stats-list {
     display: flex;
     flex-direction: column;
@@ -184,7 +198,7 @@
 }
 
 .stat-item {
-    padding: 12px 15px;
+    padding: 10px 15px;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -407,6 +421,9 @@ body.dark-theme .stat-number {
         
         <div class="stats-container">
             <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title">Task Statistics</h6>
+                </div>
                 <div class="card-body">
                     <div class="stats-list">
                         <div class="stat-item">
@@ -414,7 +431,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-list-task stat-icon"></i>
                                 <div>
                                     <small>Total Tasks</small>
-                                    <div class="stat-number" id="totalTasks"></div>
+                                    <div class="stat-number" id="totalTasks">0</div>
                                 </div>
                             </div>
                         </div>
@@ -423,7 +440,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-calendar-event stat-icon"></i>
                                 <div>
                                     <small>One-Time Tasks</small>
-                                    <div class="stat-number" id="oneTimeTasks"></div>
+                                    <div class="stat-number" id="oneTimeTasks">0</div>
                                 </div>
                             </div>
                         </div>
@@ -432,7 +449,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-arrow-repeat stat-icon"></i>
                                 <div>
                                     <small>Repetitive Tasks</small>
-                                    <div class="stat-number" id="repetitiveTasks"></div>
+                                    <div class="stat-number" id="repetitiveTasks">0</div>
                                 </div>
                             </div>
                         </div>
@@ -441,7 +458,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-check-circle stat-icon"></i>
                                 <div>
                                     <small>Tasks Completed</small>
-                                    <div class="stat-number" id="tasksOver"></div>
+                                    <div class="stat-number" id="tasksOver">0</div>
                                 </div>
                             </div>
                         </div>
@@ -450,7 +467,7 @@ body.dark-theme .stat-number {
                                 <i class="bi bi-clock-history stat-icon"></i>
                                 <div>
                                     <small>Tasks Upcoming</small>
-                                    <div class="stat-number" id="tasksUpcoming"></div>
+                                    <div class="stat-number" id="tasksUpcoming">0</div>
                                 </div>
                             </div>
                         </div>
