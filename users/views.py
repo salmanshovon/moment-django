@@ -37,11 +37,11 @@ class SignInView(LoginView):
     template_name = 'signin.html'
     success_url = reverse_lazy('update_profile')
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    def get(self, request, *args, **kwargs):
+        """Handle AJAX requests for auth state checks"""
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.method != "POST":
             return render(request, 'logged_out.html')
-        else:
-            return render(request, self.template_name)
+        return super().get(request, *args, **kwargs)
             
 
     def post(self, request, *args, **kwargs):
