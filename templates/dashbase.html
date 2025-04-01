@@ -196,7 +196,8 @@ html, body {
     }
 
     .cblogo {
-        margin-left: 330px;
+        margin-right: auto;
+        cursor: pointer;
     }
 
     /* Warning Display */
@@ -470,6 +471,10 @@ body.dark-theme {
     color: #ffffff; /* Light text */
 }
 
+body.dark-theme .cblogo img {
+  filter: brightness(0) invert(1); /* Turns black → white */
+}
+
 /* Dark Theme for Sidebar */
 body.dark-theme .sidebar {
     background-color: #1e1e1e; /* Dark sidebar background */
@@ -641,11 +646,11 @@ body.dark-theme .spinner {
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Centered Brand Logo -->
-            <div class="d-flex justify-content-center flex-grow-1 cblogo">
-                <a class="navbar-brand d-flex align-items-center" href="#">
-                    <img src="{% static 'img/logo.jpg' %}" alt="Logo" width="40" height="40" class="me-2">
-                    <span>M O M E N T</span>
+            <!-- Left-aligned Brand Logo -->
+            <div class="d-flex flex-grow-1 cblogo justify-content-center justify-content-md-start">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}" onclick="$(document).trigger('contentUpdated', [this.href, '#new-content',true]); return false;">
+                    <img src="{% static 'img/moment-logo.png' %}" alt="Logo" width="auto" height="42" class="me-2">
+                    <!-- <span>M O M E N T</span> -->
                 </a>
             </div>
 
