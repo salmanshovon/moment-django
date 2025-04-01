@@ -77,15 +77,11 @@ html, body {
     text-align: center;
 }
 #loading-logo {
-    width: 100px;
+    width: 300px;
     height: auto;
     animation: pulse 1.5s infinite;
 }
-#loading-text {
-    margin-top: 20px;
-    font-size: 24px;
-    color: #333;
-}
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
@@ -101,11 +97,28 @@ html, body {
     text-align: center;
     font-size: 14px;
     color: #666;
-    background-color: white !important; /* Add this line */
+    background-color: white !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    white-space: nowrap; /* Prevents text wrapping */
 }
+
 .footer img {
-    vertical-align: middle;
+    margin: 4px 0; /* Slightly more spacing around logo */
 }
+
+.powered-by {
+    font-size: 12px;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.company-name {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
 </style>
 <style>
     /* Spinning Animation */
@@ -778,16 +791,15 @@ body.dark-theme .spinner {
     </div>
     <!-- Loading Screen -->
     <div id="loading-screen">
-        <img src="{% static 'img/logo.jpg' %}" alt="Company Logo" id="loading-logo">
-        <h1 id="loading-text">M O M E N T</h1>
+        <img src="{% static 'img/moment-logo.png' %}" alt="Brand Logo" id="loading-logo">
         <!-- Footer -->
         <footer class="footer mt-auto py-3 bg-light">
             <div class="container text-center">
-                <span class="text-muted">
-                    Powered by 
-                    <img src="{% static 'img/company-logo.jpg' %}" alt="Aranya Tech Logo" width="20" height="20" class="me-1">
-                    <strong>Aranya Tech</strong> &copy; 2025
-                </span>
+                <div class="footer">
+                    <div class="powered-by text-muted">Powered by</div>
+                    <img src="{% static 'img/aranya-logo.svg' %}" alt="Aranya Tech Logo" width="60" height="60">
+                    <div class="company-name">Aranya Tech &copy; 2025</div>
+                </div>
             </div>
         </footer>
     </div>
