@@ -812,7 +812,7 @@ body.dark-theme .spinner {
     </div>
 
     <!-- Main Content -->
-    <div class="main-content" id="new-content""></div>
+    <div class="main-content" id="new-content"></div>
 
     <div id="dashbase-root" style="display: none;"></div>
 
@@ -955,7 +955,9 @@ body.dark-theme .spinner {
                 url: url,
                 type: "GET",
                 dataType: "html",
-                headers: { "X-Requested-With": "XMLHttpRequest" },
+                headers: { "X-Requested-With": "XMLHttpRequest",
+                    "isOut": false
+                 },
                 success: function(response) {
                     $(targetDivId).fadeOut(200, function() {
                         $(this).html(response).css("display", "none"); // Insert content but keep it hidden

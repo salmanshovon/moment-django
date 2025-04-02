@@ -19,39 +19,92 @@ def not_authenticated(user):
 @method_decorator(user_passes_test(not_authenticated, login_url='home'), name='dispatch')
 class SignUpView(CreateView):
     form_class = SignUpForm
-    template_name = 'signup.html'
-    success_url = reverse_lazy('signin')  # Redirect to home page after sign-up
+    template_name = 'signup_main.html'
+    success_url = reverse_lazy('signin')
+
+    def get(self, request, *args, **kwargs):
+        """Handle AJAX requests."""
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        if is_ajax:
+            return super().get(request, *args, **kwargs)
+        return render(request, 'rootbase.html')
 
     def form_valid(self, form):
+        """Handle valid form submissions, specifically for AJAX requests."""
+        print("Form is valid. Processing user registration...")
+
+        is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        print(f"Is AJAX request: {is_ajax}")
+
         user = form.save(commit=False)  # Don't save the user yet
+        print(f"User object created: {user}")
+
         user.save()  # Save the user to the database
+        print(f"User saved: {user.id}")
+
         Profile.objects.create(user=user, is_verified=False)  # Explicitly create the profile
+        print(f"Profile created for user: {user.id}")
+
         send_email_otp(user)  # Send OTP
-        # print('Email Sending is omitted Now, remove the comment to send email')
-        messages.success(self.request, "Account created successfully! Sign in now.")
-        return super().form_valid(form)
-    
+        print(f"OTP sent to: {user.email}")
+
+        if is_ajax:
+            response_data = {
+                'success': True,
+                'message': 'Account created successfully! Please check your email for verification.',
+                'redirect_url': self.success_url  # Optionally, include the redirect URL
+            }
+            print("AJAX response:", response_data)
+            return JsonResponse(response_data)
+        else:
+            messages.success(self.request, "Account created successfully! Sign in now.")
+            return super().form_valid(form)  # Handle non-AJAX form submissions
+
+    def form_invalid(self, form):
+        """Handle invalid form submissions, specifically for AJAX requests."""
+        print("Form is invalid. Errors:", form.errors)
+
+        is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        print(f"Is AJAX request: {is_ajax}")
+
+        if is_ajax:
+            response_data = {
+                'success': False,
+                'errors': form.errors.get_json_data(),
+                'message': 'Please correct the errors below.'
+            }
+            print("AJAX response:", response_data)
+            return JsonResponse(response_data, status=400)
+        else:
+            return super().form_invalid(form)  # Handle non-AJAX form submissions
+
+
 @method_decorator(user_passes_test(not_authenticated, login_url=reverse_lazy('home')), name='dispatch')
-class SignInView(LoginView):
-    form_class = SignInForm
-    template_name = 'signin.html'
+class SignInView(TemplateView):
+    template_name = 'signin_main.html'
     success_url = reverse_lazy('update_profile')
 
     def get(self, request, *args, **kwargs):
-        """Handle AJAX requests for auth state checks"""
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.method != "POST":
-            return render(request, 'logged_out.html')
-        return super().get(request, *args, **kwargs)
+        """Handle AJAX requests and 'isOut' parameter."""
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        is_out = request.headers.get('isOut')
+
+        if is_ajax:
+            if is_out:
+                return super().get(request, *args, **kwargs)  # If isOut, send signin_main.html
+            return render(request, 'logged_out.html')  # Default AJAX response
+        
+        return render(request, 'rootbase.html')  # If not AJAX, return rootbase.html
             
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form()
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            if form.is_valid():
-                username = form.cleaned_data["username"]
-                password = form.cleaned_data["password"]
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            
+            if username and password:
                 user = authenticate(request, username=username, password=password)
-
+                
                 if user is not None:
                     # Get user's timezone from IP
                     user_timezone = get_timezone_from_ip(request) or "UTC"  # Default to UTC if not found
@@ -60,9 +113,17 @@ class SignInView(LoginView):
                     user.profile.user_timezone = user_timezone
                     user.profile.save()
                     login(request, user)
-                    return JsonResponse({"success": True,"redirect_url": str(self.success_url)})
-            else:
-                return JsonResponse({"success": False, "error": "Invalid username/email or password"})
+                    return JsonResponse({
+                        "success": True,
+                        "redirect_url": self.success_url
+                    })
+            
+            return JsonResponse({
+                "success": False, 
+                "error": "Invalid username/email or password"
+            }, status=400)
+        
+        # Fallback for non-AJAX requests
         return super().post(request, *args, **kwargs)
 
 

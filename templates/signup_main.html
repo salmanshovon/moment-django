@@ -1,0 +1,619 @@
+<style>
+    /* Container CSS */
+    .custom-container {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        width: 900px;
+        box-shadow: var(--shadow);
+        border-radius: 15px;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(7px) !important;
+        border: solid 2px var(--primary-color);
+    }
+
+    .login-container {
+        background-color: white;
+        padding: 2rem 3rem;
+        flex: 0 0 40%;
+        margin-right: -14px;
+        margin-left: auto;
+    }
+
+    .login-title {
+        font-weight: 400;
+        color: var(--secondary-color) !important;
+        color: var(--dark-color);
+        margin-bottom: 1.25rem;
+        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    .form-control {
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.2);
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 0.65rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    .btn-google {
+        background-color: white;
+        color: #757575;
+        border: 1px solid #e0e0e0;
+        padding: 0.65rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .btn-google:hover {
+        background-color: #f5f5f5;
+        border-color: #d0d0d0;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 1.25rem 0;
+        color: #757575;
+        font-size: 0.9rem;
+    }
+
+    .divider::before, .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .divider::before {
+        margin-right: 1rem;
+    }
+
+    .divider::after {
+        margin-left: 1rem;
+    }
+
+    .signin-link {
+        text-align: center;
+        text-decoration: none !important;
+        margin-top: 1.25rem;
+        color: #757575;
+        font-size: 0.95rem;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .form-label {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 1200px) {
+        .login-container {
+            padding: 2rem 2rem;
+            width: auto;
+        }
+    }
+
+    @media (max-width: 767.8px) {
+        .login-container {
+            padding: 1.5rem 2rem;
+            justify-self: center;
+            margin: auto;               
+        }
+        
+        .login-title {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .custom-container {
+            display: block;
+            width: auto;
+            height: auto;
+            padding: 0;
+            margin: 1rem 1rem;
+            border: none;
+        }
+    }
+
+    .brand-sidebar {
+        max-width: 80%;
+        margin-left: 30px;
+        padding-right: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .brand-sidebar {
+            padding: 0 2rem;
+        }
+    }
+
+    .brand-text {
+        font-size: 3.5rem;
+        font-weight: 100;
+        text-transform: uppercase;
+        font-family: 'Raleway', sans-serif;
+        letter-spacing: 2px;
+        color: #e8e8e8;
+        text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(to right, #f0f0f0, #d0d0d0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        padding: 8px 16px;
+        display: inline-block;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .text-back {
+        font-weight: 100;
+        font-size: 1.3rem;
+        color:#a8a8a8;
+    }
+</style>
+
+<div class="container-fluid my-5">
+    <div class="row justify-content-center align-items-center min-vh-50">
+        <div class="custom-container">
+            <!-- Branding Sidebar (Left) - Hidden on mobile -->
+            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center">
+                <div class="brand-sidebar text-center px-4">
+                    <h3 class="text-back mb-2">Welcome To</h3>
+                    <h4 class="mb-2 brand-text">MOMENT</h4>
+                    <h2 class="fw-light fs-6 text-light" style="font-size: 0.8rem;">Master Your Time, Master Your Life</h2>
+                    <hr class="my-3 border-light">
+                    <p class="fst-italic text-light small">
+                        "It is not that we have a short time to live, but that we waste much of it."
+                        <br>
+                        - Seneca
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Sign Up Container (Right) -->
+            <div class="login-container">
+                <h4 class="login-title">Sign Up</h4>
+                
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}" id="username" name="username" placeholder="Choose a username" required>
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="email" name="email" placeholder="Enter your email" required>
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.email.errors %}{{ error }}{% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" id="password1" name="password1" placeholder="Create a password" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password1.errors %}{{ error }}{% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">Repeat Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" id="password2" name="password2" placeholder="Repeat your password" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the <a href="{% url 'terms&conditions' %}" class="text-decoration-none" target="_blank">Terms and Conditions</a>
+                        </label>
+                        <div class="terms-invalid-feedback invalid-feedback" style="display: none;">
+                            You must agree before submitting.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 mb-1">Sign Up</button>
+                    
+                    <div class="divider">or</div>
+                    {% load socialaccount %}
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-google w-100 mb-3">
+                        <i class="fab fa-google"></i> Sign Up with Google
+                    </a>
+                    
+                    <div class="signin-link">
+                        Already have an account? <a href="{% url 'signin' %}"
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Sign In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // AJAX to check username uniqueness
+    document.getElementById('username').addEventListener('input', function () {
+        const username = this.value;
+        const usernameField = this;
+        const invalidFeedback = usernameField.nextElementSibling; // The existing invalid-feedback div
+    
+        // Create valid feedback element if it doesn't exist
+        let validFeedback = invalidFeedback.nextElementSibling;
+        if (!validFeedback || !validFeedback.classList.contains('valid-feedback')) {
+            validFeedback = document.createElement('div');
+            validFeedback.classList.add('valid-feedback', 'd-block');
+            invalidFeedback.parentNode.insertBefore(validFeedback, invalidFeedback.nextSibling);
+        }
+    
+        if (username.length > 3) {
+            fetch("{% url 'check_username' %}?username=" + encodeURIComponent(username))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.is_unique) {
+                        usernameField.classList.remove('is-invalid');
+                        usernameField.classList.add('is-valid');
+                        
+                        // Clear and hide invalid feedback
+                        invalidFeedback.textContent = '';
+                        invalidFeedback.style.display = 'none';
+                        
+                        // Show valid feedback
+                        validFeedback.style.display = 'block';
+                        validFeedback.textContent = "Looks good!";
+                    } else {
+                        usernameField.classList.remove('is-valid');
+                        usernameField.classList.add('is-invalid');
+                        
+                        // Clear and hide valid feedback
+                        validFeedback.textContent = '';
+                        validFeedback.style.display = 'none';
+                        
+                        // Show invalid feedback
+                        invalidFeedback.style.display = 'block';
+                        invalidFeedback.textContent = "A user with that username already exists.";
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+            // Clear validation classes
+            usernameField.classList.remove('is-valid', 'is-invalid');
+            
+            // Clear and hide both feedback messages
+            invalidFeedback.textContent = '';
+            invalidFeedback.style.display = 'none';
+            validFeedback.textContent = '';
+            validFeedback.style.display = 'none';
+        }
+    });
+    
+    // Email validation with debounce
+    function checkEmail() {
+        const emailField = document.querySelector('input[name="email"]');
+        if (!emailField) return;
+    
+        let debounceTimer;
+        let validFeedback = document.createElement('div');
+        validFeedback.classList.add('valid-feedback', 'd-block');
+        emailField.parentNode.appendChild(validFeedback);
+    
+        emailField.addEventListener("input", function() {
+            clearTimeout(debounceTimer);
+            const email = this.value.trim();
+            const invalidFeedback = this.parentNode.querySelector(".invalid-feedback");
+
+            // Reset validation states - THIS IS THE CRUCIAL PART
+            this.classList.remove("is-invalid", "is-valid");
+            invalidFeedback.style.display = "none";
+            validFeedback.style.display = "none";
+
+            if (!email) return;
+
+            if (!isValidEmail(email)) {
+                displayEmailError(this, "Please enter a valid email address.");
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetch("{% url 'check_email' %}?email=" + encodeURIComponent(email))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.is_unique) {
+                            this.classList.remove("is-invalid");
+                            this.classList.add("is-valid");
+                            invalidFeedback.textContent = "";
+                            invalidFeedback.style.display = "none";
+                            validFeedback.textContent = "Looks good!";
+                            validFeedback.style.display = "block";
+                        } else {
+                            validFeedback.textContent="";
+                            validFeedback.style.display = "none"; // Ensure "Looks good!" is hidden
+                            displayEmailError(this, "A user with that email already exists.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error checking email:", error);
+                        displayEmailError(this, "An error occurred. Please try again.");
+                    });
+            }, 500);
+        });
+    
+        function isValidEmail(email) {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailRegex.test(email);
+        }
+    
+        function displayEmailError(field, message) {
+            const invalidFeedback = field.parentNode.querySelector(".invalid-feedback");
+            field.classList.remove("is-valid"); // Ensure "is-valid" is removed
+            field.classList.add("is-invalid");
+            invalidFeedback.textContent = message;
+            invalidFeedback.style.display = "block";
+            validFeedback.textContent = "";
+            validFeedback.style.display = "none"; 
+        }
+    }
+    
+    checkEmail();
+    
+    // Password validation
+    function setupPasswordValidation() {
+    const password1 = document.getElementById("password1");
+    const password2 = document.getElementById("password2");
+    if (!password1 || !password2) return;
+
+    // Get feedback elements (they're siblings of the input-group div)
+    const password1Container = password1.closest('.input-group');
+    const password2Container = password2.closest('.input-group');
+    const password1Feedback = password1Container.nextElementSibling;
+    const password2Feedback = password2Container.nextElementSibling;
+
+    // Add valid feedback elements after the invalid feedback
+    const password1ValidFeedback = document.createElement('div');
+    password1ValidFeedback.classList.add('valid-feedback', 'd-block');
+    password1Container.parentNode.insertBefore(password1ValidFeedback, password1Feedback.nextSibling);
+
+    const password2ValidFeedback = document.createElement('div');
+    password2ValidFeedback.classList.add('valid-feedback', 'd-block');
+    password2Container.parentNode.insertBefore(password2ValidFeedback, password2Feedback.nextSibling);
+
+    function validatePasswords() {
+        const p1 = password1.value;
+        const p2 = password2.value;
+
+        // Reset states
+        password1.classList.remove("is-invalid", "is-valid");
+        password2.classList.remove("is-invalid", "is-valid");
+        password1Feedback.style.display = "none";
+        password2Feedback.style.display = "none";
+        password1ValidFeedback.style.display = "none";
+        password2ValidFeedback.style.display = "none";
+
+        // Validate password1
+        if (p1.length > 0) {
+            if (p1.length < 8) {
+                password1.classList.add("is-invalid");
+                password1.classList.remove("is-valid");
+                password1Feedback.textContent = "Password must be at least 8 characters.";
+                password1Feedback.style.display = "block";
+                password1ValidFeedback.textContent = "";
+                password1ValidFeedback.style.display = "none";
+            } else {
+                password1.classList.add("is-valid");
+                password1.classList.remove("is-invalid");
+                password1ValidFeedback.textContent = "Looks good!";
+                password1ValidFeedback.style.display = "block";
+                password1Feedback.textContent = "";
+                password1Feedback.style.display = "none";
+            }
+        }
+
+        // Validate password2
+        if (p2.length > 0) {
+            if (p1 !== p2) {
+                password2.classList.add("is-invalid");
+                password2.classList.remove("is-valid");
+                password2ValidFeedback.textContent = "";
+                password2ValidFeedback.style.display = "none";
+                password2Feedback.textContent = "Passwords do not match.";
+                password2Feedback.style.display = "block";
+            } else if (p2.length >= 8) {
+                password2.classList.add("is-valid");
+                password2.classList.remove("is-invalid");
+                password2ValidFeedback.textContent = "Passwords match!";
+                password2ValidFeedback.style.display = "block";
+                password2Feedback.textContent = "";
+                password2Feedback.style.display = "none";
+            }
+        }
+    }
+
+    password1.addEventListener("input", validatePasswords);
+    password2.addEventListener("input", validatePasswords);
+}
+setupPasswordValidation();
+    
+    // Form submission handler
+    function setupFormSubmission() {
+        const form = document.querySelector("form.needs-validation");
+        if (!form) return;
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Manually trigger validation for all fields
+            const username = document.getElementById("username");
+            const email = document.querySelector('input[name="email"]');
+            const password1 = document.getElementById("password1");
+            const password2 = document.getElementById("password2");
+            const terms = document.getElementById("terms");
+            const termsError = document.querySelector('.terms-invalid-feedback');
+
+            // Validate each field
+            let isValid = true;
+
+            if (!username.value) {
+                username.classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!email.value || !isValidEmail(email.value)) {
+                email.classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!password1.value || password1.value.length < 8) {
+                password1.classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!password2.value || password1.value !== password2.value) {
+                password2.classList.add("is-invalid");
+                isValid = false;
+            }
+
+            if (!terms.checked) {
+                terms.classList.add("is-invalid");
+                termsError.style.display = 'block';
+                isValid = false;
+            } else {
+                terms.classList.remove("is-invalid");
+                termsError.style.display = 'none';
+                isValid = true;
+            }
+
+            if (isValid) {
+                // Form is valid, submit via AJAX
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.success) {
+                        $(document).trigger('contentUpdated', [data.redirect_url, '#new-content', true]);
+                    } else {
+                        // Handle server-side errors
+                        Object.keys(data.errors).forEach(field => {
+                            const input = form.querySelector(`[name="${field}"]`);
+                            if (input) {
+                                input.classList.add("is-invalid");
+                                // For inputs in input-group, feedback is after the input-group div
+                                const inputContainer = input.closest('.mb-3');
+                                const feedback = inputContainer.querySelector(".invalid-feedback");
+                                if (feedback) {
+                                    // Clear existing content
+                                    feedback.textContent = '';
+                                    // Handle multiple errors
+                                    data.errors[field].forEach(error => {
+                                        const errorDiv = document.createElement('div');
+                                        errorDiv.textContent = error.message;
+                                        feedback.appendChild(errorDiv);
+                                    });
+                                    feedback.style.display = "block";
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+            }
+
+            form.classList.add("was-validated");
+        });
+
+        function isValidEmail(email) {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailRegex.test(email);
+        }
+    }
+    
+    setupFormSubmission();
+    
+    // Password toggle functionality
+    function setupPasswordToggle() {
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+    }
+    
+    setupPasswordToggle();
+    </script>
