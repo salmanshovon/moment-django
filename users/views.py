@@ -31,22 +31,21 @@ class SignUpView(CreateView):
 
     def form_valid(self, form):
         """Handle valid form submissions, specifically for AJAX requests."""
-        print("Form is valid. Processing user registration...")
-
+        # Indicate that the form is valid and user registration is being processed
         is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        print(f"Is AJAX request: {is_ajax}")
+        # Check if this is an AJAX request
 
         user = form.save(commit=False)  # Don't save the user yet
-        print(f"User object created: {user}")
+        # Create user object without saving to database
 
         user.save()  # Save the user to the database
-        print(f"User saved: {user.id}")
+        # Persist the user to the database
 
         Profile.objects.create(user=user, is_verified=False)  # Explicitly create the profile
-        print(f"Profile created for user: {user.id}")
+        # Create a profile for the new user with verification set to False
 
         send_email_otp(user)  # Send OTP
-        print(f"OTP sent to: {user.email}")
+        # Send verification OTP to user's email
 
         if is_ajax:
             response_data = {
@@ -54,7 +53,7 @@ class SignUpView(CreateView):
                 'message': 'Account created successfully! Please check your email for verification.',
                 'redirect_url': self.success_url  # Optionally, include the redirect URL
             }
-            print("AJAX response:", response_data)
+            # Prepare success response for AJAX request
             return JsonResponse(response_data)
         else:
             messages.success(self.request, "Account created successfully! Sign in now.")
@@ -62,10 +61,9 @@ class SignUpView(CreateView):
 
     def form_invalid(self, form):
         """Handle invalid form submissions, specifically for AJAX requests."""
-        print("Form is invalid. Errors:", form.errors)
-
+        # Note that form is invalid and contains errors
         is_ajax = self.request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        print(f"Is AJAX request: {is_ajax}")
+        # Check if this is an AJAX request
 
         if is_ajax:
             response_data = {
@@ -73,7 +71,7 @@ class SignUpView(CreateView):
                 'errors': form.errors.get_json_data(),
                 'message': 'Please correct the errors below.'
             }
-            print("AJAX response:", response_data)
+            # Prepare error response for AJAX request
             return JsonResponse(response_data, status=400)
         else:
             return super().form_invalid(form)  # Handle non-AJAX form submissions
