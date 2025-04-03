@@ -256,7 +256,8 @@
                             </div>
                             
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <a href="{% url 'passreset' %}" class="text-decoration-none" style="font-size: 0.9rem;">Forgot password?</a>
+                                <a href="{% url 'passreset' %}" class="text-decoration-none" style="font-size: 0.9rem;"
+                                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Forgot password?</a>
                             </div>
                             
                             <!-- Error message container -->
