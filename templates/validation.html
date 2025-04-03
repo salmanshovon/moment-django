@@ -1,53 +1,150 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOMENT - Master your time!</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
-{% block title %}OTP Verification{% endblock %}
+<div class="content-wrapper">
+    <div class="main-content" id="new-content">
+        <div class="container">
+            <div class="custom-container mx-auto">
+                <div class="p-4 p-md-5 text-center">
+                    {% load static %}
+                    <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-4" style="max-width: 150px;">
+                    
+                    <h2 class="fw-bold text-dark mb-3">Enter OTP</h2>
+                    <p class="text-muted mb-4">
+                        A 6-digit OTP has been sent to your email (<strong>{{ request.user.email }}</strong>). 
+                        Please enter it below to verify your account.
+                    </p>
 
-{% block content %}
-<h2>Enter OTP</h2>
-<p>A 6-digit OTP has been sent to your email (<strong>{{ request.user.email }}</strong>). Please enter it below to verify your account.</p>
+                    <div id="error-message" class="alert alert-danger d-none" role="alert">
+                        Invalid OTP. Please try again.
+                    </div>
+                    <div id="success-message" class="alert alert-success d-none" role="alert"></div>
 
-<div id="error-message" style="color: red; display: none;">Invalid OTP. Please try again.</div>
-<div id="success-message" style="color: green; display: none;"></div>
+                    <form id="otp-form" class="mb-4">
+                        {% csrf_token %}
+                        <div class="otp-container d-flex justify-content-center gap-2 mb-3">
+                            {% for i in "123456" %}
+                            <input type="text" class="otp-input form-control text-center" maxlength="1" pattern="\d" 
+                                inputmode="numeric" required style="width: 40px; height: 40px;">
+                            {% endfor %}
+                            <input type="hidden" name="otp" id="otp-value">
+                        </div>
+                    </form>
 
-<form id="otp-form">
-    {% csrf_token %}
-    <div class="otp-container">
-        {% for i in "123456" %}
-        <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
-        {% endfor %}
-        <input type="hidden" name="otp" id="otp-value">
+                    <div class="otp-resend mb-3">
+                        <p class="text-muted mb-2">Didn't receive the OTP?</p>
+                        <form method="post" action="{% url 'resend_otp' %}" id="resend-form" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary resend-btn">Resend OTP</button>
+                            <span id="loading-spinner" class="ms-2 d-none">🔄 Please Wait...</span>
+                        </form>
+                    </div>
+
+                    <div class="change-email mb-4">
+                        <p class="text-muted mb-2">Need to change your email address?</p>
+                        <button id="change-email-btn" class="btn btn-outline-primary">Change Email Address</button>
+                    </div>
+
+                    <div id="change-email-form" class="d-none">
+                        <form method="post" action="{% url 'change_email' %}" id="email-change-form">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="new-email" class="form-label">New Email Address:</label>
+                                <input type="email" class="form-control" id="new-email" name="new_email" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+
+                    <form action="{% url 'logout' %}" method="post" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary">Cancel</button>
+                    </form>
+
+                    <div class="mt-4">
+                        <p class="small text-muted">
+                            "It is not that we have a short time to live, but that we waste much of it." <br>— Seneca
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</form>
-
-<p class="otp-resend">
-    Didn't receive the OTP?
-    <form method="post" action="{% url 'resend_otp' %}" id="resend-form">
-        {% csrf_token %}
-        <button type="submit" class="resend-btn">Resend OTP</button>
-        <span id="loading-spinner" style="display: none; margin-left: 10px;">🔄 Please Wait...</span>
-    </form>
-</p>
-
-<!-- Add a "Change Email Address" button and form -->
-<p class="change-email">
-    Need to change your email address?
-    <button id="change-email-btn">Change Email Address</button>
-</p>
-
-<div id="change-email-form" style="display: none;">
-    <form method="post" action="{% url 'change_email' %}" id="email-change-form">
-        {% csrf_token %}
-        <label for="new-email">New Email Address:</label>
-        <input type="email" id="new-email" name="new_email" required>
-        <button type="submit">Submit</button>
-    </form>
 </div>
-<form action="{% url 'logout' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Cancel</button>
-</form>
-<script> 
-document.addEventListener("DOMContentLoaded", function () {
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+    .content-wrapper {
+        background-image: url("{% static 'img/root-img-back.jpg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-content {
+        /* padding-top: calc(15px + 15rem); */
+        /* height: 100dvh; */
+        /* background-color: lightseagreen; */
+        /* overflow-y: auto; */
+        display: flex;
+        justify-content: center; /* Horizontal centering */
+        align-items: center; /* Vertical centering */
+        /* border: solid 2px var(--primary-color); */
+    }
+    .custom-container {
+        max-width: 400px;
+        box-shadow: var(--shadow);
+        border-radius: 15px !important;
+        background-color: rgba(255, 255, 255, 1);
+        border: solid 2px var(--primary-color);
+        margin: 3rem auto;
+        
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 0.65rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 767.8px) {
+        .custom-container {
+            width: auto;
+            border: none;
+            margin: 3rem 2rem;
+            max-width: 85%;
+        }
+    }
+</style>
+
+<script>
+function setupPage() {
     const inputs = document.querySelectorAll(".otp-input");
     const otpValue = document.getElementById("otp-value");
     const errorMessage = document.getElementById("error-message");
@@ -63,10 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         if (otp.length === 6) {
             otpValue.value = otp;
-            
-            // Disable inputs after entering 6 digits
             inputs.forEach(input => input.disabled = true);
-            
             verifyOTP(otp);
         }
     }
@@ -85,15 +179,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.success) {
                 window.location.href = "{% url 'update_profile' %}";
             } else {
-                errorMessage.style.display = "block";
-                
-                // Reset OTP inputs on failure
+                errorMessage.classList.remove("d-none");
                 inputs.forEach(input => {
-                    input.value = ""; 
+                    input.value = "";
                     input.disabled = false;
                 });
-
-                inputs[0].focus(); // Reset focus
+                inputs[0].focus();
             }
         })
         .catch(error => console.error("Error:", error));
@@ -118,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("resend-form").addEventListener("submit", function (event) {
         event.preventDefault();
-        disableResendButton(); // Disable button and start countdown
+        disableResendButton();
         fetch("{% url 'resend_otp' %}", {
             method: "POST",
             headers: {
@@ -129,17 +220,18 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.message) {
                 successMessage.textContent = data.message;
-                successMessage.style.display = "block";
-                loadingSpinner.style.display = "none"; // Hide loading spinner
+                successMessage.classList.remove("d-none");
+                loadingSpinner.classList.add("d-none");
             }
         })
         .catch(error => console.error("Error:", error));
     });
+
     function disableResendButton() {
-        let countdown = 60; // 60 seconds
-        loadingSpinner.style.display = "inline"; // Show loading spinner
-        resendBtn.disabled = true; // Disable the button
-        resendBtn.textContent = `Resend OTP (${countdown}s)`; // Show timer
+        let countdown = 60;
+        loadingSpinner.classList.remove("d-none");
+        resendBtn.disabled = true;
+        resendBtn.textContent = `Resend OTP (${countdown}s)`;
 
         const timer = setInterval(() => {
             countdown -= 1;
@@ -147,19 +239,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (countdown <= 0) {
                 clearInterval(timer);
-                loadingSpinner.style.display = "none"; // Hide loading spinner
-                resendBtn.disabled = false; // Re-enable button
+                loadingSpinner.classList.add("d-none");
+                resendBtn.disabled = false;
                 resendBtn.textContent = "Resend OTP";
-                successMessage.style.display = "none";
+                successMessage.classList.add("d-none");
             }
         }, 1000);
     }
-    // Show/hide the "Change Email Address" form
+
     changeEmailBtn.addEventListener("click", function () {
-        changeEmailForm.style.display = "block";
+        changeEmailForm.classList.remove("d-none");
     });
 
-    // Handle email change form submission
     document.getElementById("email-change-form").addEventListener("submit", function (event) {
         event.preventDefault();
         const newEmail = document.getElementById("new-email").value;
@@ -176,68 +267,24 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.success) {
                 successMessage.textContent = "Email updated successfully. A new OTP has been sent to your new email address.";
-                successMessage.style.display = "block";
-
-                // Hide message after 10 seconds
+                successMessage.classList.remove("d-none");
                 setTimeout(() => {
-                    successMessage.style.display = "none";
+                    successMessage.classList.add("d-none");
                 }, 10000);
-
-                // Reload the page to reflect the new email address
                 window.location.reload();
             } else {
                 errorMessage.textContent = data.error || "Failed to update email address.";
-                errorMessage.style.display = "block";
+                errorMessage.classList.remove("d-none");
             }
         })
         .catch(error => console.error("Error:", error));
     });
-});
+};
 
+setupPage();
 
 </script>
-
-<style>
-    .otp-container {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .otp-input {
-        width: 40px;
-        height: 50px;
-        font-size: 24px;
-        text-align: center;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        outline: none;
-    }
-
-    .otp-input:focus {
-        border-color: #007bff;
-    }
-
-    #error-message, #success-message {
-        text-align: center;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-
-    .change-email {
-        margin-top: 20px;
-    }
-
-    #change-email-form {
-        margin-top: 10px;
-    }
-
-    .resend-btn:disabled {
-    background-color: #ccc; /* Light grey background */
-    color: #999; /* Grey text */
-    cursor: not-allowed; /* Change cursor to indicate it’s disabled */
-    }
-</style>
-
-{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

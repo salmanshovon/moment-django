@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}OTP Verification{% endblock %}
+
+{% block content %}
+<h2>Enter OTP</h2>
+<p>A 6-digit OTP has been sent to your email (<strong>{{ request.user.email }}</strong>). Please enter it below to verify your account.</p>
+
+<div id="error-message" style="color: red; display: none;">Invalid OTP. Please try again.</div>
+<div id="success-message" style="color: green; display: none;"></div>
+
+<form id="otp-form">
+    {% csrf_token %}
+    <div class="otp-container">
+        {% for i in "123456" %}
+        <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
+        {% endfor %}
+        <input type="hidden" name="otp" id="otp-value">
+    </div>
+</form>
+
+<p class="otp-resend">
+    Didn't receive the OTP?
+    <form method="post" action="{% url 'resend_otp' %}" id="resend-form">
+        {% csrf_token %}
+        <button type="submit" class="resend-btn">Resend OTP</button>
+        <span id="loading-spinner" style="display: none; margin-left: 10px;">🔄 Please Wait...</span>
+    </form>
+</p>
+
+<!-- Add a "Change Email Address" button and form -->
+<p class="change-email">
+    Need to change your email address?
+    <button id="change-email-btn">Change Email Address</button>
+</p>
+
+<div id="change-email-form" style="display: none;">
+    <form method="post" action="{% url 'change_email' %}" id="email-change-form">
+        {% csrf_token %}
+        <label for="new-email">New Email Address:</label>
+        <input type="email" id="new-email" name="new_email" required>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Cancel</button>
+</form>
+<script> 
+document.addEventListener("DOMContentLoaded", function () {
+    const inputs = document.querySelectorAll(".otp-input");
+    const otpValue = document.getElementById("otp-value");
+    const errorMessage = document.getElementById("error-message");
+    const successMessage = document.getElementById("success-message");
+    const changeEmailBtn = document.getElementById("change-email-btn");
+    const changeEmailForm = document.getElementById("change-email-form");
+    const loadingSpinner = document.getElementById("loading-spinner");
+    const resendBtn = document.querySelector(".resend-btn");
+
+    function checkOTP() {
+        let otp = "";
+        inputs.forEach(input => otp += input.value);
+        
+        if (otp.length === 6) {
+            otpValue.value = otp;
+            
+            // Disable inputs after entering 6 digits
+            inputs.forEach(input => input.disabled = true);
+            
+            verifyOTP(otp);
+        }
+    }
+
+    function verifyOTP(otp) {
+        fetch("{% url 'check_otp' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ otp: otp })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = "{% url 'update_profile' %}";
+            } else {
+                errorMessage.style.display = "block";
+                
+                // Reset OTP inputs on failure
+                inputs.forEach(input => {
+                    input.value = ""; 
+                    input.disabled = false;
+                });
+
+                inputs[0].focus(); // Reset focus
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", function (e) {
+            if (e.inputType !== "deleteContentBackward" && this.value.length === 1) {
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            }
+            checkOTP();
+        });
+
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Backspace" && this.value === "" && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+    });
+
+    document.getElementById("resend-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        disableResendButton(); // Disable button and start countdown
+        fetch("{% url 'resend_otp' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                successMessage.textContent = data.message;
+                successMessage.style.display = "block";
+                loadingSpinner.style.display = "none"; // Hide loading spinner
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+    function disableResendButton() {
+        let countdown = 60; // 60 seconds
+        loadingSpinner.style.display = "inline"; // Show loading spinner
+        resendBtn.disabled = true; // Disable the button
+        resendBtn.textContent = `Resend OTP (${countdown}s)`; // Show timer
+
+        const timer = setInterval(() => {
+            countdown -= 1;
+            resendBtn.textContent = `Resend OTP (${countdown}s)`;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                loadingSpinner.style.display = "none"; // Hide loading spinner
+                resendBtn.disabled = false; // Re-enable button
+                resendBtn.textContent = "Resend OTP";
+                successMessage.style.display = "none";
+            }
+        }, 1000);
+    }
+    // Show/hide the "Change Email Address" form
+    changeEmailBtn.addEventListener("click", function () {
+        changeEmailForm.style.display = "block";
+    });
+
+    // Handle email change form submission
+    document.getElementById("email-change-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const newEmail = document.getElementById("new-email").value;
+
+        fetch("{% url 'change_email' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ new_email: newEmail })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                successMessage.textContent = "Email updated successfully. A new OTP has been sent to your new email address.";
+                successMessage.style.display = "block";
+
+                // Hide message after 10 seconds
+                setTimeout(() => {
+                    successMessage.style.display = "none";
+                }, 10000);
+
+                // Reload the page to reflect the new email address
+                window.location.reload();
+            } else {
+                errorMessage.textContent = data.error || "Failed to update email address.";
+                errorMessage.style.display = "block";
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+
+</script>
+
+<style>
+    .otp-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .otp-input {
+        width: 40px;
+        height: 50px;
+        font-size: 24px;
+        text-align: center;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    .otp-input:focus {
+        border-color: #007bff;
+    }
+
+    #error-message, #success-message {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .change-email {
+        margin-top: 20px;
+    }
+
+    #change-email-form {
+        margin-top: 10px;
+    }
+
+    .resend-btn:disabled {
+    background-color: #ccc; /* Light grey background */
+    color: #999; /* Grey text */
+    cursor: not-allowed; /* Change cursor to indicate it’s disabled */
+    }
+</style>
+
+{% endblock %}
