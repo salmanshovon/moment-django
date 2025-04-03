@@ -1,17 +1,496 @@
-{% extends "base.html" %}  {# Or your main layout #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOMENT - Master your time!</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
 
-{% block title %}Social Login Confirmation{% endblock %}
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
 
-{% block content %}
-    <div class="social-login-confirm">
-        <h2>->Sign In With Google <-</h2>
-        <p>You are about to sign in using your Google account.</p>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            /* min-height: 100vh; */
+            display: flex;
+            flex-direction: column;
+            /* background-color: transparent; */
+            margin: 0; /* Remove default body margin */
+        }
+
+        .content-wrapper {
+            background-image: url("{% static 'img/root-img-back.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar-island {
+            background-color: white;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            padding: 0.75rem 1.5rem;
+            /* margin: 0.7rem auto; */
+            margin: 15px auto;
+            max-width: 95%;
+            width: 70dvw;
+            position: sticky; /* Make navbar sticky */
+            top: 15px;
+            z-index: 1000; /* Ensure navbar stays above other content */
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .icon-mobile {
+            display: none; /* Hide icons by default */
+            color: grey;
+            margin-right: 5px;
+        }
+
+        /* Enhanced Footer CSS */
+        .footer {
+            margin-top: auto;
+            padding: 1rem 1.5rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eaeaea;
+            font-size: 0.9rem;
+            color: #757575;
+        }
+
+        .footer .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* gap: none; */
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-link {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #333;
+            text-decoration: underline;
+        }
+
+        .footer-divider {
+            color: #ccc;
+        }
+
+        .footer-copyright {
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .footer-copyright strong {
+            color: #444;
+            font-weight: 600;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            /* margin-top: 0.5rem; */
+        }
+
+        .social-icon {
+            color: #666;
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+        }
+
+        .social-icon:hover {
+            color: #333;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .footer-divider {
+                display: none;
+            }
+        }
+/* End of footer CSS */
+
+
+        .main-content {
+            /* padding-top: calc(15px + 15rem); */
+            /* height: 100dvh; */
+            /* background-color: lightseagreen; */
+            /* overflow-y: auto; */
+            display: flex;
+            justify-content: center; /* Horizontal centering */
+            align-items: center; /* Vertical centering */
+        }
+
+        /* For mobile menu */
+        @media (max-width: 767.8px) {
+            .navbar-island {
+                position: sticky; /* Changed from sticky to fixed */
+                width: 80%;
+                border-radius: 50px;
+                margin: 0px auto;
+            }
+
+            .icon-mobile {
+                display: inline-block;
+            }
+            
+            
+            /* For the expanded menu */
+            .navbar-collapse {
+                position: absolute;
+                margin-left: 10%;
+                top: 100%;
+                padding-left: 2rem;
+                width: 80%;
+                background: white;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+                z-index: 1000;
+                border-radius: 5px;
+                left:0;
+                margin-top: -5px;
+                padding-bottom: 1rem;
+            }
+        }
+
+        /* navbar animation */
+
+        .navbar-island {
+            animation: rollInTop 0.8s ease-out; /* Adjust duration and easing as needed */
+            transform-origin: top center; /* Set the origin for the roll-in effect */
+        }
+
+        @keyframes rollInTop {
+            0% {
+                transform: translateY(-100%); /* Start off-screen at the top */
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0); /* End at its normal position */
+                opacity: 1;
+            }
+        }
+
+    </style>
+
+</head>
+<body>
+    <div class="content-wrapper">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-island">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'root' %}"
+            onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
+                <img src="{% static 'img/moment-logo.png' %}" alt="Moment Logo" class="me-2" style="height: 30px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'root' %}"><i class="fas fa-home icon-mobile"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'features' %}"><i class="fas fa-star icon-mobile"></i> Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'pricing' %}"
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"><i class="fas fa-tags icon-mobile"></i> Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-envelope icon-mobile"></i> Contact</a>
+                    </li>
+                </ul>                
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Content -->
+    <div class="main-content" id="new-content">
+        <style>
+            /* Core Container Styles */
+            .custom-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    max-width: 400px;
+    box-shadow: var(--shadow);
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 1);
+    border: solid 2px var(--primary-color);
+    margin-bottom: 3rem;
+    margin-top: 3rem;
+}
         
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Continue</button>
-        </form>
-        <a href="{% url 'signin' %}" class="btn btn-secondary">Cancel</a>
-        <!-- <a href="{% url 'account_login' %}" class="btn btn-secondary">Cancel</a> -->
+        
+        .text-back {
+            font-weight: 100;
+            font-size: 1.3rem;
+            color: #a8a8a8;
+        }
+        
+        
+        
+        .container-right {
+            margin: auto;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.65rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        
+        .btn-google {
+            background-color: white;
+            color: #757575;
+            border: 1px solid #e0e0e0;
+            padding: 0.65rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .btn-google:hover {
+            background-color: #f5f5f5;
+            border-color: #d0d0d0;
+        }
+        
+        /* Divider Style */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.25rem 0;
+            color: #757575;
+            font-size: 0.9rem;
+        }
+        
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .divider::before {
+            margin-right: 1rem;
+        }
+        
+        .divider::after {
+            margin-left: 1rem;
+        }
+        
+        
+        
+        
+        @media (max-width: 767.8px) {
+            .custom-container {
+                display: block;
+                width: auto;
+                height: auto;
+                padding: 0;
+                /* margin: 1rem 1rem; */
+                border: none;
+                margin-left: 2rem;
+                margin-right: 2rem;
+                margin-top: 3rem;
+                margin-bottom: 0;
+            }
+            
+            .login-title {
+                margin-bottom: 1rem;
+                font-size: 2rem;
+            }
+        
+            .brand-logo {
+                width: 13rem;
+                height: auto;
+            }
+        
+            .sub-text {
+                font-size: 0.8rem;
+            }
+        
+        
+        
+        }
+        </style>
+        
+                <div class="custom-container">
+                    <div class="p-5 mx-auto text-center" style="background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <div class="social-login-confirm">
+                            {% load static %}
+                            <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-4" style="max-width: 150px;">
+                            
+                            <h2 class="fw-bold text-dark mb-3" style="font-size: 1.8rem;">Sign In With Google</h2>
+                            <p class="text-muted mb-4" style="font-size: 1.1rem;">
+                                You are about to sign in using your Google account. Continue to access Moment and start mastering your time.
+                            </p>
+        
+                            <form method="post" class="d-grid gap-3">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary py-2" style="font-size: 1rem; font-weight: 500;">
+                                    <i class="fab fa-google me-2"></i> Continue with Google
+                                </button>
+                            </form>
+        
+                            <div class="mt-4">
+                                <a href="{% url 'signin' %}" class="btn btn-outline-primary py-2 px-4" style="font-size: 1rem; font-weight: 500;">
+                                    Cancel
+                                </a>
+                            </div>
+        
+                            <div class="mt-4">
+                                <p class="small text-muted">
+                                    "It is not that we have a short time to live, but that we waste much of it." <br>— Seneca
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     </div>
-{% endblock %}
+
+    <div id="dashbase-root" style="display: none;"></div>
+    <!-- End of main content -->
+
+
+</div> 
+
+<!-- end of content wrapper -->
+    <!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-links">
+            <a href="#" class="footer-link">About Us</a>
+            <span class="footer-divider">•</span>
+            <a href="{% url 'privacy_policy' %}" class="footer-link" target="_blank">Privacy Policy</a>
+            <span class="footer-divider">•</span>
+            <a href="{% url 'terms&conditions' %}" class="footer-link" target="_blank">Terms & Conditions</a>
+            <span class="footer-divider">•</span>
+            <a href="#" class="footer-link">Contact</a>
+        </div>
+        <div class="footer-copyright">
+            <p>&copy; 2025 <strong>Aranya Tech</strong>. All rights reserved.</p>
+        </div>
+        <div class="footer-social">
+            <a href="#" class="social-icon" aria-label="facebook"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.linkedin.com/company/aranya-it/" target="_blank" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+
+        // Fetch content from URL
+        function fetchContent(url, targetDivId, updateHistory = false) {       
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "html",
+                headers: { 
+                    "X-Requested-With": "XMLHttpRequest",
+                    "isOut": true // Sending isOut in header
+                 },
+                success: function(response) {
+                    $(targetDivId).fadeOut(200, function() {
+                        $(this).html(response).css("display", "none"); // Insert content but keep it hidden
+                        setTimeout(function() {
+                            $(this).fadeIn(200); // Delay fadeIn for the same duration as fadeOut
+                        }.bind(this), 50); // Delay equal to fadeOut time-- add this between } and ) --> .bind(this), 200
+
+                        if (updateHistory) {
+                            history.pushState(null, '', url); // Update browser history
+                        }
+                    });
+                },
+                error: function() {
+                    alert("Error loading content. Please try again.");
+                }
+            });
+        }
+
+
+        // Fetch content if #new-content is empty on page load
+        if ($("#new-content").html() === "") {
+            fetchContent(window.location.href, "#new-content"); // Fetch current URL content
+        }
+
+        // Handle browser back/forward navigation
+        let isPopState = false;
+        window.onpopstate = function() {
+            if (!isPopState) {
+                isPopState = true;
+                fetchContent(window.location.href, "#new-content", false);
+            }
+            isPopState = false;
+        };
+
+        // Listen for content update trigger and load content
+        $(document).off("contentUpdated").on("contentUpdated", function(event, url, div, history) {
+        fetchContent(url, div, history); // Trigger content update
+        });
+
+    });
+    
+</script>
+
+   
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

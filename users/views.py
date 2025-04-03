@@ -137,6 +137,11 @@ class SignInView(TemplateView):
 class PassResetView(TemplateView):
     template_name = 'passreset.html'
 
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return render(request, self.template_name)
+        return render(request, 'rootbase.html')
+
 
 
 @method_decorator(login_required(login_url='signin'), name='dispatch')
@@ -268,7 +273,8 @@ def reset_password(request):
         password = data.get('password')
         user = User.objects.filter(email=email).first()
         if update_password(user, password):
-            return JsonResponse({"success": True})
+            return JsonResponse({"success": True,
+                                 "message": "Password has been changed! Sign in now."})
 
 
 

@@ -1,351 +1,387 @@
-{% extends 'base.html' %}
+<!-- Add your container around this, e.g., <div class="container-fluid my-5"> -->
 
-{% block title %}Password Reset{% endblock %}
-
-{% block content %}
-<h2>Password Reset</h2>
-<p>Please enter your email address to reset your password.</p>
-
-<div id="email-error-message" style="color: red; display: none;">This email address is not associated with any account.</div>
-<div id="email-success-message" style="color: green; display: none;"></div>
-
-<form id="email-form">
-    {% csrf_token %}
-    <label for="email">Email Address:</label>
-    <input type="email" id="email" name="email" required>
-    <button type="submit" id="submit-btn">Submit</button> 
-    <span id="loading-spinner" style="display: none; margin-left: 10px;">🔄 Please Wait...</span>
-</form>
-
-<div id="otp-section" style="display: none;">
-    <p>A 6-digit OTP has been sent to your email (<strong id="otp-email"></strong>). Please enter it below to verify your account.</p>
-
-    <div id="otp-error-message" style="color: red; display: none;">Invalid OTP. Please try again.</div>
-    <div id="otp-success-message" style="color: green; display: none;"></div>
-
-    <form id="otp-form">
-        {% csrf_token %}
-        <div class="otp-container">
-            {% for i in "123456" %}
-            <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
-            {% endfor %}
-            <input type="hidden" name="otp" id="otp-value">
-        </div>
-    </form>
-
-    <p class="otp-resend">
-        Didn't receive the OTP?
-        <form method="post" action="{% url 'resend_otp' %}" id="resend-form">
-            {% csrf_token %}
-            <button type="submit" class="resend-btn">Resend OTP</button>
-        </form>
-    </p>
-</div>
-
-<div id="password-section" style="display: none;">
-    <h3>Set New Password</h3>
-    <div id="password-error-message" style="color: red; display: none;">Passwords do not match.</div>
-
-    <form id="password-form">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="password">Password</label>
-            <div class="password-container">
-                <input type="password" id="password" name="password" required>
-                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</button>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="confirm-password">Confirm Password</label>
-            <div class="password-container">
-                <input type="password" id="confirm-password" name="confirm_password" required>
-                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm-password')">👁️</button>
-            </div>
-        </div>
-
-        <button type="submit">Reset Password</button>
-    </form>
-</div>
-<br><a href="{% url 'signin' %}" class="btn btn-secondary">Cancel</a>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const emailForm = document.getElementById("email-form");
-    const emailInput = document.getElementById("email");
-    const emailErrorMessage = document.getElementById("email-error-message");
-    const emailSuccessMessage = document.getElementById("email-success-message");
-    const otpSection = document.getElementById("otp-section");
-    const otpEmail = document.getElementById("otp-email");
-    const otpInputs = document.querySelectorAll(".otp-input");
-    const otpValue = document.getElementById("otp-value");
-    const otpErrorMessage = document.getElementById("otp-error-message");
-    const otpSuccessMessage = document.getElementById("otp-success-message");
-    const passwordSection = document.getElementById("password-section");
-    const passwordForm = document.getElementById("password-form");
-    const passwordInput = document.getElementById("password");
-    const confirmPasswordInput = document.getElementById("confirm-password");
-    const passwordErrorMessage = document.getElementById("password-error-message");
-    const resendForm = document.getElementById("resend-form");
-    const submitBtn = document.getElementById("submit-btn");
-    const submitBtn2 = document.getElementById("otp-resend");
-    const loadingSpinner = document.getElementById("loading-spinner");
-    const resendBtn = document.querySelector(".resend-btn");
-
-
-    // Handle email form submission
-    emailForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const email = emailInput.value;
-
-        loadingSpinner.style.display = "inline-block";
-        disableResendButton(); // Disable resend button
-
-        fetch("{% url 'check_and_passreset' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ email: email })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                emailSuccessMessage.textContent = "An OTP has been sent to your email address.";
-                sessionStorage.setItem("reset_email", email); // Store email in sessionStorage
-                emailSuccessMessage.style.display = "block";
-                emailErrorMessage.style.display = "none";
-
-                otpEmail.textContent = email;
-                otpSection.style.display = "block";
-            } else {
-                emailErrorMessage.textContent = data.error || "This email address is not associated with any account.";
-                emailErrorMessage.style.display = "block";
-                emailSuccessMessage.style.display = "none";
-            }
-        })
-        .catch(error => console.error("Error:", error))
-        .finally(() => {
-            loadingSpinner.style.display = "none";
-        });
-    });
-
-    // Function to check OTP input
-    function checkOTP() {
-        let otp = "";
-        otpInputs.forEach(input => otp += input.value);
+    <div class="custom-container">
+        <div class="row justify-content-center align-items-center min-vh-50">
+            <div class="p-5 mx-auto text-center" style="background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                {% load static %}
+                <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-4" style="max-width: 150px;">
+                
+                <h2 class="fw-bold text-dark mb-3" style="font-size: 1.8rem;">Password Reset</h2>
+                <p class="text-muted mb-4" style="font-size: 1.1rem;">Please enter your email address to reset your password.</p>
         
-        if (otp.length === 6) {
-            otpValue.value = otp;
-            otpInputs.forEach(input => input.disabled = true);
-            verifyOTP(otp);
-        }
-    }
-
-    // Verify OTP
-    function verifyOTP(otp) {
-        const email = sessionStorage.getItem("reset_email"); // Retrieve stored email
-        if (!email) {
-            alert("Session expired. Please restart the password reset process.");
-            window.location.href = "{% url 'passreset' %}";
-            return;
-        }
-
-        fetch("{% url 'check_otp' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ otp: otp, email: email })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                otpSuccessMessage.textContent = "OTP verified successfully!";
-                otpSuccessMessage.style.display = "block";
-                otpSection.style.display = "none"; // Hide OTP section after success
-                passwordSection.style.display = "block"; // Show password reset fields
-            } else {
-                otpErrorMessage.style.display = "block";
-                otpInputs.forEach(input => {
-                    input.value = ""; 
-                    input.disabled = false;
-                });
-                otpInputs[0].focus();
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    }
-
-    // OTP input handling
-    otpInputs.forEach((input, index) => {
-        input.addEventListener("input", function (e) {
-            if (e.inputType !== "deleteContentBackward" && this.value.length === 1) {
-                if (index < otpInputs.length - 1) {
-                    otpInputs[index + 1].focus();
-                }
-            }
-            checkOTP();
-        });
-
-        input.addEventListener("keydown", function (e) {
-            if (e.key === "Backspace" && this.value === "" && index > 0) {
-                otpInputs[index - 1].focus();
-            }
-        });
-    });
-
-    // Handle password reset submission
-    passwordForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-        const email = sessionStorage.getItem("reset_email"); // Retrieve stored email
-
-        if (!email) {
-            alert("Session expired. Please restart the password reset process.");
-            window.location.href = "{% url 'passreset' %}";
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            passwordErrorMessage.style.display = "block";
-            return;
-        }
-
-        fetch("{% url 'reset_password' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ email: email, password: password }) // Include email
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = "{% url 'signin' %}";
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
-
-    // Toggle password visibility
-    function togglePasswordVisibility(fieldId) {
-        const field = document.getElementById(fieldId);
-        field.type = field.type === "password" ? "text" : "password";
-    }
-
-    // Handle OTP Resend
-    resendForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        resendOTP();
-    });
+                <div id="email-error-message" class="text-danger mb-3" style="display: none;">This email address is not associated with any account.</div>
+                <div id="email-success-message" class="text-success mb-3" style="display: none;"></div>
+        
+                <form id="email-form" class="d-grid gap-3">
+                    {% csrf_token %}
+                    <div class="form-group text-start">
+                        <label for="email" class="fw-bold text-dark">Email Address:</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <button type="submit" id="submit-btn" class="btn btn-primary py-2">Submit</button>
+                    <span id="loading-spinner" style="display: none; margin-left: 10px;">🔄 Please Wait...</span>
+                </form>
+        
+                <div id="otp-section" style="display: none;" class="mt-4">
+                    <p class="text-muted">A 6-digit OTP has been sent to your email (<strong id="otp-email"></strong>). Please enter it below to verify your account.</p>
+        
+                    <div id="otp-error-message" class="text-danger mb-3" style="display: none;">Invalid OTP. Please try again.</div>
+                    <div id="otp-success-message" class="text-success mb-3" style="display: none;"></div>
+        
+                    <form id="otp-form" class="d-grid gap-3">
+                        {% csrf_token %}
+                        <div class="otp-container d-flex justify-content-center gap-2">
+                            {% for i in "123456" %}
+                            <input type="text" class="otp-input form-control" maxlength="1" pattern="\d" inputmode="numeric" required>
+                            {% endfor %}
+                            <input type="hidden" name="otp" id="otp-value">
+                        </div>
+                    </form>
+        
+                    <p class="otp-resend text-muted mt-3">
+                        Didn't receive the OTP?
+                        <form method="post" action="{% url 'resend_otp' %}" id="resend-form" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="resend-btn btn btn-link p-0" style="text-decoration: none;">Resend OTP</button>
+                        </form>
+                    </p>
+                </div>
+        
+                <div id="password-section" style="display: none;" class="mt-4">
+                    <h3 class="fw-bold text-dark mb-3">Set New Password</h3>
+                    <div id="password-error-message" class="text-danger mb-3" style="display: none;">Passwords do not match.</div>
+        
+                    <form id="password-form" class="d-grid gap-3">
+                        {% csrf_token %}
+                        <div class="form-group text-start">
+                            <label for="password" class="fw-bold text-dark">Password</label>
+                            <div class="password-container d-flex align-items-center">
+                                <input type="password" id="password" name="password" class="form-control" required>
+                                <button type="button" class="toggle-password btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+        
+                        <div class="form-group text-start">
+                            <label for="confirm-password" class="fw-bold text-dark">Confirm Password</label>
+                            <div class="password-container d-flex align-items-center">
+                                <input type="password" id="confirm-password" name="confirm_password" class="form-control" required>
+                                <button type="button" class="toggle-password btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+        
+                        <button type="submit" class="btn btn-primary py-2">Reset Password</button>
+                    </form>
+                </div>
+        
+                <div class="mt-4">
+                    <a href="{% url 'signin' %}" class="btn btn-outline-primary py-2 px-4"
+                    onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    function resendOTP() {
-        const email = sessionStorage.getItem("reset_email"); // Retrieve email from sessionStorage
-        if (!email) {
-            alert("Session expired. Please restart the password reset process.");
-            window.location.href = "{% url 'passreset' %}";
-            return;
+    <script>
+    function setupEverything() {
+        const emailForm = document.getElementById("email-form");
+        const emailInput = document.getElementById("email");
+        const emailErrorMessage = document.getElementById("email-error-message");
+        const emailSuccessMessage = document.getElementById("email-success-message");
+        const otpSection = document.getElementById("otp-section");
+        const otpEmail = document.getElementById("otp-email");
+        const otpInputs = document.querySelectorAll(".otp-input");
+        const otpValue = document.getElementById("otp-value");
+        const otpErrorMessage = document.getElementById("otp-error-message");
+        const otpSuccessMessage = document.getElementById("otp-success-message");
+        const passwordSection = document.getElementById("password-section");
+        const passwordForm = document.getElementById("password-form");
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirm-password");
+        const passwordErrorMessage = document.getElementById("password-error-message");
+        const resendForm = document.getElementById("resend-form");
+        const submitBtn = document.getElementById("submit-btn");
+        const loadingSpinner = document.getElementById("loading-spinner");
+        const resendBtn = document.querySelector(".resend-btn");
+    
+        // Password toggle functionality
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                
+                // Toggle the type attribute
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                
+                // Toggle the eye icon
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+                
+                // Optional: Change button appearance when active
+                this.classList.toggle('active');
+            });
+        });
+    
+        // Handle email form submission
+        emailForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const email = emailInput.value;
+    
+            loadingSpinner.style.display = "inline-block";
+            submitBtn.disabled = true;
+    
+            fetch("{% url 'check_and_passreset' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    emailSuccessMessage.textContent = "An OTP has been sent to your email address.";
+                    sessionStorage.setItem("reset_email", email);
+                    emailSuccessMessage.style.display = "block";
+                    emailErrorMessage.style.display = "none";
+    
+                    otpEmail.textContent = email;
+                    otpSection.style.display = "block";
+                    
+                    // Keep submit button disabled since OTP was sent
+                    submitBtn.disabled = true;
+                } else {
+                    emailErrorMessage.textContent = data.error || "This email address is not associated with any account.";
+                    emailErrorMessage.style.display = "block";
+                    emailSuccessMessage.style.display = "none";
+                    
+                    // Re-enable submit button if email is invalid
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                submitBtn.disabled = false;
+            })
+            .finally(() => {
+                loadingSpinner.style.display = "none";
+            });
+        });
+    
+        // Function to check OTP input
+        function checkOTP() {
+            let otp = "";
+            otpInputs.forEach(input => otp += input.value);
+            
+            if (otp.length === 6) {
+                otpValue.value = otp;
+                otpInputs.forEach(input => input.disabled = true);
+                verifyOTP(otp);
+            }
+        }
+    
+        // Verify OTP
+        function verifyOTP(otp) {
+            const email = sessionStorage.getItem("reset_email");
+            if (!email) {
+                alert("Session expired. Please restart the password reset process.");
+                window.location.href = "{% url 'passreset' %}";
+                return;
+            }
+    
+            fetch("{% url 'check_otp' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ otp: otp, email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    otpSuccessMessage.textContent = "OTP verified successfully!";
+                    otpSuccessMessage.style.display = "block";
+                    otpSection.style.display = "none";
+                    passwordSection.style.display = "block";
+                } else {
+                    otpErrorMessage.style.display = "block";
+                    otpInputs.forEach(input => {
+                        input.value = ""; 
+                        input.disabled = false;
+                    });
+                    otpInputs[0].focus();
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    
+        // OTP input handling
+        otpInputs.forEach((input, index) => {
+            input.addEventListener("input", function (e) {
+                if (e.inputType !== "deleteContentBackward" && this.value.length === 1) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+                checkOTP();
+            });
+    
+            input.addEventListener("keydown", function (e) {
+                if (e.key === "Backspace" && this.value === "" && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+    
+        // Handle password reset submission
+        passwordForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const email = sessionStorage.getItem("reset_email");
+    
+            if (!email) {
+                alert("Session expired. Please restart the password reset process.");
+                window.location.href = "{% url 'passreset' %}";
+                return;
+            }
+    
+            if (password !== confirmPassword) {
+                passwordErrorMessage.style.display = "block";
+                return;
+            }
+    
+            fetch("{% url 'reset_password' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ email: email, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let redirect_url = "{% url 'signin' %}" + '?success_message=' + encodeURIComponent(data.message);
+                    $(document).trigger('contentUpdated', [redirect_url, '#new-content', true]); return false;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    
+        // Handle OTP Resend
+        resendForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            resendOTP();
+        });
+        
+        function resendOTP() {
+            const email = sessionStorage.getItem("reset_email");
+            if (!email) {
+                alert("Session expired. Please restart the password reset process.");
+                window.location.href = "{% url 'passreset' %}";
+                return;
+            }
+    
+            disableResendButton();
+    
+            fetch("{% url 'resend_otp' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    otpSuccessMessage.textContent = data.message;
+                    otpSuccessMessage.style.display = "block";
+                    otpSection.style.display = "block";
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    
+        function disableResendButton() {
+            let countdown = 60;
+    
+            resendBtn.disabled = true;
+            resendBtn.textContent = `Resend OTP (${countdown}s)`;
+    
+            const timer = setInterval(() => {
+                countdown -= 1;
+                resendBtn.textContent = `Resend OTP (${countdown}s)`;
+    
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = "Resend OTP";
+                    otpSuccessMessage.style.display = "none";
+                }
+            }, 1000);
+        }
+    };
+    
+    setupEverything();
+    </script>
+    
+    <style>
+
+        .custom-container {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 1);
+            border: solid 2px var(--primary-color);
+            margin-bottom: 3rem;
+            margin-top: 3rem;
+        }
+        .otp-input {
+            width: 40px;
+            height: 50px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+    
+        .otp-input:focus {
+            border-color: #007bff;
+        }
+    
+        #submit-btn:disabled,
+        .resend-btn:disabled {
+            background-color: #ccc;
+            color: #999;
+            cursor: not-allowed;
         }
 
-        disableResendButton(); // Disable button and start countdown
-
-        fetch("{% url 'resend_otp' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ email: email }) // Attach email
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                otpSuccessMessage.textContent = data.message;
-                otpSuccessMessage.style.display = "block";
-
-                // Ensure the OTP section remains visible
-                otpSection.style.display = "block";
-
+        @media (max-width: 767.8px) {
+            .custom-container {
+                display: block;
+                width: auto;
+                height: auto;
+                padding: 0;
+                /* margin: 1rem 1rem; */
+                border: none;
+                margin-left: 2rem;
+                margin-right: 2rem;
+                margin-top: 3rem;
+                /* margin-bottom: 0; */
             }
-        })
-        .catch(error => console.error("Error:", error));
-    }
-
-    function disableResendButton() {
-        let countdown = 60; // 60 seconds
-
-        resendBtn.disabled = true; // Disable the button
-        submitBtn.disabled = true; // Disable the submit button
-        resendBtn.textContent = `Resend OTP (${countdown}s)`; // Show timer
-
-        const timer = setInterval(() => {
-            countdown -= 1;
-            resendBtn.textContent = `Resend OTP (${countdown}s)`;
-
-            if (countdown <= 0) {
-                clearInterval(timer);
-                resendBtn.disabled = false; // Re-enable button
-                submitBtn.disabled = false; // Re-enable submit button
-                resendBtn.textContent = "Resend OTP";
-                otpSuccessMessage.style.display = "none";
-            }
-        }, 1000);
-    }
-});
-
-</script>
-
-<style>
-    .password-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .toggle-password {
-        border: none;
-        background: none;
-        cursor: pointer;
-        font-size: 18px;
-    }
-    .otp-container {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .otp-input {
-        width: 40px;
-        height: 50px;
-        font-size: 24px;
-        text-align: center;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-        outline: none;
-    }
-
-    .otp-input:focus {
-        border-color: #007bff;
-    }
-
-    #submit-btn:disabled {
-    background-color: #ccc; /* Light grey background */
-    color: #999; /* Grey text */
-    cursor: not-allowed; /* Change cursor to indicate it’s disabled */
-    }
-
-    .resend-btn:disabled {
-    background-color: #ccc; /* Light grey background */
-    color: #999; /* Grey text */
-    cursor: not-allowed; /* Change cursor to indicate it’s disabled */
-    }
-
-
-</style>
-
-{% endblock %}
+        }
+    </style>

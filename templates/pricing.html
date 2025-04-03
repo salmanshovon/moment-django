@@ -121,24 +121,54 @@
 }
 </style>
 
-<div class="container-fluid my-5">
+<div class="container-fluid my-lg-5 my-3">  <!-- Reduced vertical margin on mobile -->
     <div class="row justify-content-center align-items-center min-vh-50">
         <div class="custom-container">
             <!-- Main Content Area -->
-            <div class="col-lg-12 p-5 text-center">
+            <div class="col-lg-12 p-lg-5 p-3 text-center">  <!-- Reduced padding on mobile -->
                 <div class="text-center">
                     {% load static %}
-                    <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">
-                    <h2 class="fw-light mb-4 text-dark sub-text" style="font-size: 1.2rem;">Master Your Time, Maximize Your Life</h2>
+                    <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">  <!-- Smaller logo on mobile -->
+                    <h2 class="fw-light mb-lg-4 mb-3 text-dark sub-text" style="font-size: clamp(1rem, 4vw, 1.2rem);">Master Your Time, Maximize Your Life</h2>
                     
-                    <div class="pricing-section mt-5">
-                        <h3 class="fw-Bold text-dark mb-4" style="font-size: 2rem;">Pricing</h3>
-                        <p class="text-muted" style="font-size: 1.5rem;">
-                            The best part is, this whole service is free to use.
-                        </p>
-                        <p class="text-muted mt-3">
-                            Enjoy all the features of Moment—precision planning, smart scheduling, and progress tracking—at no cost. Start mastering your time today!
-                        </p>
+                    <div class="pricing-section mt-lg-5 mt-4">  <!-- Reduced top margin on mobile -->
+                        <div class="d-flex justify-content-center align-items-center mb-4">
+                            <h3 class="fw-bold text-dark mb-0 me-2" style="font-size: 2.5rem;">Free</h3>
+                            <span class="badge bg-success-gradient rounded-pill px-3 py-2" style="font-size: 1.2rem;">
+                                <i class="fas fa-dollar-sign"></i>0.00
+                            </span>
+                        </div>
+                        
+                        <div class="premium-box p-lg-4 p-3 mb-lg-4 mb-3" style="background-color: #f8f9fa; border-radius: 10px; border-left: 4px solid #0d6efd;">
+                            <p class="text-muted mb-2" style="font-size: 1.1rem;">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                Full feature access
+                            </p>
+                            <p class="text-muted mb-2" style="font-size: 1.1rem;">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                No hidden charges
+                            </p>
+                            <p class="text-muted" style="font-size: 1.1rem;">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                No credit card required
+                            </p>
+                        </div>
+
+                        <div class="why-free-container bg-light p-lg-4 p-3 rounded" style="max-width: 800px; margin: 0 auto;">
+                            <h4 class="fw-semibold text-dark mb-3">Why Moment is Free</h4>
+                            <p class="text-muted mb-3" style="font-size: 1.1rem;">
+                                Moment represents the technical excellence and innovative vision of <strong>Salman Mahmood</strong>, 
+                                Head of Aranya Technology. This platform is still under development and serves as both a 
+                                professional showcase of cutting-edge development capabilities and a 
+                                commitment to democratizing productivity tools.
+                            </p>
+                            <p class="text-muted" style="font-size: 1.1rem;">
+                                We believe exceptional time management should be accessible to all, 
+                                which is why we've made our full suite of precision planning tools 
+                                available at no cost – a testament to our technical expertise and 
+                                dedication to creating value beyond commercial constraints.
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Call to Action -->
@@ -154,3 +184,39 @@
         </div>
     </div>
 </div>
+
+<style>
+
+.badge.bg-success-gradient {
+        background: linear-gradient(135deg, #28a745 0%, #5cb85c 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .premium-box {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+    
+    .premium-box:hover {
+        transform: translateY(-3px);
+    }
+    
+    .why-free-container {
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+    }
+    /* Mobile-specific adjustments */
+    @media (max-width: 767.98px) {
+        .custom-container {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .premium-box p, .why-free-container p {
+            font-size: 1rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+    }
+</style>

@@ -123,99 +123,97 @@
 
 
 
-        <div class="container-fluid my-5">
-            <div class="row justify-content-center align-items-center min-vh-50">
-                <div class="custom-container">
-                    <!-- Main Content Area -->
-                    <div class="col-lg-8 p-5 border-end">
-                        <div class="text-center text-lg-start">
-                            {% load static %}
-                            <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">
-                            <h2 class="fw-light mb-4 text-darkt sub-text" style="font-size: 1.2rem;">Master Your Time, Maximize Your Life</h2>
-                            
-                            <div class="feature-list mt-5">
-                                <div class="feature-item mb-4 d-flex align-items-start text-start">
-                                    <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
-                                        <i class="fas fa-calendar-check fa-2x"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h3 class="h5 fw-bold text-dark mb-1">Every Second Counts</h3>
-                                        <p class="text-muted">Plan tomorrow with precision, down to the minute, for maximum productivity.</p>
-                                    </div>
-                                </div>
-                            
-                                <div class="feature-item mb-4 d-flex align-items-start text-start">
-                                    <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
-                                        <i class="fas fa-clock fa-2x"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h3 class="h5 fw-bold text-dark mb-1">Smart Scheduling</h3>
-                                        <p class="text-muted">Let Moment intelligently organize your day based on your priorities.</p>
-                                    </div>
-                                </div>
-                            
-                                <div class="feature-item mb-4 d-flex align-items-start text-start">
-                                    <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
-                                        <i class="fas fa-chart-line fa-2x"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h3 class="h5 fw-bold text-dark mb-1">Progress Tracking</h3>
-                                        <p class="text-muted">Visualize your time investment and optimize your daily routines.</p>
-                                    </div>
-                                </div>
+<div class="container-fluid my-5">
+    <div class="row justify-content-center align-items-center min-vh-50">
+        <div class="custom-container">
+            <!-- Main Content Area -->
+            <div class="col-lg-8 p-4 p-lg-5 border-end"> <!-- Reduced padding to p-4 on mobile, p-5 on lg+ -->
+                <div class="text-center text-lg-start">
+                    {% load static %}
+                    <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">
+                    <h2 class="fw-light mb-4 text-darkt sub-text" style="font-size: 1.2rem;">Master Your Time, Maximize Your Life</h2>
                     
-                                <!-- More Button Here -->
-                                <div class="text-center mt-4">
-                                    <a href="{% url 'features' %}" class="btn btn-outline-primary"
-                                    onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
-                                        More Features
-                                    </a>
-                                </div>
+                    <div class="feature-list mt-5">
+                        <div class="feature-item mb-4 d-flex align-items-start text-start">
+                            <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
+                                <i class="fas fa-calendar-check fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="h5 fw-bold text-dark mb-1">Every Second Counts</h3>
+                                <p class="text-muted">Plan tomorrow with precision, down to the minute, for maximum productivity.</p>
                             </div>
                         </div>
-                    </div>
-
-
-                    <!-- Divider for mobile (visible when stacked) -->
-                    <div class="d-lg-none border-top w-100 my-2"></div> <!-- Horizontal divider on mobile -->
                     
-
-                    <!-- Action Sidebar (Right) -->
-                    <div class="col-lg-4 d-flex align-items-center justify-content-center p-4" style="background-color: white;">
-                        <div class="text-center w-100 container-right">
-                            <h3 class="login-title mb-4">Get Started</h3>
-                            <p class="mb-4 text-muted">Join thousands who are taking control of their time</p>
-                            
-                            <div class="d-grid gap-2">
-                                <a href="{% url 'signin' %}" 
-                                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
-                                class="btn btn-primary">
-                                    Sign In
-                                </a>
-                                
-                                <div class="divider">or</div>
-                                
-                                <a href="{% url 'signup' %}" 
-                                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
-                                class="btn btn-outline-primary">
-                                    Create Account
-                                </a>
-                                
-                                {% load socialaccount %}
-                                <a href="{% provider_login_url 'google' %}" class="btn btn-google mt-4">
-                                    <i class="fab fa-google"></i> Continue with Google
-                                </a>
+                        <div class="feature-item mb-4 d-flex align-items-start text-start">
+                            <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
+                                <i class="fas fa-clock fa-2x"></i>
                             </div>
-                            
-                            <div class="mt-4">
-                                <p class="small text-muted">
-                                    "It is not that we have a short time to live, but that we waste much of it."
-                                    <br>- Seneca
-                                </p>
+                            <div class="flex-grow-1">
+                                <h3 class="h5 fw-bold text-dark mb-1">Smart Scheduling</h3>
+                                <p class="text-muted">Let Moment intelligently organize your day based on your priorities.</p>
                             </div>
+                        </div>
+                    
+                        <div class="feature-item mb-4 d-flex align-items-start text-start">
+                            <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="h5 fw-bold text-dark mb-1">Progress Tracking</h3>
+                                <p class="text-muted">Visualize your time investment and optimize your daily routines.</p>
+                            </div>
+                        </div>
+            
+                        <!-- More Button Here -->
+                        <div class="text-center mt-4">
+                            <a href="{% url 'features' %}" class="btn btn-outline-primary"
+                            onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
+                                More Features
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Divider for mobile (visible when stacked) -->
+            <div class="d-lg-none border-top w-100 my-2"></div> <!-- Horizontal divider on mobile -->
+
+            <!-- Action Sidebar (Right) -->
+            <div class="col-lg-4 d-flex align-items-center justify-content-center p-4 p-lg-4" style="background-color: white;"> <!-- Reduced padding to p-2 on mobile, p-4 on lg+ -->
+                <div class="text-center w-100 container-right">
+                    <h3 class="login-title mb-4">Get Started</h3>
+                    <p class="mb-4 text-muted">Join thousands who are taking control of their time</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'signin' %}" 
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+                        class="btn btn-primary">
+                            Sign In
+                        </a>
+                        
+                        <div class="divider">or</div>
+                        
+                        <a href="{% url 'signup' %}" 
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+                        class="btn btn-outline-primary">
+                            Create Account
+                        </a>
+                        
+                        {% load socialaccount %}
+                        <a href="{% provider_login_url 'google' %}" class="btn btn-google mt-4">
+                            <i class="fab fa-google"></i> Continue with Google
+                        </a>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <p class="small text-muted">
+                            "It is not that we have a short time to live, but that we waste much of it."
+                            <br>- Seneca
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+</div>
 
