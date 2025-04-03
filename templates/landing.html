@@ -1,0 +1,221 @@
+<style>
+    /* Core Container Styles */
+.custom-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 900px;
+    box-shadow: var(--shadow);
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 1);
+    border: solid 2px var(--primary-color);
+}
+
+
+.text-back {
+    font-weight: 100;
+    font-size: 1.3rem;
+    color: #a8a8a8;
+}
+
+.brand-logo {
+    height: 4rem;
+}
+
+.container-right {
+    margin: auto;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+    font-size: 0.95rem;
+}
+
+.btn-google {
+    background-color: white;
+    color: #757575;
+    border: 1px solid #e0e0e0;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.btn-google:hover {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+/* Divider Style */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.25rem 0;
+    color: #757575;
+    font-size: 0.9rem;
+}
+
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.divider::before {
+    margin-right: 1rem;
+}
+
+.divider::after {
+    margin-left: 1rem;
+}
+
+
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .brand-sidebar {
+        padding: 0 2rem;
+    }
+}
+
+@media (max-width: 767.8px) {
+    .custom-container {
+        display: block;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 1rem 1rem;
+        border: none;
+        max-width: 85%;
+    }
+    
+    .login-title {
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .brand-logo {
+        width: 13rem;
+        height: auto;
+    }
+
+    .sub-text {
+        font-size: 0.8rem;
+    }
+
+
+
+}
+</style>
+
+
+
+        <div class="container-fluid my-5">
+            <div class="row justify-content-center align-items-center min-vh-50">
+                <div class="custom-container">
+                    <!-- Main Content Area -->
+                    <div class="col-lg-8 p-5 border-end">
+                        <div class="text-center text-lg-start">
+                            {% load static %}
+                            <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">
+                            <h2 class="fw-light mb-4 text-darkt sub-text" style="font-size: 1.2rem;">Master Your Time, Maximize Your Life</h2>
+                            
+                            <div class="feature-list mt-5">
+                                <div class="feature-item mb-4 d-flex align-items-start text-start">
+                                    <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
+                                        <i class="fas fa-calendar-check fa-2x"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h3 class="h5 fw-bold text-dark mb-1">Every Second Counts</h3>
+                                        <p class="text-muted">Plan tomorrow with precision, down to the minute, for maximum productivity.</p>
+                                    </div>
+                                </div>
+                            
+                                <div class="feature-item mb-4 d-flex align-items-start text-start">
+                                    <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
+                                        <i class="fas fa-clock fa-2x"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h3 class="h5 fw-bold text-dark mb-1">Smart Scheduling</h3>
+                                        <p class="text-muted">Let Moment intelligently organize your day based on your priorities.</p>
+                                    </div>
+                                </div>
+                            
+                                <div class="feature-item mb-4 d-flex align-items-start text-start">
+                                    <div class="flex-shrink-0 me-3" style="color: var(--primary-color);">
+                                        <i class="fas fa-chart-line fa-2x"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h3 class="h5 fw-bold text-dark mb-1">Progress Tracking</h3>
+                                        <p class="text-muted">Visualize your time investment and optimize your daily routines.</p>
+                                    </div>
+                                </div>
+                    
+                                <!-- More Button Here -->
+                                <div class="text-center mt-4">
+                                    <a href="{% url 'features' %}" class="btn btn-outline-primary"
+                                    onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
+                                        More Features
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Divider for mobile (visible when stacked) -->
+                    <div class="d-lg-none border-top w-100 my-2"></div> <!-- Horizontal divider on mobile -->
+                    
+
+                    <!-- Action Sidebar (Right) -->
+                    <div class="col-lg-4 d-flex align-items-center justify-content-center p-4" style="background-color: white;">
+                        <div class="text-center w-100 container-right">
+                            <h3 class="login-title mb-4">Get Started</h3>
+                            <p class="mb-4 text-muted">Join thousands who are taking control of their time</p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'signin' %}" 
+                                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+                                class="btn btn-primary">
+                                    Sign In
+                                </a>
+                                
+                                <div class="divider">or</div>
+                                
+                                <a href="{% url 'signup' %}" 
+                                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+                                class="btn btn-outline-primary">
+                                    Create Account
+                                </a>
+                                
+                                {% load socialaccount %}
+                                <a href="{% provider_login_url 'google' %}" class="btn btn-google mt-4">
+                                    <i class="fab fa-google"></i> Continue with Google
+                                </a>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <p class="small text-muted">
+                                    "It is not that we have a short time to live, but that we waste much of it."
+                                    <br>- Seneca
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+

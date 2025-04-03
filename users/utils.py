@@ -93,8 +93,8 @@ def send_email_otp(user):
                 <p>If you did not request this OTP, please ignore this message or contact our support team immediately.</p>
             </div>
             <div class="footer">
-                <p>&copy; 2025 Aranya Info-Tech. All rights reserved.</p>
-                <p><a href="https://www.aranyait.com.bd">Visit Aranya IT</a> for more information.</p>
+                <p>&copy; 2025 Aranya Technology. All rights reserved.</p>
+                <p><a href="https://www.aranyait.com.bd">Visit Aranya Tech.</a> for more information.</p>
             </div>
         </div>
     </body>

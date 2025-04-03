@@ -1,0 +1,362 @@
+<style>
+    /* Core Container Styles */
+.custom-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 900px;
+    box-shadow: var(--shadow);
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 1);
+    border: solid 2px var(--primary-color);
+}
+
+
+.text-back {
+    font-weight: 100;
+    font-size: 1.3rem;
+    color: #a8a8a8;
+}
+
+.brand-logo {
+    height: 4rem;
+}
+
+.container-right {
+    margin: auto;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+    font-size: 0.95rem;
+}
+
+.btn-google {
+    background-color: white;
+    color: #757575;
+    border: 1px solid #e0e0e0;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.btn-google:hover {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+/* Divider Style */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.25rem 0;
+    color: #757575;
+    font-size: 0.9rem;
+}
+
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.divider::before {
+    margin-right: 1rem;
+}
+
+.divider::after {
+    margin-left: 1rem;
+}
+
+
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .brand-sidebar {
+        padding: 0 2rem;
+    }
+}
+
+@media (max-width: 767.8px) {
+    .custom-container {
+        display: block;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 1rem 1rem;
+        border: none;
+        max-width: 85%;
+    }
+    
+    .login-title {
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .brand-logo {
+        width: 13rem;
+        height: auto;
+    }
+
+    .sub-text {
+        font-size: 0.8rem;
+    }
+
+
+
+}
+
+</style>
+
+
+
+<div class="container-fluid my-5">
+    <div class="row justify-content-center align-items-center min-vh-50">
+        <div class="custom-container">
+            <!-- Main Content Area -->
+            <div class="col-12 p-5">
+                <div class="text-center">
+                    {% load static %}
+                    <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">
+                    <h2 class="fw-light mb-4 text-dark" style="font-size: 1.5rem;">Precision Time Management System</h2>
+                    <p class="text-dark mb-5">Transform how you plan, execute, and reflect on every moment of your day</p>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="row g-4">
+                    <!-- Row 1 -->
+                    <div class="col-md-6">
+                        <div class="feature-card p-4 h-100" style="background-color: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-calendar-day fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h5 fw-bold text-dark">Gapless Scheduling</h3>
+                                    <p class="text-muted">Plan every minute of today and tomorrow with our enforced continuous scheduling system. No unaccounted time - specify exactly what you'll do in each moment.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="feature-card p-4 h-100" style="background-color: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-clipboard-check fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h5 fw-bold text-dark">Daily Reflection</h3>
+                                    <p class="text-muted">Complete your day with structured reflection. Compare planned vs actual execution and build self-awareness about your time management patterns.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="col-md-6">
+                        <div class="feature-card p-4 h-100" style="background-color: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-layer-group fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h5 fw-bold text-dark">Smart Templates</h3>
+                                    <p class="text-muted">Create routine templates for different day types (office day, holiday, travel day) and apply them with one click to instantly structure your schedule.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="feature-card p-4 h-100" style="background-color: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-tasks fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h5 fw-bold text-dark">Intelligent Task System</h3>
+                                    <p class="text-muted">Add one-time, repetitive, and miscellaneous tasks. They'll automatically appear in your scheduler based on due dates and notification settings.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="col-md-6">
+                        <div class="feature-card p-4 h-100" style="background-color: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-chart-pie fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h5 fw-bold text-dark">Time Analytics</h3>
+                                    <p class="text-muted">Track achievements and analyze time investments by category, priority, and merit. Visualize your data across weekly, monthly, and yearly views.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="feature-card p-4 h-100" style="background-color: rgba(255,255,255,0.05); border-radius: 10px;">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3" style="color: var(--primary-color);">
+                                    <i class="fas fa-trophy fa-2x"></i>
+                                </div>
+                                <div>
+                                    <h3 class="h5 fw-bold text-dark">Progress Tracking</h3>
+                                    <p class="text-muted">Monitor your consistency and improvement over time with detailed metrics on schedule adherence, task completion rates, and productivity trends.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Floating CTA for All Devices -->
+<div class="cta-floating position-fixed bottom-0 end-0 p-2 p-lg-3 m-3 m-lg-4" 
+     style="background-color: white; border-radius: 50px; box-shadow: 0 0 10px rgba(0,0,0,0.1); z-index: 1000; max-width: 350px; transition: all 0.3s ease;"
+     id="floatingCTA">
+    
+    <!-- Compact View (always visible) -->
+    <div class="cta-compact text-center">
+        <a href="{% url 'signup' %}" 
+           onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+           class="btn btn-primary rounded-pill px-3 py-2">
+            Join Us Now!
+        </a>
+    </div>
+    
+    <!-- Expanded View (shown on hover for desktop, always for mobile) -->
+    <div class="cta-expanded text-center mt-2" style="display: none;">
+        <p class="small text-muted mb-3">
+            "Ordinary people think merely of spending time.<br>
+            Great people think of using it."
+            <br>- Arthur Schopenhauer
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'signup' %}" 
+               onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+               class="btn btn-primary rounded-pill px-3 py-2">
+                Join Now
+            </a>
+            <a href="{% url 'signin' %}" 
+               onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+               class="btn btn-outline-primary rounded-pill px-3 py-2">
+                Sign In
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Desktop hover effect */
+    @media (min-width: 992px) {
+        .cta-floating {
+            width: auto;
+            height: auto;
+            overflow: hidden;
+        }
+        
+        .cta-floating:hover {
+            border-radius: 10px !important;
+            padding: 1rem !important;
+        }
+        
+        .cta-floating:hover .cta-expanded {
+            display: block !important;
+        }
+        
+        .cta-floating:hover .cta-compact {
+            display: none !important;
+        }
+    }
+    
+    /* Mobile styling */
+    @media (max-width: 991px) {
+        .cta-floating {
+            width: 100%;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin: 0 !important;
+            padding: 1rem !important;
+        }
+        
+        .cta-compact {
+            display: none !important;
+        }
+        
+        .cta-expanded {
+            display: block !important;
+        }
+        
+        .cta-expanded .btn {
+            padding: 0.5rem 1rem !important;
+        }
+    }
+    
+    /* Button styling fixes */
+    .btn-outline-primary {
+        border-width: 2px;
+        background-color: white;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        vertical-align: middle;
+    }
+</style>
+
+<script>
+    // Optional: Add animation for mobile when scrolling
+    $(document).ready(function() {
+        let lastScrollTop = 0;
+        $(window).scroll(function() {
+            if ($(window).width() < 992) {
+                let st = $(this).scrollTop();
+                if (st > lastScrollTop) {
+                    // Scrolling down
+                    $('#floatingCTA').css('transform', 'translateY(100%)');
+                } else {
+                    // Scrolling up
+                    $('#floatingCTA').css('transform', 'translateY(0)');
+                }
+                lastScrollTop = st;
+            }
+        });
+    });
+</script>
+
+<style>
+    .feature-card {
+        transition: var(--transition);
+        border: 1px solid rgba(115, 115, 116, 0.1);
+    }
+    
+    .feature-card:hover {
+        cursor: pointer;
+        background-color: rgba(156, 156, 156, 0.2) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Darker shadow */
+    }
+</style>

@@ -137,7 +137,7 @@
         .login-container {
             padding: 1.5rem 2rem;
             justify-self: center;
-            margin: auto;               
+            margin: auto;              
         }
         
         .login-title {
@@ -206,7 +206,9 @@
     color:#a8a8a8;
 }
 
-
+#error-message, #success-message {
+    font-size: 13px;
+}
 
 </style>
 
@@ -351,7 +353,7 @@
                         // Hide error message after 5 seconds
                         setTimeout(function() {
                             errorMessage.style.display = "none";
-                        }, 5000);
+                        }, 10000);
                     }
                 })
                 .catch(error => {
@@ -373,6 +375,6 @@
 
         start_page();
         </script>
-        
+
 {% load static %}
 <script src="{% static 'js/dash_check.js' %}"></script>

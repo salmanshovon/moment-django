@@ -187,6 +187,11 @@
         font-size: 1.3rem;
         color:#a8a8a8;
     }
+
+
+    #error-message, #success-message {
+        font-size: 13px;
+    }
 </style>
 
 <div class="container-fluid my-5">
@@ -265,7 +270,7 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 mb-1">Sign Up</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-1" id="signup-btn">Sign Up</button>
                     
                     <div class="divider">or</div>
                     {% load socialaccount %}
@@ -502,6 +507,7 @@ setupPasswordValidation();
             const password2 = document.getElementById("password2");
             const terms = document.getElementById("terms");
             const termsError = document.querySelector('.terms-invalid-feedback');
+            const signUpButton = document.getElementById("signup-btn");
 
             // Validate each field
             let isValid = true;
@@ -539,6 +545,10 @@ setupPasswordValidation();
             if (isValid) {
                 // Form is valid, submit via AJAX
                 const formData = new FormData(form);
+
+                // Start loading state (you can add a spinner class if you want)
+                signUpButton.disabled = true;
+                signUpButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Signing Up...';
                 
                 fetch(form.action, {
                     method: "POST",
@@ -550,9 +560,12 @@ setupPasswordValidation();
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    signUpButton.disabled = false;
+                    signUpButton.textContent = "Sign Up"
                     if (data.success) {
-                        $(document).trigger('contentUpdated', [data.redirect_url, '#new-content', true]);
+                        // Add message as URL parameter
+                        const redirectUrl = data.redirect_url + '?success_message=' + encodeURIComponent(data.message);
+                        $(document).trigger('contentUpdated', [redirectUrl, '#new-content', true]);
                     } else {
                         // Handle server-side errors
                         Object.keys(data.errors).forEach(field => {

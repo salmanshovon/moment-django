@@ -1,0 +1,156 @@
+<style>
+    /* Core Container Styles */
+.custom-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    width: 900px;
+    box-shadow: var(--shadow);
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 1);
+    border: solid 2px var(--primary-color);
+}
+
+
+.text-back {
+    font-weight: 100;
+    font-size: 1.3rem;
+    color: #a8a8a8;
+}
+
+.brand-logo {
+    height: 4rem;
+}
+
+.container-right {
+    margin: auto;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+    font-size: 0.95rem;
+}
+
+.btn-google {
+    background-color: white;
+    color: #757575;
+    border: 1px solid #e0e0e0;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.btn-google:hover {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+/* Divider Style */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.25rem 0;
+    color: #757575;
+    font-size: 0.9rem;
+}
+
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.divider::before {
+    margin-right: 1rem;
+}
+
+.divider::after {
+    margin-left: 1rem;
+}
+
+
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .brand-sidebar {
+        padding: 0 2rem;
+    }
+}
+
+@media (max-width: 767.8px) {
+    .custom-container {
+        display: block;
+        width: auto;
+        height: auto;
+        padding: 0;
+        margin: 1rem 1rem;
+        border: none;
+        max-width: 85%;
+    }
+    
+    .login-title {
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .brand-logo {
+        width: 13rem;
+        height: auto;
+    }
+
+    .sub-text {
+        font-size: 0.8rem;
+    }
+
+
+
+}
+</style>
+
+<div class="container-fluid my-5">
+    <div class="row justify-content-center align-items-center min-vh-50">
+        <div class="custom-container">
+            <!-- Main Content Area -->
+            <div class="col-lg-12 p-5 text-center">
+                <div class="text-center">
+                    {% load static %}
+                    <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-3">
+                    <h2 class="fw-light mb-4 text-dark sub-text" style="font-size: 1.2rem;">Master Your Time, Maximize Your Life</h2>
+                    
+                    <div class="pricing-section mt-5">
+                        <h3 class="fw-Bold text-dark mb-4" style="font-size: 2rem;">Pricing</h3>
+                        <p class="text-muted" style="font-size: 1.5rem;">
+                            The best part is, this whole service is free to use.
+                        </p>
+                        <p class="text-muted mt-3">
+                            Enjoy all the features of Moment—precision planning, smart scheduling, and progress tracking—at no cost. Start mastering your time today!
+                        </p>
+                    </div>
+
+                    <!-- Call to Action -->
+                    <div class="text-center mt-5">
+                        <a href="{% url 'signup' %}" 
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"
+                        class="btn btn-primary">
+                            Get Started Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

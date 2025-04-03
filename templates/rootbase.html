@@ -217,7 +217,8 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-island">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{% url 'root' %}"
+            onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
                 <img src="{% static 'img/moment-logo.png' %}" alt="Moment Logo" class="me-2" style="height: 30px;">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -226,13 +227,14 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-home icon-mobile"></i> Home</a>
+                        <a class="nav-link" href="{% url 'root' %}"><i class="fas fa-home icon-mobile"></i> Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-star icon-mobile"></i> Features</a>
+                        <a class="nav-link" href="{% url 'features' %}"><i class="fas fa-star icon-mobile"></i> Features</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-tags icon-mobile"></i> Pricing</a>
+                        <a class="nav-link" href="{% url 'pricing' %}"><i class="fas fa-tags icon-mobile"></i> Pricing</a
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="fas fa-envelope icon-mobile"></i> Contact</a>
@@ -259,9 +261,9 @@
         <div class="footer-links">
             <a href="#" class="footer-link">About Us</a>
             <span class="footer-divider">•</span>
-            <a href="#" class="footer-link">Privacy Policy</a>
+            <a href="{% url 'privacy_policy' %}" class="footer-link" target="_blank">Privacy Policy</a>
             <span class="footer-divider">•</span>
-            <a href="#" class="footer-link">Terms & Conditions</a>
+            <a href="{% url 'terms&conditions' %}" class="footer-link" target="_blank">Terms & Conditions</a>
             <span class="footer-divider">•</span>
             <a href="#" class="footer-link">Contact</a>
         </div>
@@ -269,8 +271,8 @@
             <p>&copy; 2025 <strong>Aranya Tech</strong>. All rights reserved.</p>
         </div>
         <div class="footer-social">
-            <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="social-icon" aria-label="facebook"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.linkedin.com/company/aranya-it/" target="_blank" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
             <a href="#" class="social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
         </div>
     </div>
@@ -282,8 +284,7 @@
     $(document).ready(function() {
 
         // Fetch content from URL
-        function fetchContent(url, targetDivId, updateHistory = false) { 
-            console.log("calling via ajax")       
+        function fetchContent(url, targetDivId, updateHistory = false) {       
             $.ajax({
                 url: url,
                 type: "GET",

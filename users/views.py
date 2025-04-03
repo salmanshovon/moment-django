@@ -50,7 +50,7 @@ class SignUpView(CreateView):
         if is_ajax:
             response_data = {
                 'success': True,
-                'message': 'Account created successfully! Please check your email for verification.',
+                'message': 'Account created successfully! Sign in now.',
                 'redirect_url': self.success_url  # Optionally, include the redirect URL
             }
             # Prepare success response for AJAX request
@@ -86,43 +86,51 @@ class SignInView(TemplateView):
         """Handle AJAX requests and 'isOut' parameter."""
         is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         is_out = request.headers.get('isOut')
+        success_message = request.GET.get('success_message')
+        if success_message:
+            messages.success(request, success_message)
 
         if is_ajax:
             if is_out:
-                return super().get(request, *args, **kwargs)  # If isOut, send signin_main.html
-            return render(request, 'logged_out.html')  # Default AJAX response
+                # For AJAX requests with isOut, return the template with messages
+                return render(request, self.template_name)
+            return render(request, 'logged_out.html')
         
-        return render(request, 'rootbase.html')  # If not AJAX, return rootbase.html
+        # For non-AJAX requests, ensure messages are included
+        return render(request, 'rootbase.html', self.get_context_data())
             
 
     def post(self, request, *args, **kwargs):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            
-            if username and password:
+            form = SignInForm(data=request.POST)
+            if form.is_valid():
+                username = form.cleaned_data["username"]
+                password = form.cleaned_data["password"]
                 user = authenticate(request, username=username, password=password)
-                
                 if user is not None:
-                    # Get user's timezone from IP
-                    user_timezone = get_timezone_from_ip(request) or "UTC"  # Default to UTC if not found
-                    
-                    # Update user's timezone in their profile
+                    user_timezone = get_timezone_from_ip(request) or "UTC"
                     user.profile.user_timezone = user_timezone
                     user.profile.save()
                     login(request, user)
                     return JsonResponse({
                         "success": True,
-                        "redirect_url": self.success_url
+                        "redirect_url": str(self.success_url)
                     })
-            
             return JsonResponse({
-                "success": False, 
+                "success": False,
                 "error": "Invalid username/email or password"
             }, status=400)
         
-        # Fallback for non-AJAX requests
-        return super().post(request, *args, **kwargs)
+        # Fallback for non-AJAX: render the form with errors
+        form = SignInForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                return redirect(self.success_url)
+        return render(request, self.template_name, {'form': form})
 
 
 @method_decorator(user_passes_test(not_authenticated, login_url=reverse_lazy('home')), name='dispatch')
