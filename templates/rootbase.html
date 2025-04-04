@@ -261,13 +261,15 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-links">
-            <a href="#" class="footer-link">About Us</a>
+            <a href="{% url 'about_us' %}" class="footer-link"
+            onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">About Us</a>
             <span class="footer-divider">•</span>
             <a href="{% url 'privacy_policy' %}" class="footer-link" target="_blank">Privacy Policy</a>
             <span class="footer-divider">•</span>
             <a href="{% url 'terms&conditions' %}" class="footer-link" target="_blank">Terms & Conditions</a>
             <span class="footer-divider">•</span>
-            <a href="#" class="footer-link">Contact</a>
+            <a href="{% url 'contact_us' %}" class="footer-link"
+            onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Contact</a>
         </div>
         <div class="footer-copyright">
             <p>&copy; 2025 <strong>Aranya Tech</strong>. All rights reserved.</p>

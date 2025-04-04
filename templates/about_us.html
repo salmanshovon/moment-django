@@ -1,0 +1,127 @@
+<div class="container">
+    <div class="custom-container mx-auto">
+        <div class="p-4 p-md-5">
+            {% load static %}
+            <img src="{% static 'img/aranya-logo.svg' %}" alt="Aranya Technology Logo" class="brand-logo mb-4 d-block mx-auto" style="max-width: 100px;">
+            
+            <h2 class="fw-bold text-dark mb-3 text-center">About Us</h2>
+            <p class="text-muted mb-4 text-center">
+                From Seed to Solution – Building a Future Rooted in Innovation
+            </p>
+
+            <div class="mb-4">
+                <h4 class="fw-semibold text-dark mb-3">Who We Are</h4>
+                <p class="text-muted">
+                    Aranya Technology is a proud Bangladeshi startup based in the vibrant heart of Dhaka. Our name, <em>Aranya</em> (অরণ্য), meaning "forest" in Bengali, reflects our vision: to grow strong, sustainable solutions that branch out to meet the needs of businesses and individuals alike. Just as a forest nurtures life, we cultivate ideas, transforming them into powerful, affordable, and aesthetically pleasing technical solutions.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="fw-semibold text-dark mb-3">What We Do</h4>
+                <p class="text-muted">
+                    At Aranya Technology, we believe that cutting-edge technology should be accessible to all. We specialize in delivering high-quality, cost-effective solutions tailored to your unique needs. Our expertise spans:
+                </p>
+                <ul class="text-muted ps-4">
+                    <li><strong>Custom Software Development</strong> – Bespoke software designed to streamline your operations.</li>
+                    <li><strong>Website & Web App Development</strong> – Stunning, functional digital experiences.</li>
+                    <li><strong>E-commerce Solutions</strong> – Empowering businesses to thrive in the online marketplace.</li>
+                    <li><strong>Business Automation & Digital Solutions</strong> – Simplifying processes with smart technology.</li>
+                </ul>
+                <p class="text-muted">
+                    We prioritize aesthetics and user experience, ensuring every product we create is as beautiful as it is functional.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="fw-semibold text-dark mb-3">Our Mission</h4>
+                <p class="text-muted">
+                    Founded with a passion for innovation, Aranya Technology is committed to bridging the gap between advanced technology and affordability. We aim to empower businesses in Bangladesh and beyond by providing tools that drive growth, efficiency, and success. From the seed of an idea to a fully realized solution, we’re with you every step of the way.
+                </p>
+            </div>
+
+            <div class="mt-5 text-center">
+                <h5 class="fw-semibold text-dark mb-3">Ready to Grow with Us?</h5>
+                <p class="text-muted mb-4">
+                    Let’s work together to turn your vision into reality. Reach out to us today!
+                </p>
+                <a href="{% url 'contact_us' %}" class="btn btn-primary"
+                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Contact Us</a>
+            </div>
+
+            <div class="mt-5 text-center">
+                <h5 class="fw-semibold text-dark mb-3">Connect With Us</h5>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="https://www.facebook.com/profile.php?id=61573497579019" target="_blank" class="btn btn-outline-primary px-4">
+                        <i class="fab fa-facebook-f me-2"></i>Facebook
+                    </a>
+                    <a href="https://www.linkedin.com/company/aranya-it/" target="_blank" class="btn btn-outline-primary px-4">
+                        <i class="fab fa-linkedin-in me-2"></i>LinkedIn
+                    </a>
+                    <a href="https://aranyait.com.bd" target="_blank" class="btn btn-outline-primary px-4">
+                        <i class="fas fa-globe me-2"></i>Aranya Tech.
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-5 text-center">
+                <p class="small text-muted">
+                    "Innovation distinguishes between a leader and a follower." <br>— Steve Jobs
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-container {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        max-width: 900px;
+        box-shadow: var(--shadow);
+        border-radius: 15px;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 1);
+        border: solid 2px var(--primary-color);
+        margin-bottom: 3rem;
+        margin-top: 3rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-primary {
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 767.8px) {
+        .custom-container {
+            display: block;
+            width: auto;
+            height: auto;
+            padding: 0;
+            border: none;
+            margin-left: 2rem;
+            margin-right: 2rem;
+            margin-top: 3rem;
+            max-width: 90%;
+        }
+
+        .btn-outline-primary {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>

@@ -90,3 +90,11 @@ class ContactMailSendView(View):
                 "success": False, 
                 "error": f"Server error: {str(e)}"
             }, status=500)
+        
+class AboutUsView(TemplateView):
+    template_name='about_us.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return render(request, self.template_name)
+        return render(request, 'rootbase.html')
