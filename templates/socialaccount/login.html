@@ -392,8 +392,14 @@
                             </div>
         
                             <div class="mt-4">
-                                <p class="small text-muted">
-                                    "It is not that we have a short time to live, but that we waste much of it." <br>— Seneca
+                                {% load quote_tags %}
+                                <p class="small text-muted" style="position: relative; display: inline-block;">
+                                    {% random_stoic_quote as quote %}
+                                    "{{ quote.text }}"
+                                    {% if quote.author %}
+                                    <br>
+                                    <span style="position: absolute; right: 0; bottom: -1.5em;">— {{ quote.author }}</span>
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>

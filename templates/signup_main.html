@@ -205,10 +205,14 @@
                     <h4 class="mb-2 brand-text">MOMENT</h4>
                     <h2 class="fw-light fs-6 text-light" style="font-size: 0.8rem;">Master Your Time, Master Your Life</h2>
                     <hr class="my-3 border-light">
-                    <p class="fst-italic text-light small">
-                        "It is not that we have a short time to live, but that we waste much of it."
+                    {% load quote_tags %}
+                    <p class="fst-italic text-light small" style="position: relative; display: inline-block;">
+                        {% random_stoic_quote as quote %}
+                        "{{ quote.text }}"
+                        {% if quote.author %}
                         <br>
-                        - Seneca
+                        <span style="position: absolute; right: 0; bottom: -1.5em;">— {{ quote.author }}</span>
+                        {% endif %}
                     </p>
                 </div>
             </div>
