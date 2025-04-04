@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.gis.geoip2 import GeoIP2
 from ipware import get_client_ip
+from email.utils import formataddr
 
 
 def generate_otp(user):
@@ -108,7 +109,7 @@ def send_email_otp(user):
     send_mail(
         subject='Account Verification',
         message=plain_message,  # Plain text version
-        from_email=settings.EMAIL_HOST_USER,
+        from_email=formataddr((settings.DEFAULT_FROM_NAME, settings.DEFAULT_FROM_EMAIL)),
         recipient_list=[user.email],
         html_message=html_message,  # HTML version
     )
