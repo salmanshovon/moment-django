@@ -238,7 +238,8 @@
                         onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"><i class="fas fa-tags icon-mobile"></i> Pricing</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-envelope icon-mobile"></i> Contact</a>
+                        <a class="nav-link" href="{% url 'contact_us' %}"
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"><i class="fas fa-envelope icon-mobile"></i> Contact</a>
                     </li>
                 </ul>                
             </div>

@@ -1,0 +1,205 @@
+
+    <div class="container">
+        <div class="custom-container mx-auto">
+            <div class="p-4 p-md-5">
+                {% load static %}
+                <img src="{% static 'img/moment-logo.png' %}" alt="MOMENT Logo" class="brand-logo mb-4 d-block mx-auto" style="max-width: 150px;">
+                
+                <h2 class="fw-bold text-dark mb-3 text-center">Contact Us</h2>
+                <p class="text-muted mb-4 text-center">
+                    We’d love to hear from you. Please fill out the form below to get in touch.
+                </p>
+            
+                <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+                <div id="success-message" class="alert alert-success d-none" role="alert"></div>
+            
+                <form id="contact-form">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Your Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Your Full Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Your Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="example@domain.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="form-label">Your Message</label>
+                        <textarea id="message" class="form-control" rows="4" placeholder="Type your message here..." required></textarea>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </div>
+                </form>
+            
+                <div class="mt-5 text-center">
+                    <h5 class="fw-semibold text-dark mb-3">Connect With Us</h5>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="https://facebook.com" target="_blank" class="btn btn-outline-primary px-4">
+                            <i class="fab fa-facebook-f me-2"></i>Facebook
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" class="btn btn-outline-primary px-4">
+                            <i class="fab fa-linkedin-in me-2"></i>LinkedIn
+                        </a>
+                        <a href="https://aranyait.com.bd" target="_blank" class="btn btn-outline-primary px-4">
+                            <i class="fas fa-globe me-2"></i>AranyaIT
+                        </a>
+                    </div>
+                </div>
+            
+                <div class="mt-5 text-center">
+                    <p class="small text-muted">
+                        "The only way to do great work is to love what you do." <br>— Steve Jobs
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<style>
+    .custom-container {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 1);
+            border: solid 2px var(--primary-color);
+            margin-bottom: 3rem;
+            margin-top: 3rem;
+        }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-primary {
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: var(--transition);
+        font-size: 0.95rem;
+    }
+
+    @media (max-width: 767.8px) {
+            .custom-container {
+                display: block;
+                width: auto;
+                height: auto;
+                padding: 0;
+                /* margin: 1rem 1rem; */
+                border: none;
+                margin-left: 2rem;
+                margin-right: 2rem;
+                margin-top: 3rem;
+                max-width: 90%;
+                /* margin-bottom: 0; */
+            }
+
+        .btn-outline-primary {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
+<script>
+function setupPage() {
+    const form = document.getElementById("contact-form");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const messageInput = document.getElementById("message");
+    const errorMessage = document.getElementById("error-message");
+    const successMessage = document.getElementById("success-message");
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.innerHTML;
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        // Clear previous messages and disable button
+        errorMessage.classList.add("d-none");
+        successMessage.classList.add("d-none");
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending Message...';
+
+        // Email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const message = messageInput.value.trim();
+        const wordCount = message.split(/\s+/).filter(word => word.length > 0).length;
+
+        // Validation checks
+        if (!name) {
+            showError("Please enter your name.");
+            return;
+        }
+
+        if (!emailRegex.test(email)) {
+            showError("Please enter a valid email address.");
+            return;
+        }
+
+        if (wordCount < 5) {
+            showError("Message must be at least 5 words long.");
+            return;
+        }
+
+        try {
+            const response = await fetch("{% url 'contact_email_submit' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    message: message
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to send message");
+            }
+
+            if (data.success) {
+                successMessage.textContent = "Message sent successfully! We'll get back to you soon.";
+                successMessage.classList.remove("d-none");
+                form.reset();
+            } else {
+                throw new Error(data.error || "Failed to send message");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            showError(error.message || "An error occurred. Please try again later.");
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+        }
+    });
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove("d-none");
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+    }
+}
+
+// Initialize when DOM is loaded
+setupPage();
+</script>
