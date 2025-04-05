@@ -1534,6 +1534,8 @@ $(document).ready(function () {
         hourInput.placeholder = 'HH';
         hourInput.style.width = '50px';
         hourInput.id = 'startHour';
+        hourInput.classList.add('start-hour');
+        hourInput.addEventListener('input', handleInput2);
 
         const minuteInput = document.createElement('input');
         minuteInput.type = 'number';
@@ -1542,6 +1544,8 @@ $(document).ready(function () {
         minuteInput.placeholder = 'MM';
         minuteInput.style.width = '50px';
         minuteInput.id = 'startMin';
+        minuteInput.classList.add('start-minute');
+        minuteInput.addEventListener('input', handleInput2);
 
         const ampmSelect = document.createElement('select');
         ampmSelect.id = 'startAmPm';
@@ -1549,36 +1553,32 @@ $(document).ready(function () {
             <option value="AM">AM</option>
             <option value="PM">PM</option>
         `;
-        ampmSelect.style.width = '60px'; // Slightly wider to accommodate AM/PM text
+        ampmSelect.style.width = '60px';
 
-        // If startTime is provided, parse and set the values
         if (startTime) {
-            const date = new Date(startTime); // Convert string to Date object (local time)
-            let hours = date.getHours(); // Get local hours
+            const date = new Date(startTime);
+            let hours = date.getHours();
             const minutes = date.getMinutes();
             const period = hours >= 12 ? 'PM' : 'AM';
-
-            // Convert 24-hour to 12-hour format
-            hours = hours % 12 || 12; // 0 becomes 12, 13 becomes 1, etc.
-
+            hours = hours % 12 || 12;
             hourInput.value = hours;
-            minuteInput.value = String(minutes).padStart(2, '0'); // Ensure 2 digits
+            minuteInput.value = String(minutes).padStart(2, '0');
             ampmSelect.value = period;
         }
 
-        // Append inputs with spacing
         startTimeContainer.appendChild(hourInput);
         startTimeContainer.appendChild(document.createTextNode(' : '));
         startTimeContainer.appendChild(minuteInput);
         startTimeContainer.appendChild(document.createTextNode(' '));
         startTimeContainer.appendChild(ampmSelect);
 
-        // Apply same styling as duration widget
         startTimeContainer.style.marginBottom = '15px';
         startTimeContainer.style.marginTop = '15px';
 
         return startTimeContainer;
     }
+
+
 
 
     // Function to create duration element
@@ -1709,46 +1709,6 @@ $(document).ready(function () {
         return hours * 60 + minutes;
     }
 
-
-    // Function to create duration element
-    function createDurationInput(durationInMinutes) {
-        const durationContainer = document.createElement('div');
-        durationContainer.innerHTML = `<i class="bi bi-clock"></i> Duration: `;
-
-        const hoursInput = document.createElement('input');
-        hoursInput.type = 'number';
-        hoursInput.min = '0';
-        hoursInput.placeholder = 'Hours';
-        hoursInput.style.width = '50px';
-        hoursInput.classList.add('duration-hour'); // Add class for event listener
-
-        const minutesInput = document.createElement('input');
-        minutesInput.type = 'number';
-        minutesInput.min = '0';
-        minutesInput.max = '59';
-        minutesInput.placeholder = 'Minutes';
-        minutesInput.style.width = '50px';
-        minutesInput.classList.add('duration-minute'); // Add class for event listener
-
-        const hours = Math.floor(durationInMinutes / 60);
-        const minutes = durationInMinutes % 60;
-
-        hoursInput.value = hours;
-        minutesInput.value = minutes;
-
-        durationContainer.appendChild(hoursInput);
-        durationContainer.appendChild(document.createTextNode(' hr '));
-        durationContainer.appendChild(minutesInput);
-        durationContainer.appendChild(document.createTextNode(' min'));
-        durationContainer.style.marginBottom = '15px';
-        durationContainer.style.marginTop = '15px';
-
-        // Attach event listeners to inputs
-        hoursInput.addEventListener('input', handleInput);
-        minutesInput.addEventListener('input', handleInput);
-
-        return durationContainer;
-    }
 
     function updateTaskDuration(taskId, duration, item) {
         // Helper function to update the duration of a task item
@@ -2068,6 +2028,7 @@ $(document).ready(function () {
         title.className = 'task-title'; // Add a class for styling
         title.textContent = titleText;
         title.style.color = 'red';
+        title.style.fontWeight = '500'
 
         // Center text using Flexbox
         title.style.display = 'flex';
@@ -2110,7 +2071,7 @@ $(document).ready(function () {
                         console.log(`Gap of ${gapMinutes} minutes detected before task ${taskId}`);
                         
                         // Create a gap task
-                        const gapTaskItem = createGapTask(`Gap (${formatDuration(gapMinutes)})`);
+                        const gapTaskItem = createGapTask(`Idle - ${formatDuration(gapMinutes)}`);
                         gapTaskItem.attr("data-duration", gapMinutes); // Store duration
                         
                         // Insert gap task before the current task item
@@ -2332,6 +2293,28 @@ $(document).ready(function () {
 
         event.target.value = value;
     };
+
+    function handleInput2(event) {
+        const inputValue = event.target.value;
+        const numericValue = inputValue.replace(/[^0-9]/g, '');
+        let value = parseInt(numericValue, 10);
+
+        if (isNaN(value)) {
+            value = '';
+        } else {
+            if (event.target.classList.contains('start-hour')) {
+                if (value < 1) value = 1;
+                if (value > 12) value = 12;
+            } else if (event.target.classList.contains('start-minute')) {
+                if (value < 0) value = 0;
+                if (value > 59) value = 59;
+                value = value.toString().padStart(2, '0');
+            }
+        }
+
+        event.target.value = value;
+    }
+
 
 
     function setupTaskPanelToggle() {

@@ -530,6 +530,102 @@ body.dark-theme .stat-number {
         }
     }
 
+    function fillScheduleGaps(schedule) {
+    if (!schedule || schedule.length === 0) return [];
+    
+    // Filter out items without start_time and create a new array to avoid mutation
+    const validSchedule = schedule.filter(item => item.start_time);
+    
+    if (validSchedule.length === 0) return schedule;
+    
+    // Sort the schedule by start_time
+    validSchedule.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    
+    const filledSchedule = [];
+    
+    // Add beginning idle time if first task doesn't start at midnight
+    const firstItem = validSchedule[0];
+    const firstStartTime = new Date(firstItem.start_time);
+    const dayStart = new Date(firstStartTime);
+    dayStart.setHours(0, 0, 0, 0); // Set to midnight
+    
+    if (firstStartTime > dayStart) {
+        const gapMinutes = (firstStartTime - dayStart) / (1000 * 60);
+        const beginningIdleItem = {
+            start_time: dayStart.toISOString(),
+            duration: gapMinutes,
+            title: `Schedule starting at ${formatTimeStamp(firstStartTime)}`,
+            is_task: false,
+            is_idle: true,
+            color: "#F5F5F5"
+        };
+        filledSchedule.push(beginningIdleItem);
+    }
+    
+    // Add the first actual item
+    filledSchedule.push(firstItem);
+    
+    // Iterate through the schedule to find gaps between tasks
+    for (let i = 1; i < validSchedule.length; i++) {
+        const prevItem = validSchedule[i - 1];
+        const currentItem = validSchedule[i];
+        
+        const prevEndTime = new Date(prevItem.start_time);
+        prevEndTime.setMinutes(prevEndTime.getMinutes() + (prevItem.duration || 0));
+        
+        const currentStartTime = new Date(currentItem.start_time);
+        
+        // Calculate gap in minutes
+        const gapMinutes = (currentStartTime - prevEndTime) / (1000 * 60);
+        
+        // If there's a gap, insert a dummy item
+        if (gapMinutes > 0) {
+            const idleItem = {
+                start_time: prevEndTime.toISOString(),
+                duration: gapMinutes,
+                title: "Idle Time / Unscheduled",
+                is_task: false,
+                is_idle: true,
+                color: "#F5F5F5"
+            };
+            filledSchedule.push(idleItem);
+        }
+        
+        // Add the current item
+        filledSchedule.push(currentItem);
+    }
+    
+    // Add ending idle time from last task's end to 11:59 PM
+    const lastItem = validSchedule[validSchedule.length - 1];
+    const lastEndTime = new Date(lastItem.start_time);
+    lastEndTime.setMinutes(lastEndTime.getMinutes() + (lastItem.duration || 0));
+    
+    const dayEnd = new Date(lastEndTime);
+    dayEnd.setHours(23, 59, 0, 0); // Set to end of day
+    
+    if (lastEndTime < dayEnd) {
+        const gapMinutes = (dayEnd - lastEndTime) / (1000 * 60);
+        const endingIdleItem = {
+            start_time: lastEndTime.toISOString(),
+            duration: gapMinutes,
+            title: "All Tasks Completed",
+            is_task: false,
+            is_idle: true,
+            color: "#F5F5F5"
+        };
+        filledSchedule.push(endingIdleItem);
+    }
+    
+    return filledSchedule;
+}
+
+// Helper function to format time as HH:MM AM/PM
+function formatTimebb(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+
+
     // Fetch routine using AJAX
     function fetchRoutine(paramValue, callback) {
         $.ajax({
@@ -540,7 +636,9 @@ body.dark-theme .stat-number {
             success: function (data) {
                 allTskRtn = [];
                 if (data !== 3 && data.tasks && data.tasks.length > 0) {
-                    allTskRtn = [...data.tasks];
+                    
+                    allTskRtn = fillScheduleGaps(data.tasks);
+                    
                     routine_date = data.updated_at;
                     currentIndex = findCurrentTaskIndex(allTskRtn);
                     populateStatistics(allTskRtn, currentIndex);
@@ -732,6 +830,9 @@ body.dark-theme .stat-number {
         if (allTskRtn[index].is_task) {
             priority = allTskRtn[index].priority;
             category = allTskRtn[index].category;
+        } else if (allTskRtn[index].is_idle) {
+            priority = "--";
+            category = 'Idle'
         } else {
             priority = "--";
             category = 'Misc'
@@ -827,45 +928,53 @@ body.dark-theme .stat-number {
     }
 
     function populateStatistics(tasks, currentIndex) {
-        let totalTasks = tasks.length;
+        // Filter out idle tasks for counting statistics
+        const activeTasks = tasks.filter(task => !task.is_idle);
+        const totalTasks = activeTasks.length;
+        
         let oneTimeTasks = 0;
         let repetitiveTasks = 0;
-        let tasksOver = 0;
-        let tasksUpcoming = 0;
-
-        tasks.forEach((task, index) => {
+        
+        // Count task types
+        activeTasks.forEach(task => {
             if (task.is_task) {
-                if (task.is_repetitive) {
-                    repetitiveTasks++;
-                } else {
-                    oneTimeTasks++;
-                }
+                task.is_repetitive ? repetitiveTasks++ : oneTimeTasks++;
             }
         });
 
-        // Calculate tasksOver and tasksUpcoming using currentIndex
-        tasksOver = currentIndex; // Number of tasks completed (up to current index)
-        tasksUpcoming = totalTasks - currentIndex - 1; // Remaining tasks after current index
-        if (tasksUpcoming === -1){ tasksUpcoming = 0;}
+        // Calculate completed tasks (non-idle before currentIndex)
+        const tasksOver = tasks
+            .slice(0, currentIndex)
+            .filter(task => !task.is_idle)
+            .length;
 
+        // Check if current task is idle
+        const currentIsIdle = tasks[currentIndex]?.is_idle || false;
+        
+        // Calculate upcoming tasks
+        let tasksUpcoming;
+        if (currentIsIdle) {
+            // When current is idle, all remaining real tasks are upcoming
+            tasksUpcoming = totalTasks - tasksOver;
+        } else {
+            // When current is real, exclude it from upcoming count
+            const remainingRealTasks = tasks
+                .slice(currentIndex)
+                .filter(task => !task.is_idle)
+                .length;
+            tasksUpcoming = remainingRealTasks - 1;
+        }
+
+        // Ensure we don't show negative numbers
+        tasksUpcoming = Math.max(0, tasksUpcoming);
+
+        // Update the DOM
         document.getElementById('totalTasks').textContent = totalTasks;
         document.getElementById('oneTimeTasks').textContent = oneTimeTasks;
         document.getElementById('repetitiveTasks').textContent = repetitiveTasks;
         document.getElementById('tasksOver').textContent = tasksOver;
         document.getElementById('tasksUpcoming').textContent = tasksUpcoming;
     }
-
-    document.getElementById('fab').addEventListener('click', function() {
-        const fab = this;
-        const plus = fab.querySelector('.plus');
-        const options = document.querySelector('.options');
-
-        // Toggle spin class on the button
-        fab.classList.toggle('spin');
-
-        // Toggle the visibility of the options
-        options.classList.toggle('show-options');
-    });
 })();
     </script>
 </body>
