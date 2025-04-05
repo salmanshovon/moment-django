@@ -1,10 +1,12 @@
 from rest_framework import generics, permissions, status
+from rest_framework.generics import CreateAPIView, ListAPIView 
 from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
 from tasks.models import Task, PublicTask
-from routines.models import Routine, Notification
+from routines.models import Routine, Notification, RoutineTemplate
 from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer, PublicTaskList, PublicTaskToTaskSerializer
+from .serializers import RoutineTemplateSerializer, RoutineTemplateListSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -248,6 +250,45 @@ class BulkCreateTasksFromPublicTasks(APIView):
             return Response({"message": f"{len(tasks)} tasks added successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+class RoutineTemplateCreateView(CreateAPIView):
+    queryset = RoutineTemplate.objects.all()
+    serializer_class = RoutineTemplateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            template_name = serializer.validated_data.get('template_name')
+            user = request.user
+
+            if template_name:
+                base_name = template_name
+                count = 0
+                while RoutineTemplate.objects.filter(user=user, template_name=template_name).exists():
+                    count += 1
+                    template_name = f"{base_name} {count}"
+
+                serializer.validated_data['template_name'] = template_name
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            else:
+                return Response({"error": "Template name is required."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        
+
+class RoutineTemplateListView(generics.ListAPIView):
+    serializer_class = RoutineTemplateListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only templates belonging to the authenticated user
+        return RoutineTemplate.objects.filter(user=self.request.user)
 
 #For irrigation (Temporary)
 from .serializers import IrrigateBasicSerializer

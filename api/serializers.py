@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from tasks.models import Task, PublicTask, TaskCategory
-from routines.models import Routine, Notification
+from routines.models import Routine, Notification, RoutineTemplate
 from django.utils import timezone
 from users.models import UserSettings, Profile
+from django.contrib.auth.models import User
 import pytz
 from datetime import timedelta
 
@@ -102,6 +103,41 @@ class UserSettingsSerializer(serializers.ModelSerializer):
         model = UserSettings
         fields = ['sort']
 
+class RoutineTemplateListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoutineTemplate
+        fields = ('id', 'template_name', 'taskCount')
+
+class RoutineTemplateSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = RoutineTemplate
+        fields = ['id', 'user', 'template_name', 'tasks', 'taskCount', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'taskCount', 'created_at', 'updated_at']
+
+    def validate_tasks(self, value):
+        """
+        Validate the 'tasks' field to ensure it contains the required structure.
+        Each task should be a dictionary with 'start_time', 'id', and 'is_fixed'.
+        """
+        for task in value:
+            required_keys = ['start_time', 'id', 'is_fixed']
+            if not isinstance(task, dict):
+                raise serializers.ValidationError("Each task in the template must be a dictionary.")
+            if not all(key in task for key in required_keys):
+                raise serializers.ValidationError(
+                    f"Each task in the template must contain: {', '.join(required_keys)}."
+                )
+        return value
+
+    def create(self, validated_data):
+        """
+        Override the create method to automatically set the user and taskCount.
+        """
+        validated_data['user'] = self.context['request'].user
+        validated_data['taskCount'] = len(validated_data.get('tasks', []))
+        return super().create(validated_data)
 
 
 class RoutineSerializer(serializers.ModelSerializer):

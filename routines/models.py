@@ -11,6 +11,7 @@ class RoutineTemplate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     template_name = models.CharField(max_length=255)
     tasks = models.JSONField()  # Stores list of {start_time, end_time, task_id}
+    taskCount = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 

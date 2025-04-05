@@ -491,6 +491,39 @@
         display: none;
     }
 
+body.dark-theme #templateName {
+    background-color: #585858;
+    border-color: #4a5568;
+    color: #b9b9b9;
+}
+
+body.dark-theme #templateName::placeholder {
+    color: #d4d4d4;
+}
+
+body.dark-theme .taskListContainer {
+    background-color: #7c7c7c;
+    border-color: #4a5568 !important;
+}
+
+body.dark-theme .list-group-item {
+    background-color: #585858;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body.dark-theme .list-group-item .text-muted {
+    color: #cccccc !important;
+}
+
+
+body.dark-theme .form-control:focus {
+    background-color: #b3b3b3;
+    color: #e2e8f0;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+}
+
 /* Mobile styles (applies to screens smaller than 768px) */
 @media (max-width: 767.98px) {
   /* Override container padding for mobile */
@@ -728,10 +761,19 @@
                         <ul id="schedule-list" class="task-list dropzone flex-grow-1" data-type="schedule"></ul>
                     </div>
                 </div>
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-3 align-items-center">
                     {% csrf_token %}
-                    <button class="btn btn-primary" id="saveButton" type="submit">Save</button>
-                    <button class="btn btn-outline-secondary me-2" id="cancelButton">Cancel</button>
+                    <button class="btn btn-primary" id="saveButton" type="submit">
+                        <i class="bi bi-save me-2"></i>Save
+                    </button>
+                    <button class="btn btn-outline-secondary me-2" id="cancelButton">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                    <div class="ms-auto">
+                        <button class="btn btn-secondary" id="moreButton">
+                            <i class="bi bi-three-dots me-2"></i>More
+                        </button>
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -862,9 +904,8 @@ $(document).ready(function () {
         // Fetch routine first, then fetch tasks
         fetchRoutine(day, function () {
             fetchTasks(day);
+            unsavedChanges = false;
         });
-
-        unsavedChanges = false;
 
         dateDisplay.textContent = formatDate1(selectedDate);
         makeMiscTasks();
@@ -1626,13 +1667,14 @@ $(document).ready(function () {
         const overlay = document.getElementById('overlay');
         const taskDetailContainer = document.getElementById('taskDetail');
         const updatedDuration = getDurationInMinutes(durationContainer);
-        
-        console.log(`Is fixed value: ${is_fixed}`);
 
         let startTimeISO = null;
 
         // If is_fixed is true, extract and store the start time
         if (is_fixed) {
+            // Get the selected date from the dropdown
+            const dateSelector = document.getElementById('dateSelector');
+            const selectedDate = dateSelector?.value;
             const hour = parseInt(startTimeContainer.querySelector('#startHour')?.value || 0, 10);
             const minute = parseInt(startTimeContainer.querySelector('#startMin')?.value || 0, 10);
             const period = startTimeContainer.querySelector('#startAmPm')?.value || 'AM';
@@ -1641,12 +1683,19 @@ $(document).ready(function () {
             let hours24 = hour % 12;
             if (period === 'PM') hours24 += 12;
 
-            // Create a local Date object with today's date and the time provided
-            const now = new Date();
-            now.setHours(hours24, minute, 0, 0);
+            let targetDate = new Date(); // Default to today
+
+            if (selectedDate === 'tomorrow') {
+                // Create a new Date object for tomorrow
+                targetDate = new Date();
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+
+            // Set the hours, minutes, seconds, and milliseconds on the target date
+            targetDate.setHours(hours24, minute, 0, 0);
 
             // Convert to ISO string (in UTC)
-            startTimeISO = now.toISOString();
+            startTimeISO = targetDate.toISOString();
         }
 
         // Add duration and start_time (only if is_fixed is true) to the appropriate task array
@@ -1688,7 +1737,6 @@ $(document).ready(function () {
         // Hide overlay and task detail
         overlay.style.display = 'none';
         taskDetailContainer.style.display = 'none';
-        console.log(`Task ITEM: ${item}`);
         updateTimeSlots();
     }
 
@@ -1938,7 +1986,6 @@ $(document).ready(function () {
         const taskItems = Array.from(scheduleList.children); // Use children instead of querySelectorAll to maintain order
         
         if (!taskItems.length) {
-            console.log("No tasks in the schedule list.");
             return;
         }
 
@@ -1970,7 +2017,6 @@ $(document).ready(function () {
 
         // If no fixed tasks to sort, we're done
         if (fixedTasksWithTime.length <= 1) {
-            console.log("Zero or one valid fixed-time task, no sorting needed.");
             return;
         }
 
@@ -2010,38 +2056,37 @@ $(document).ready(function () {
         scheduleList.innerHTML = '';
         finalItems.forEach(item => scheduleList.appendChild(item));
 
-        console.log("Fixed-time schedule items sorted by start time while maintaining non-fixed items' positions.");
     }
 
 
-    // Function to create a brand new gap task item
-    function createGapTask(titleText) {
-        // Create a task item with necessary attributes
-        const taskItem = $("<li></li>")
-            .addClass("task-item gap") // Add 'gap' class
-            .attr("data-item-type", "gap") // Set item type to 'gap'
-            .attr("data-is_gap", "true") // Indicate it's a gap
-            .css("height", "70px");
+function createGapTask(titleText) {
+    // Create a task item with theme-aware classes
+    const taskItem = $("<li></li>")
+        .addClass("task-item gap list-group-item d-flex align-items-center justify-content-center")
+        .attr("data-item-type", "gap")
+        .attr("data-is_gap", "true")
+        .addClass("bg-body-secondary") // Uses theme-aware background
+        .addClass("border border-secondary-subtle") // Theme-aware border
+        .css({
+            "height": "70px",
+            "border-radius": "0.375rem",
+            "margin-bottom": "4px"
+        });
 
-        // Task Title
-        const title = document.createElement('h4');
-        title.className = 'task-title'; // Add a class for styling
-        title.textContent = titleText;
-        title.style.color = 'red';
-        title.style.fontWeight = '500'
+    // Create title with theme-aware text color
+    const title = document.createElement('h4');
+    title.className = 'task-title mb-0 text-body-secondary fw-medium'; // Theme-aware text color
+    
+    // Add icon with theme-aware color
+    const icon = document.createElement('i');
+    icon.className = 'bi bi-clock me-2 text-body-secondary'; // Theme-aware icon color
+    
+    title.textContent = titleText;
+    title.prepend(icon);
+    taskItem.append(title);
 
-        // Center text using Flexbox
-        title.style.display = 'flex';
-        title.style.justifyContent = 'center'; // Centers horizontally
-        title.style.alignItems = 'center'; // Centers vertically
-        title.style.height = '100%'; // Ensures it takes full height of the parent container
-
-        // Append title to the task item
-        taskItem.append(title);
-
-
-        return taskItem;
-    }
+    return taskItem;
+}
 
     function updateGaps() {
         const scheduleList = document.getElementById("schedule-list");
@@ -2067,9 +2112,7 @@ $(document).ready(function () {
                     const fixedStartTime = new Date(taskData.start_time);
                     const gapMinutes = (fixedStartTime - lastEndTime) / 60000;
 
-                    if (gapMinutes > 0) {
-                        console.log(`Gap of ${gapMinutes} minutes detected before task ${taskId}`);
-                        
+                    if (gapMinutes > 0) {                       
                         // Create a gap task
                         const gapTaskItem = createGapTask(`Idle - ${formatDuration(gapMinutes)}`);
                         gapTaskItem.attr("data-duration", gapMinutes); // Store duration
@@ -2135,12 +2178,10 @@ $(document).ready(function () {
                     if (gapMinutes < 0) {
                         const overlapMinutes = Math.abs(gapMinutes);
                         if (prevTask && prevTask.taskData.is_fixed) {
-                            console.log(`Overlap detected for task ${taskId}. Reducing previous fixed task ${prevTask.taskId} duration by ${overlapMinutes} minutes`);
                             prevTask.taskData.duration -= overlapMinutes;
                             is_shuffled = true;
                             updateTaskDuration2(prevTask.taskId, prevTask.taskSrc, prevTask.taskData.duration, lastItem);
                         } else if (prevTask) {
-                            console.log(`Overlap detected for task ${taskId}. Moving current task ${taskId} above previous non-fixed task ${prevTask.taskId}`);
                             is_shuffled = true;
                             if (taskItem && lastItem && scheduleList.contains(taskItem) && scheduleList.contains(lastItem)) {
                                 scheduleList.insertBefore(taskItem, lastItem);
@@ -2217,6 +2258,7 @@ $(document).ready(function () {
         });
 
         dropzone.style.height = `${totalHeight + counter * 5}px`;
+        unsavedChanges = true;
     }
 
     // Helper function to update task duration in source array
@@ -2337,7 +2379,6 @@ $(document).ready(function () {
 
 
     function showMobileActionButtons(taskId, type, element, isInSchedule) {
-        console.log('showing mobile action button');
         element.classList.add('selected-for-actions');
         // Create overlay
         const overlay = document.createElement('div');
@@ -2547,6 +2588,353 @@ $(document).ready(function () {
     }
 
     setupTaskPanelToggle();
+
+    document.getElementById('cancelButton').addEventListener('click', function(event) {
+        // unsavedChanges = false;
+        if (!unsavedChanges) {
+            $(document).trigger('contentUpdated', ["{% url 'home' %}", '#new-content', true]);
+            return false;
+        }
+
+        // If there are unsaved changes, show a warning
+        const bdy = document.getElementById('new-content');
+        const existingWarning = document.querySelector('.warningdiv');
+        if (existingWarning) return; // Avoid multiple prompts
+
+        const warningDiv = document.createElement('div');
+        warningDiv.className = 'warningdiv mt-4';
+
+        warningDiv.innerHTML = `
+            <div class="text-center">
+                <h5 class="mb-3">Unsaved Changes</h5>
+                <p class="mb-2">You have unsaved changes. Are you sure you want to leave?</p>
+                <p class="text-muted small mb-4">*Your changes will be lost.</p>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-danger me-3" id="confirmLeaveBtn">Yes, Leave</button>
+                    <button class="btn btn-outline-secondary" id="stayBtn">Stay</button>
+                </div>
+            </div>
+        `;
+
+        bdy.appendChild(warningDiv);
+
+        // Button actions
+        document.getElementById('stayBtn').addEventListener('click', function () {
+            warningDiv.remove();
+        });
+
+        document.getElementById('confirmLeaveBtn').addEventListener('click', function () {
+            $(document).trigger('contentUpdated', ["{% url 'home' %}", '#new-content', true]);
+            warningDiv.remove();
+        });
+
+        return false; // Prevent default behavior (e.g., from button)
+    });
+
+    document.getElementById('moreButton').addEventListener('click', function () {
+        const overlay = document.getElementById('overlay');
+        const taskDetailContainer = document.getElementById('taskDetail');
+
+        // Clear existing content
+        taskDetailContainer.innerHTML = '';
+
+        // Create Template Button (centered horizontally)
+        const createTemplateButton = document.createElement('button');
+        createTemplateButton.className = 'btn btn-primary d-block mx-auto mb-4';
+        createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
+        createTemplateButton.addEventListener('click', function () {
+            renderTemplateCreator(); // Call the new function to show the template creator
+        });
+
+        // Scrollable List Container for Templates
+        const listContainer = document.createElement('div');
+        listContainer.className = 'border rounded p-3 mb-4';
+        listContainer.style.maxHeight = '200px';
+        listContainer.style.overflowY = 'auto';
+
+        // Dummy Template Items
+        const dummyTemplates = [
+            { id: 1, name: 'Morning Routine', tasks: 5 },
+            { id: 2, name: 'Work Block', tasks: 3 },
+            { id: 3, name: 'Evening Wind-Down', tasks: 4 },
+            { id: 4, name: 'Workout Plan', tasks: 6 },
+            { id: 5, name: 'Weekend Prep', tasks: 2 }
+        ];
+
+        const ul = document.createElement('ul');
+        ul.className = 'list-group';
+
+        let selectedTemplateId = null;
+
+        dummyTemplates.forEach(template => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            const checkboxId = `template-${template.id}`;
+            li.innerHTML = `
+                <div>
+                    <input type="radio" class="form-check-input me-2" id="${checkboxId}" name="selectedTemplate">
+                    <label class="form-check-label" for="${checkboxId}">${template.name}</label>
+                </div>
+                <span class="badge bg-secondary rounded-pill">${template.tasks} tasks</span>
+            `;
+            ul.appendChild(li);
+
+            const radio = li.querySelector('input[type="radio"]');
+            radio.addEventListener('change', function () {
+                selectedTemplateId = this.checked ? template.id : null;
+            });
+        });
+
+        listContainer.appendChild(ul);
+
+        // Buttons Container (Import Selected and Cancel)
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'd-flex justify-content-end';
+
+        const importButton = document.createElement('button');
+        importButton.className = 'btn btn-success me-2';
+        importButton.innerHTML = `<i class="bi bi-box-arrow-in-down"></i> Import Selected`;
+        importButton.addEventListener('click', function () {
+            if (selectedTemplateId) {
+                const selectedTemplate = dummyTemplates.find(t => t.id === selectedTemplateId);
+                console.log('Importing template:', selectedTemplate);
+                overlay.style.display = 'none';
+                taskDetailContainer.style.display = 'none';
+            } else {
+                alert('Please select a template to import.');
+            }
+        });
+
+        const cancelButton = document.createElement('button');
+        cancelButton.className = 'btn btn-outline-secondary';
+        cancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+        cancelButton.addEventListener('click', function () {
+            overlay.style.display = 'none';
+            taskDetailContainer.style.display = 'none';
+        });
+
+        buttonsContainer.appendChild(importButton);
+        buttonsContainer.appendChild(cancelButton);
+
+        // Append all elements to taskDetailContainer
+        taskDetailContainer.appendChild(createTemplateButton);
+        taskDetailContainer.appendChild(listContainer);
+        taskDetailContainer.appendChild(buttonsContainer);
+
+        // Show overlay and task detail
+        overlay.style.display = 'block';
+        taskDetailContainer.style.display = 'block';
+
+        function renderTemplateCreator() {
+            // Clear existing content
+            taskDetailContainer.innerHTML = '';
+
+            // Responsive sizing
+            const isMobile = window.matchMedia("(max-width: 768px)").matches;
+            taskDetailContainer.style.width = isMobile ? '90vw' : '600px'; // Full width on mobile, fixed on desktop
+            taskDetailContainer.style.maxHeight = isMobile ? '90vh' : '80vh'; // Slightly smaller on mobile
+            taskDetailContainer.style.overflowY = 'auto';
+
+            // Template Name Input
+            const nameContainer = document.createElement('div');
+            nameContainer.className = 'mb-4';
+            nameContainer.innerHTML = `
+                <label for="templateName" class="form-label fw-bold">Template Name:</label>
+                <input type="text" class="form-control" id="templateName" placeholder="Enter template name">
+            `;
+
+            // Scrollable Task List Container
+            const taskListContainer = document.createElement('div');
+            taskListContainer.className = 'border rounded p-3 mb-4';
+            taskListContainer.style.maxHeight = isMobile ? '60vh' : '300px'; // Larger height on mobile
+            taskListContainer.style.overflowY = 'auto';
+
+            const taskUl = document.createElement('ul');
+            taskUl.className = 'list-group';
+
+
+            const scheduleList = document.getElementById("schedule-list");
+            const allTasks = Array.from(scheduleList.querySelectorAll(".task-item"));
+            const dummyTasks = getRepetitiveTasks(allTasks);
+
+            dummyTasks.forEach(taskItem => {
+                const taskId = taskItem.dataset.id;
+                const taskSrc = taskItem.dataset.src;
+                const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false };
+
+                
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.setAttribute('data-id', taskId);
+                li.setAttribute('data-src', taskSrc);
+                li.innerHTML = `
+                    <div>
+                        <span class="fw-medium">${taskData.title}</span>
+                        <small class="text-muted d-block">Start: ${getTimeFromISO(taskData.start_time)} | Duration: ${formatDuration(taskData.duration)} min</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-x"></i>
+                    </button>
+                `;
+                taskUl.appendChild(li);
+
+                const removeButton = li.querySelector('button');
+                removeButton.addEventListener('click', function () {
+                    li.remove();
+                });
+            });
+
+            taskListContainer.appendChild(taskUl);
+
+            // Buttons Container (Save and Cancel)
+            const creatorButtonsContainer = document.createElement('div');
+            creatorButtonsContainer.className = 'd-flex justify-content-end';
+
+            const saveButton = document.createElement('button');
+            saveButton.className = 'btn btn-primary me-2';
+            saveButton.innerHTML = `<i class="bi bi-save" id="templateSaveBtn"></i> Save`;
+            saveButton.addEventListener('click', function () {
+                const templateName = document.getElementById('templateName').value.trim();
+                if (!templateName) {
+                    alert('Please enter a template name.');
+                    return;
+                }
+                console.log('Saving template:', templateName);
+
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const ListItems = document.querySelectorAll('.list-group li');
+
+                // Prepare tasks data
+                const tasks = Array.from(ListItems).map(item => {
+                    const taskId = parseInt(item.getAttribute('data-id'));
+                    const taskSrc = item.getAttribute('data-src');
+                    let task;
+                    let flag;
+
+                    if (taskSrc === 'rtn') {
+                        task = allTskRtn.find(t => t.id === taskId);
+                        flag = true;
+                    } else if (taskSrc === 'tsk') {
+                        task = allTasks.find(t => t.id === taskId);
+                        flag = true;
+                    } else {
+                        task = allMscRtn.find(t => t.id === taskId);
+                        flag = false;
+                    }
+                    if (task && flag) {
+                        return {
+                            start_time: task.start_time,
+                            duration: task.duration,
+                            id: task.id, 
+                            title: task.title,
+                            category: task.category,
+                            priority: task.priority,
+                            is_repetitive: task.is_repetitive,
+                            frequency_interval: task.frequency_interval,
+                            due_date: task.due_date,
+                            due_time: task.due_time,
+                            color: task.color,
+                            is_task: true,
+                            is_fixed: true,
+                        };
+                    } else if (task && !flag) {
+                        return {
+                            start_time: task.start_time,
+                            duration: task.duration,
+                            title: task.title,
+                            id: task.id,
+                            is_task: false,
+                            is_fixed: true,
+                        }
+                    } else {
+                        console.error(`Task with ID ${taskId} not found!`);
+                        return null;
+                    }
+                }).filter(task => task !== null); // Filter out null tasks
+
+                // Check if there are valid tasks to save
+                if (tasks.length === 0) {
+                    showMessage('No tasks to save', 'error');
+                    return;
+                }
+
+                // Send data to the backend
+                const post_url = "{% url 'save_routine_template' %}";
+                fetch(post_url, { // Replace with your actual API endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        template_name: templateName,
+                        tasks: tasks,
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showMessage('Template Saved!', 'success');
+                    overlay.style.display = 'none';
+                    taskDetailContainer.style.display = 'none';
+                    taskDetailContainer.style.width = '';
+                    taskDetailContainer.style.maxHeight = '';
+                    taskDetailContainer.style.overflowY = '';
+                })
+                .catch(error => {
+                    console.error('Error saving routine:', error);
+                    showMessage('Failed to save routine!', 'error'); // Provide user feedback
+                });
+            });
+
+            const creatorCancelButton = document.createElement('button');
+            creatorCancelButton.className = 'btn btn-outline-secondary';
+            creatorCancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+            creatorCancelButton.addEventListener('click', function () {
+                overlay.style.display = 'none';
+                taskDetailContainer.style.display = 'none';
+                taskDetailContainer.style.width = '';
+                taskDetailContainer.style.maxHeight = '';
+                taskDetailContainer.style.overflowY = '';
+            });
+
+            creatorButtonsContainer.appendChild(saveButton);
+            creatorButtonsContainer.appendChild(creatorCancelButton);
+
+            // Append all elements to taskDetailContainer
+            taskDetailContainer.appendChild(nameContainer);
+            taskDetailContainer.appendChild(taskListContainer);
+            taskDetailContainer.appendChild(creatorButtonsContainer);
+
+            // Ensure overlay and container are visible
+            overlay.style.display = 'block';
+            taskDetailContainer.style.display = 'block';
+        }
+    });
+
+    function getRepetitiveTasks(taskList) {
+        return $(taskList).filter(function() {
+            return $(this).attr("data-item-type") === "repetitive";
+        }).get();
+    };
+
+    function getTimeFromISO(isoString) {
+        const date = new Date(isoString);
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 === 0 ? 12 : hours % 12; // Handle 12 AM/PM
+
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+        return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    };
+
+
 });
 
 
