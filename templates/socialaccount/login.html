@@ -237,7 +237,8 @@
                         onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"><i class="fas fa-tags icon-mobile"></i> Pricing</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-envelope icon-mobile"></i> Contact</a>
+                        <a class="nav-link" href="{% url 'contact_us' %}"
+                        onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;"><i class="fas fa-envelope icon-mobile"></i> Contact</a>
                     </li>
                 </ul>                
             </div>
@@ -415,27 +416,29 @@
 
 <!-- end of content wrapper -->
     <!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-links">
-            <a href="#" class="footer-link">About Us</a>
-            <span class="footer-divider">•</span>
-            <a href="{% url 'privacy_policy' %}" class="footer-link" target="_blank">Privacy Policy</a>
-            <span class="footer-divider">•</span>
-            <a href="{% url 'terms&conditions' %}" class="footer-link" target="_blank">Terms & Conditions</a>
-            <span class="footer-divider">•</span>
-            <a href="#" class="footer-link">Contact</a>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="{% url 'about_us' %}" class="footer-link"
+                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">About Us</a>
+                <span class="footer-divider">•</span>
+                <a href="{% url 'privacy_policy' %}" class="footer-link" target="_blank">Privacy Policy</a>
+                <span class="footer-divider">•</span>
+                <a href="{% url 'terms&conditions' %}" class="footer-link" target="_blank">Terms & Conditions</a>
+                <span class="footer-divider">•</span>
+                <a href="{% url 'contact_us' %}" class="footer-link"
+                onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">Contact</a>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 <strong>Aranya Tech</strong>. All rights reserved.</p>
+            </div>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/profile.php?id=61573497579019" target="_blank" class="social-icon" aria-label="facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.linkedin.com/company/aranya-it/" target="_blank" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            </div>
         </div>
-        <div class="footer-copyright">
-            <p>&copy; 2025 <strong>Aranya Tech</strong>. All rights reserved.</p>
-        </div>
-        <div class="footer-social">
-            <a href="#" class="social-icon" aria-label="facebook"><i class="fab fa-facebook"></i></a>
-            <a href="https://www.linkedin.com/company/aranya-it/" target="_blank" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-            <a href="#" class="social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        </div>
-    </div>
-</footer>
+    </footer>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

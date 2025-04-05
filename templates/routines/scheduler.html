@@ -1015,6 +1015,8 @@ $(document).ready(function () {
                             allTskRtn.push(task);
                             src = 'rtn';
                             taskItem = createTaskListItem(task, "rtn"); // Call the function
+                            // Add data-in-sch attribute for tasks where is_task is true
+                            taskItem.attr('data-in-sch', 'true');
                         } else {
                             allMscRtn.push(task);
                             src = 'msc';
@@ -1228,6 +1230,7 @@ $(document).ready(function () {
                     due_time: task.due_time,
                     color: task.color,
                     is_task: true,
+                    is_fixed: task.is_fixed,
                 };
             } else if (task && !flag) {
                 return {
@@ -1386,7 +1389,6 @@ $(document).ready(function () {
       }
     }
 
-    // Function to render task detail
     function renderTaskDetail(task, flag, src, item) {
         const overlay = document.getElementById('overlay');
         const taskDetailContainer = document.getElementById('taskDetail');
@@ -1404,12 +1406,46 @@ $(document).ready(function () {
         taskDetailContainer.appendChild(title);
         taskDetailContainer.appendChild(durationContainer);
 
+        // Add fixed time toggle and start time fields when item.data-in-sch is true
+        let fixedTimeToggle, startTimeContainer;
+        if (item.dataset.inSch === "true" && item.dataset.src !== "msc") {
+            // Fixed time toggle
+            fixedTimeToggle = document.createElement('div');
+            fixedTimeToggle.className = 'form-check form-switch mt-2';
+            fixedTimeToggle.innerHTML = `
+                <input class="form-check-input" type="checkbox" id="fixedTimeToggle">
+                <label class="form-check-label" for="fixedTimeToggle">Fixed Time</label>
+            `;
+
+            if (task.is_fixed) {
+                fixedTimeToggle.querySelector('#fixedTimeToggle').checked = true;
+            }
+            
+            // Create start time container
+            startTimeContainer = createStartTimeInput(task.start_time);
+            
+            taskDetailContainer.appendChild(fixedTimeToggle);
+            taskDetailContainer.appendChild(startTimeContainer);
+
+            // Add event listeners for start time fields
+            const startHour = startTimeContainer.querySelector('#startHour');
+            const startMin = startTimeContainer.querySelector('#startMin');
+            const startAmPm = startTimeContainer.querySelector('#startAmPm');
+            const toggleInput = fixedTimeToggle.querySelector('#fixedTimeToggle');
+
+            [startHour, startMin, startAmPm].forEach(field => {
+                field.addEventListener('change', () => {
+                    toggleInput.checked = true;
+                });
+            });
+        }
+
         if (flag) {
             const category = document.createElement('p');
-            category.innerHTML = `<i class="bi bi-tag"></i> Category: ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
+            category.innerHTML = `<i class="bi bi-tag"></i> Category: ${task.category ? task.category : 'Uncategorized'}`;
 
             const priority = document.createElement('p');
-            priority.innerHTML = `<i class="bi bi-exclamation-circle"></i> Priority: ${getPriorityLabel(task.priority)}`; // Icon for priority
+            priority.innerHTML = `<i class="bi bi-exclamation-circle"></i> Priority: ${getPriorityLabel(task.priority)}`;
 
             taskDetailContainer.appendChild(category);
             taskDetailContainer.appendChild(priority);
@@ -1418,9 +1454,10 @@ $(document).ready(function () {
         // Okay Button
         const okayButton = document.createElement('button');
         okayButton.className = 'btn btn-primary';
-        okayButton.innerHTML = `<i class="bi bi-check-circle"></i> Okay`; // Icon for Okay button
+        okayButton.innerHTML = `<i class="bi bi-check-circle"></i> Okay`;
         okayButton.onclick = function () {
-            closeTaskDetail(durationContainer, task.id, src, item);
+            const is_fixed = fixedTimeToggle?.querySelector('#fixedTimeToggle')?.checked || false;
+            closeTaskDetail(durationContainer, task.id, src, item, startTimeContainer, is_fixed);
         };
         okayButton.style.marginRight = '10px';
 
@@ -1485,44 +1522,176 @@ $(document).ready(function () {
         taskDetailContainer.style.display = 'block';
     }
 
+    // Function to create start time input widget
+    function createStartTimeInput(startTime) {
+        const startTimeContainer = document.createElement('div');
+        startTimeContainer.innerHTML = `<i class="bi bi-clock"></i> Start Time: `;
 
-    // Function to close task detail
-    function closeTaskDetail(durationContainer, taskId, taskSrc, item) {
+        const hourInput = document.createElement('input');
+        hourInput.type = 'number';
+        hourInput.min = '1';
+        hourInput.max = '12';
+        hourInput.placeholder = 'HH';
+        hourInput.style.width = '50px';
+        hourInput.id = 'startHour';
+
+        const minuteInput = document.createElement('input');
+        minuteInput.type = 'number';
+        minuteInput.min = '0';
+        minuteInput.max = '59';
+        minuteInput.placeholder = 'MM';
+        minuteInput.style.width = '50px';
+        minuteInput.id = 'startMin';
+
+        const ampmSelect = document.createElement('select');
+        ampmSelect.id = 'startAmPm';
+        ampmSelect.innerHTML = `
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+        `;
+        ampmSelect.style.width = '60px'; // Slightly wider to accommodate AM/PM text
+
+        // If startTime is provided, parse and set the values
+        if (startTime) {
+            const date = new Date(startTime); // Convert string to Date object (local time)
+            let hours = date.getHours(); // Get local hours
+            const minutes = date.getMinutes();
+            const period = hours >= 12 ? 'PM' : 'AM';
+
+            // Convert 24-hour to 12-hour format
+            hours = hours % 12 || 12; // 0 becomes 12, 13 becomes 1, etc.
+
+            hourInput.value = hours;
+            minuteInput.value = String(minutes).padStart(2, '0'); // Ensure 2 digits
+            ampmSelect.value = period;
+        }
+
+        // Append inputs with spacing
+        startTimeContainer.appendChild(hourInput);
+        startTimeContainer.appendChild(document.createTextNode(' : '));
+        startTimeContainer.appendChild(minuteInput);
+        startTimeContainer.appendChild(document.createTextNode(' '));
+        startTimeContainer.appendChild(ampmSelect);
+
+        // Apply same styling as duration widget
+        startTimeContainer.style.marginBottom = '15px';
+        startTimeContainer.style.marginTop = '15px';
+
+        return startTimeContainer;
+    }
+
+
+    // Function to create duration element
+    function createDurationInput(durationInMinutes) {
+        const durationContainer = document.createElement('div');
+        durationContainer.innerHTML = `<i class="bi bi-clock"></i> Duration: `;
+
+        const hoursInput = document.createElement('input');
+        hoursInput.type = 'number';
+        hoursInput.min = '0';
+        hoursInput.placeholder = 'Hours';
+        hoursInput.style.width = '50px';
+        hoursInput.classList.add('duration-hour'); // Add class for event listener
+
+        const minutesInput = document.createElement('input');
+        minutesInput.type = 'number';
+        minutesInput.min = '0';
+        minutesInput.max = '59';
+        minutesInput.placeholder = 'Minutes';
+        minutesInput.style.width = '50px';
+        minutesInput.classList.add('duration-minute'); // Add class for event listener
+
+        const hours = Math.floor(durationInMinutes / 60);
+        const minutes = durationInMinutes % 60;
+
+        hoursInput.value = hours;
+        minutesInput.value = minutes;
+
+        durationContainer.appendChild(hoursInput);
+        durationContainer.appendChild(document.createTextNode(' hr '));
+        durationContainer.appendChild(minutesInput);
+        durationContainer.appendChild(document.createTextNode(' min'));
+        durationContainer.style.marginBottom = '15px';
+        durationContainer.style.marginTop = '15px';
+
+        // Attach event listeners to inputs
+        hoursInput.addEventListener('input', handleInput);
+        minutesInput.addEventListener('input', handleInput);
+
+        return durationContainer;
+    }
+
+
+    function closeTaskDetail(durationContainer, taskId, taskSrc, item, startTimeContainer, is_fixed) {
         const overlay = document.getElementById('overlay');
         const taskDetailContainer = document.getElementById('taskDetail');
         const updatedDuration = getDurationInMinutes(durationContainer);
-        // Add start_time to the task in the appropriate array (allTasks or allTskRtn)
+        
+        console.log(`Is fixed value: ${is_fixed}`);
+
+        let startTimeISO = null;
+
+        // If is_fixed is true, extract and store the start time
+        if (is_fixed) {
+            const hour = parseInt(startTimeContainer.querySelector('#startHour')?.value || 0, 10);
+            const minute = parseInt(startTimeContainer.querySelector('#startMin')?.value || 0, 10);
+            const period = startTimeContainer.querySelector('#startAmPm')?.value || 'AM';
+
+            // Convert to 24-hour format
+            let hours24 = hour % 12;
+            if (period === 'PM') hours24 += 12;
+
+            // Create a local Date object with today's date and the time provided
+            const now = new Date();
+            now.setHours(hours24, minute, 0, 0);
+
+            // Convert to ISO string (in UTC)
+            startTimeISO = now.toISOString();
+        }
+
+        // Add duration and start_time (only if is_fixed is true) to the appropriate task array
         let taskIndex = -1;
         if (taskSrc === "rtn") {
             taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
             if (taskIndex !== -1) {
-                allTskRtn[taskIndex].duration = updatedDuration; // Add start_time to the task in allTskRtn
+                allTskRtn[taskIndex].duration = updatedDuration;
+                if (is_fixed) {
+                    allTskRtn[taskIndex].start_time = startTimeISO;
+                }
+                allTskRtn[taskIndex].is_fixed = is_fixed;
             }
         } else if (taskSrc === "tsk") {
             taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
             if (taskIndex !== -1) {
-                allTasks[taskIndex].duration = updatedDuration; // Add start_time to the task in allTasks
+                allTasks[taskIndex].duration = updatedDuration;
+                if (is_fixed) {
+                    allTasks[taskIndex].start_time = startTimeISO;
+                }
+                allTasks[taskIndex].is_fixed = is_fixed;
             }
         } else {
             if (taskId.toString().length === 1) {
-                taskIndex = allMisc.findIndex(task => task.id === parseInt(taskId,10));
+                taskIndex = allMisc.findIndex(task => task.id === parseInt(taskId, 10));
                 if (taskIndex !== -1) {
                     allMisc[taskIndex].duration = updatedDuration;
                 }
             } else {
-                taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId,10));
+                taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
                 if (taskIndex !== -1) {
                     allMscRtn[taskIndex].duration = updatedDuration;
                 }
             }
         }
-        updateTaskDuration(taskId, updatedDuration, item);    
+
+        updateTaskDuration(taskId, updatedDuration, item);
 
         // Hide overlay and task detail
         overlay.style.display = 'none';
         taskDetailContainer.style.display = 'none';
+        console.log(`Task ITEM: ${item}`);
         updateTimeSlots();
     }
+
 
     // Function to get duration in minutes
     function getDurationInMinutes(durationContainer) {
@@ -1640,25 +1809,28 @@ $(document).ready(function () {
             dragging.style.opacity = "1";
             zone.classList.remove("border-danger");
 
-            // ✅ Destroy only if:
-            // 1. Dropped in 'misc-tasks' **AND** type is 'misc'
-            // 2. A 'misc' task was dragged and dropped **outside** 'schedule-list'
-            if (
-                (zone.id === "misc-tasks" && dragging.dataset.itemType === "misc") ||
-                (dragging.dataset.fromMisc === "true" && zone.id !== "schedule-list")
-            ) {
-                const taskIdToRemove = parseInt(dragging.dataset.id); // Get the ID to remove
-                // Remove the task from allMscRtn
-                allMscRtn = allMscRtn.filter(task => task.id !== taskIdToRemove);
-                dragging.remove(); // Destroy the item
-                updateTimeSlots();
-                return;
-            }
-
+            // Add data-in-sch="true" when dropped in schedule-list
             if (zone.id === "schedule-list") {
+                dragging.dataset.inSch = "true";
                 updateTimeSlots();
-            } else if (zone.id === "one-time-tasks" || zone.id === "repetitive-tasks") {
-                updateTimeSlots();
+            } 
+            // Remove data-in-sch when dropped anywhere else
+            else {
+                delete dragging.dataset.inSch;
+                // Handle destroy conditions
+                if (
+                    (zone.id === "misc-tasks" && dragging.dataset.itemType === "misc") ||
+                    (dragging.dataset.fromMisc === "true" && zone.id !== "schedule-list")
+                ) {
+                    const taskIdToRemove = parseInt(dragging.dataset.id);
+                    allMscRtn = allMscRtn.filter(task => task.id !== taskIdToRemove);
+                    dragging.remove();
+                    updateTimeSlots();
+                    return;
+                }
+                if (zone.id === "one-time-tasks" || zone.id === "repetitive-tasks") {
+                    updateTimeSlots();
+                }
             }
         });
 
@@ -1677,48 +1849,31 @@ $(document).ready(function () {
 
             // 🟢 If dragging from 'misc-tasks', create a new independent item
             if (event.target.closest("#misc-tasks")) {
-                // Get the data-id attribute from the dragged element
                 const taskId = event.target.getAttribute("data-id");
-
-                // Find the corresponding task in the allMisc array
                 const task = allMisc.find(task => task.id == taskId);
 
                 if (task) {
-                    // Generate a new ID using the current time
-                    const newId = Date.now(); // Unique ID based on timestamp
-
-                    // Create a new task item using the task, new ID, and class name "x"
+                    const newId = Date.now();
                     const xx = createMiscTask(task, newId, "x");
                     newItem = xx[0];
 
-                    // Append the new item to #misc-tasks (instead of body)
                     const passBoard = document.getElementById("passBoard");
                     passBoard.appendChild(newItem);
 
-                    // Add the "dragging" class to the new item
                     newItem.classList.add("dragging");
-
-                    newItem.dataset.fromMisc = "true"; // Mark it as coming from misc
+                    newItem.dataset.fromMisc = "true";
                     newItem.onclick = function () {
                         showTaskDetail(newId, 'msc', newItem);
                     }
-                    
 
-                    // Keep the original item visible
                     event.target.style.opacity = "1";
-
-                    // Hide the new item smoothly
                     setTimeout(() => newItem.style.opacity = "0", 0);
-
-                    // Replace the dragging target with the new item
                     event.target = newItem;
 
-                    // Create a copy of the task with the new ID and push it to allMscRtn
-                    const newTaskForMscRtn = { ...task, id: newId }; // Create a shallow copy
+                    const newTaskForMscRtn = { ...task, id: newId };
                     allMscRtn.push(newTaskForMscRtn);
                 }
             } else {
-                // If not in the misc-tasks container, just add the dragging class and hide the original
                 event.target.classList.add("dragging");
                 setTimeout(() => event.target.style.opacity = "0", 0);
             }
@@ -1737,6 +1892,36 @@ $(document).ready(function () {
             }
         });
     }
+
+    // Function to get the correct insertion point in the list
+    function getDragAfterElement(zone, y) {
+        const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - (box.top + box.height / 2);
+            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Attach draggable functionality to existing task items
+    document.querySelectorAll(".task-item").forEach(makeDraggable);
+
+    // Observe dynamically added tasks
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1 && node.classList.contains("task-item")) {
+                    makeDraggable(node);
+                }
+            });
+        });
+    });
+
+    dropzones.forEach(zone => {
+        observer.observe(zone, { childList: true });
+    });
+
 
     // Function to create a brand new task item with the same attributes
     function createMiscTask(task, newId, className) {
@@ -1788,111 +1973,312 @@ $(document).ready(function () {
         return taskItem;
     }
 
-    // Function to get the correct insertion point in the list
-    function getDragAfterElement(zone, y) {
-        const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
+    function sortFixedTimeScheduleItems() {
+        const scheduleList = document.getElementById("schedule-list");
+        const taskItems = Array.from(scheduleList.children); // Use children instead of querySelectorAll to maintain order
+        
+        if (!taskItems.length) {
+            console.log("No tasks in the schedule list.");
+            return;
+        }
 
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - (box.top + box.height / 2);
-            return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
+        // Create an array to hold the sorted order
+        const sortedItems = [];
+        const fixedTasksWithTime = [];
+        
+        // First pass: identify fixed tasks with valid times
+        taskItems.forEach(item => {
+            if (item.classList.contains("task-item")) {
+                const taskId = item.dataset.id;
+                const taskSrc = item.dataset.src;
+                const taskData = getTaskDataById(taskId, taskSrc);
+                
+                if (taskData && taskData.is_fixed && taskData.start_time) {
+                    const startTime = new Date(taskData.start_time);
+                    if (startTime instanceof Date && !isNaN(startTime)) {
+                        fixedTasksWithTime.push({
+                            item: item,
+                            startTime: startTime
+                        });
+                        return; // Skip adding to sortedItems for now
+                    }
+                }
+            }
+            // Add non-fixed items and fixed items without times to the sorted array immediately
+            sortedItems.push(item);
+        });
+
+        // If no fixed tasks to sort, we're done
+        if (fixedTasksWithTime.length <= 1) {
+            console.log("Zero or one valid fixed-time task, no sorting needed.");
+            return;
+        }
+
+        // Sort the fixed tasks by time
+        fixedTasksWithTime.sort((a, b) => a.startTime - b.startTime);
+
+        // Second pass: insert fixed tasks at their original positions (but now sorted)
+        let fixedIndex = 0;
+        const finalItems = [];
+        
+        for (const item of taskItems) {
+            if (item.classList.contains("task-item")) {
+                const taskId = item.dataset.id;
+                const taskSrc = item.dataset.src;
+                const taskData = getTaskDataById(taskId, taskSrc);
+                
+                if (taskData && taskData.is_fixed && taskData.start_time) {
+                    // This is a fixed task with time - insert the next one from our sorted array
+                    if (fixedIndex < fixedTasksWithTime.length) {
+                        finalItems.push(fixedTasksWithTime[fixedIndex].item);
+                        fixedIndex++;
+                    }
+                    continue;
+                }
+            }
+            // For non-fixed items, keep them in their original position
+            finalItems.push(item);
+        }
+
+        // If we have any remaining fixed tasks (shouldn't happen), add them at the end
+        while (fixedIndex < fixedTasksWithTime.length) {
+            finalItems.push(fixedTasksWithTime[fixedIndex].item);
+            fixedIndex++;
+        }
+
+        // Update the DOM
+        scheduleList.innerHTML = '';
+        finalItems.forEach(item => scheduleList.appendChild(item));
+
+        console.log("Fixed-time schedule items sorted by start time while maintaining non-fixed items' positions.");
     }
 
-    // Attach draggable functionality to existing task items
-    document.querySelectorAll(".task-item").forEach(makeDraggable);
 
-    // Observe dynamically added tasks
-    const observer = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-            mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1 && node.classList.contains("task-item")) {
-                    makeDraggable(node);
-                }
-            });
+    // Function to create a brand new gap task item
+    function createGapTask(titleText) {
+        // Create a task item with necessary attributes
+        const taskItem = $("<li></li>")
+            .addClass("task-item gap") // Add 'gap' class
+            .attr("data-item-type", "gap") // Set item type to 'gap'
+            .attr("data-is_gap", "true") // Indicate it's a gap
+            .css("height", "70px");
+
+        // Task Title
+        const title = document.createElement('h4');
+        title.className = 'task-title'; // Add a class for styling
+        title.textContent = titleText;
+        title.style.color = 'red';
+
+        // Center text using Flexbox
+        title.style.display = 'flex';
+        title.style.justifyContent = 'center'; // Centers horizontally
+        title.style.alignItems = 'center'; // Centers vertically
+        title.style.height = '100%'; // Ensures it takes full height of the parent container
+
+        // Append title to the task item
+        taskItem.append(title);
+
+
+        return taskItem;
+    }
+
+    function updateGaps() {
+        const scheduleList = document.getElementById("schedule-list");
+        
+        // Remove all previous gap elements
+        scheduleList.querySelectorAll(".task-item.gap").forEach(gapItem => {
+            gapItem.remove();
         });
-    });
 
-    // Start observing changes in the task lists
-    dropzones.forEach(zone => {
-        observer.observe(zone, { childList: true });
-    });
+        let lastEndTime = new Date(selectedDayStartTime);
+        let taskItems = Array.from(scheduleList.querySelectorAll(".task-item"));
+
+        taskItems.forEach((taskItem, index) => {
+            const taskId = taskItem.dataset.id;
+            const taskSrc = taskItem.dataset.src;
+            const taskData = getTaskDataById(taskId, taskSrc);
+
+            if (taskData) {
+                let startTime;
+
+                // Handle fixed-time tasks and detect gaps
+                if (taskData.is_fixed && taskData.start_time) {
+                    const fixedStartTime = new Date(taskData.start_time);
+                    const gapMinutes = (fixedStartTime - lastEndTime) / 60000;
+
+                    if (gapMinutes > 0) {
+                        console.log(`Gap of ${gapMinutes} minutes detected before task ${taskId}`);
+                        
+                        // Create a gap task
+                        const gapTaskItem = createGapTask(`Gap (${formatDuration(gapMinutes)})`);
+                        gapTaskItem.attr("data-duration", gapMinutes); // Store duration
+                        
+                        // Insert gap task before the current task item
+                        $(taskItem).before(gapTaskItem);
+                    }
+
+                    startTime = fixedStartTime;
+                } else {
+                    startTime = lastEndTime; // Non-fixed tasks start where the last one ended
+                }
+
+                const durationMinutes = taskData.duration;
+                lastEndTime = new Date(startTime.getTime() + durationMinutes * 60000);
+            }
+        });
+    }
 
 
     // Function to calculate and update time slots
     function updateTimeSlots() {
+        sortFixedTimeScheduleItems();
         const scheduleList = document.getElementById("schedule-list");
         const timeSlotsContainer = document.getElementById("time-slots");
-        const dropzone = document.querySelector(".schedule .dropzone"); // Get the dropzone element
+        const dropzone = document.querySelector(".schedule .dropzone");
 
-        timeSlotsContainer.innerHTML = ""; // Clear existing time slots
-        let totalHeight = 0; // Variable to store the total height of all task items
+        // Update gaps first
+        updateGaps();
+
+        timeSlotsContainer.innerHTML = ""; // Clear previous time slots
+        let totalHeight = 0;
         let counter = 0;
+        let currentTime = new Date(selectedDayStartTime);
+        let lastEndTime = new Date(selectedDayStartTime);
+        let is_shuffled = false;
+        let prevTask = null;
+        let lastItem = null;
 
-         // Use the global selectedDayStartTime for initialization
-        let currentTime = new Date(selectedDayStartTime); // Create a new Date from the global variable
+        let taskItems = scheduleList.querySelectorAll(".task-item");
+        // setSerialAttribute(taskItems);
 
-        scheduleList.querySelectorAll(".task-item").forEach(taskItem => {
+        // Convert NodeList to Array for easier manipulation
+        let taskItemArray = Array.from(scheduleList.querySelectorAll(".task-item"));
+
+        taskItemArray.forEach((taskItem, index) => {
             const taskId = taskItem.dataset.id;
             const taskSrc = taskItem.dataset.src;
-            const taskData = getTaskDataById(taskId, taskSrc); // Function to fetch task data
+            const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false }; // Handle gaps with no taskId
 
             if (taskData) {
                 counter += 1;
                 const taskHeight = taskItem.getBoundingClientRect().height;
-                totalHeight += taskHeight + 4; // Add task height + 4px margin to the total height
+                totalHeight += taskHeight + 4;
 
-                const durationMinutes = taskData.duration; // Assuming duration is in minutes
-                const endTime = new Date(currentTime.getTime() + durationMinutes * 60000);
+                let startTime = currentTime;
+                let endTime;
 
-                // Format time in hh:mm AM/PM (uppercase)
+                // Handle fixed-time tasks
+                if (taskData.is_fixed && taskData.start_time) {
+                    startTime = new Date(taskData.start_time);
+                    const gapMinutes = (startTime - lastEndTime) / 60000;
+                    if (gapMinutes < 0) {
+                        const overlapMinutes = Math.abs(gapMinutes);
+                        if (prevTask && prevTask.taskData.is_fixed) {
+                            console.log(`Overlap detected for task ${taskId}. Reducing previous fixed task ${prevTask.taskId} duration by ${overlapMinutes} minutes`);
+                            prevTask.taskData.duration -= overlapMinutes;
+                            is_shuffled = true;
+                            updateTaskDuration2(prevTask.taskId, prevTask.taskSrc, prevTask.taskData.duration, lastItem);
+                        } else if (prevTask) {
+                            console.log(`Overlap detected for task ${taskId}. Moving current task ${taskId} above previous non-fixed task ${prevTask.taskId}`);
+                            is_shuffled = true;
+                            if (taskItem && lastItem && scheduleList.contains(taskItem) && scheduleList.contains(lastItem)) {
+                                scheduleList.insertBefore(taskItem, lastItem);
+                            } else {
+                                console.error("Could not find or manipulate DOM elements for shuffling.");
+                                startTime = new Date(taskData.start_time);
+                            }
+                        }
+                    }
+                }
+
+                const durationMinutes = taskData.duration;
+                endTime = new Date(startTime.getTime() + durationMinutes * 60000);
+
                 const formatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-                const startTimeString = currentTime.toLocaleTimeString([], formatOptions).toUpperCase();
+                const startTimeString = startTime.toLocaleTimeString([], formatOptions).toUpperCase();
                 const endTimeString = endTime.toLocaleTimeString([], formatOptions).toUpperCase();
 
-                // Save time in 24-hour format in the arrays
-                const startTime24hr = currentTime.toISOString();
+                // Update task data (skip for gaps, which have no taskId)
+                if (taskId) {
+                    const startTime24hr = startTime.toISOString();
+                    let taskIndex = -1;
 
-                // Add start_time to the task in the appropriate array (allTasks, allTskRtn, or allMscRtn)
-                let taskIndex = -1;
-                if (taskSrc === "rtn") {
-                    taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
-                    if (taskIndex !== -1) {
-                        allTskRtn[taskIndex].start_time = startTime24hr; // Save in 24-hour format
-                    }
-                } else if (taskSrc === "tsk") {
-                    taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
-                    if (taskIndex !== -1) {
-                        allTasks[taskIndex].start_time = startTime24hr; // Save in 24-hour format
-                    }
-                } else {
-                    taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
-                    if (taskIndex !== -1) {
-                        allMscRtn[taskIndex].start_time = startTime24hr; // Save in 24-hour format
+                    if (taskSrc === "rtn") {
+                        taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                        if (taskIndex !== -1) {
+                            allTskRtn[taskIndex].start_time = startTime24hr;
+                            if (allTskRtn[taskIndex].is_fixed === undefined) allTskRtn[taskIndex].is_fixed = false;
+                        }
+                    } else if (taskSrc === "tsk") {
+                        taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
+                        if (taskIndex !== -1) {
+                            allTasks[taskIndex].start_time = startTime24hr;
+                            if (allTasks[taskIndex].is_fixed === undefined) allTasks[taskIndex].is_fixed = false;
+                        }
+                    } else {
+                        taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                        if (taskIndex !== -1) {
+                            allMscRtn[taskIndex].start_time = startTime24hr;
+                        }
                     }
                 }
 
                 const timeSlotDiv = document.createElement("div");
                 timeSlotDiv.classList.add("time-slot");
+                if (taskItem.classList.contains("gap")) timeSlotDiv.classList.add("gap-slot"); // Style gaps differently
                 timeSlotDiv.style.height = `${taskHeight + 4}px`;
 
                 const startTimeSpan = document.createElement("span");
-                startTimeSpan.textContent = startTimeString; // Display in hh:mm AM/PM format
+                startTimeSpan.textContent = startTimeString;
 
                 const endTimeSpan = document.createElement("span");
-                endTimeSpan.textContent = endTimeString; // Display in hh:mm AM/PM format
+                endTimeSpan.textContent = endTimeString;
 
                 timeSlotDiv.appendChild(startTimeSpan);
                 timeSlotDiv.appendChild(endTimeSpan);
-
                 timeSlotsContainer.appendChild(timeSlotDiv);
 
-                currentTime = endTime; // Update current time for the next task
+                prevTask = taskId ? {
+                    taskId: taskId,
+                    taskSrc: taskSrc,
+                    taskData: { ...taskData }
+                } : null; // Skip prevTask for gaps
+                lastItem = taskItem;
+
+                currentTime = endTime;
+                lastEndTime = endTime;
+
+                if (is_shuffled) {
+                    updateTimeSlots();
+                    return;
+                }
             }
         });
 
-        // Set the total height to the dropzone
         dropzone.style.height = `${totalHeight + counter * 5}px`;
+    }
+
+    // Helper function to update task duration in source array
+    function updateTaskDuration2(taskId, taskSrc, newDuration, taskItem) {
+        let taskIndex = -1;
+        if (taskSrc === "rtn") {
+            taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
+            if (taskIndex !== -1) {
+                allTskRtn[taskIndex].duration = newDuration;
+            }
+        } else if (taskSrc === "tsk") {
+            taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
+            if (taskIndex !== -1) {
+                allTasks[taskIndex].duration = newDuration;
+            }
+        } else {
+            taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
+            if (taskIndex !== -1) {
+                allMscRtn[taskIndex].duration = newDuration;
+            }
+        }
+        updateTaskDuration(taskId, newDuration, taskItem);
+        updateTimeSlots();
     }
 
     function getRepeatFrequencyText(interval) {

@@ -85,14 +85,14 @@ class SignInView(TemplateView):
     def get(self, request, *args, **kwargs):
         """Handle AJAX requests and 'isOut' parameter."""
         is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        is_out = request.headers.get('isOut')
+        is_out = request.headers.get('isOut', '').lower() == 'true'  # Convert to boolean
+        
         success_message = request.GET.get('success_message')
         if success_message:
             messages.success(request, success_message)
 
         if is_ajax:
-            if is_out:
-                # For AJAX requests with isOut, return the template with messages
+            if is_out:  # Now properly checks boolean
                 return render(request, self.template_name)
             return render(request, 'logged_out.html')
         
@@ -197,12 +197,30 @@ class HomeView(TemplateView):
     template_name = 'home.html'
 
     def dispatch(self, request, *args, **kwargs):
+        is_out = request.headers.get('isOut')
+        print(f'Is Out: {is_out}')
+        
+        # Debug user verification status
+        print(f'User Verified: {request.user.profile.is_verified}')
+        
         if not request.user.profile.is_verified:
+            print("User not verified, redirecting to OTP validation.")
             return redirect('validate_otp')
-        elif request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return render(request, self.template_name)
+        
+        print(f'X-Requested-With Header: {request.headers.get("X-Requested-With")}')
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Compare is_out as string or convert to boolean
+            if is_out and is_out.lower() == 'true':
+                print("User is out, redirecting to home.")
+                return redirect('home')
+            else:
+                print("Rendering template:", self.template_name)
+                return render(request, self.template_name)
         else:
+            print("Rendering dashbase.html")
             return render(request, 'dashbase.html')
+
     
 
 def check_username(request):

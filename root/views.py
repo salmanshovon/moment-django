@@ -16,7 +16,7 @@ class PrivacyPolicyView(TemplateView):
 class RootView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('home')  # Replace 'home' with your actual home URL name
+            return redirect('home') 
         
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
