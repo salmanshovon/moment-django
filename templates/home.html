@@ -975,6 +975,19 @@ function formatTimebb(date) {
         document.getElementById('tasksOver').textContent = tasksOver;
         document.getElementById('tasksUpcoming').textContent = tasksUpcoming;
     }
+
+    document.getElementById('fab').addEventListener('click', function() {
+        const fab = this;
+        const plus = fab.querySelector('.plus');
+        const options = document.querySelector('.options');
+
+        // Toggle spin class on the button
+        fab.classList.toggle('spin');
+
+        // Toggle the visibility of the options
+        options.classList.toggle('show-options');
+    });
+
 })();
     </script>
 </body>
