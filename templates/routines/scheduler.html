@@ -2507,6 +2507,7 @@ $(document).ready(function () {
         // Remove from schedule and add to appropriate list
         element.remove();
         destination.appendChild(element);
+        delete element.dataset.inSch;
         updateTimeSlots();
     }
 
@@ -2556,6 +2557,7 @@ $(document).ready(function () {
             // For non-misc tasks, just move to schedule
             element.remove();
             scheduleList.appendChild(element);
+            element.dataset.inSch = 'true';
         }
         
         updateTimeSlots();
