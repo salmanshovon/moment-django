@@ -494,7 +494,7 @@
 body.dark-theme #templateName {
     background-color: #585858;
     border-color: #4a5568;
-    color: #b9b9b9;
+    color: #d4d4d4;
 }
 
 body.dark-theme #templateName::placeholder {
@@ -830,6 +830,7 @@ $(document).ready(function () {
     // URL to fetch tasks (Django URL name: get_sch_tasks)
     const task_url = "{% url 'get_sch_tasks' %}";
     const routine_url = "{% url 'routine_view' %}";
+    const rtn_template_url = "{% url 'rtn_template_list' %}";
     let unsavedChanges = false;
     let day = true;
 
@@ -838,6 +839,7 @@ $(document).ready(function () {
     let allTasks = [];
     let allTskRtn = [];
     let allMscRtn = [];
+    let daySelected = true;
     let allMisc = [
         {
             id: 1,
@@ -892,9 +894,9 @@ $(document).ready(function () {
 
         if (dateSelector.value === "tomorrow") {
             selectedDate.setDate(selectedDate.getDate() + 1);
-            day = false;
+            daySelected = false;
         } else {
-            day = true;
+            daySelected = true;
         }
 
         // Set the selectedDayStartTime to the beginning of the selected day
@@ -902,8 +904,8 @@ $(document).ready(function () {
         selectedDayStartTime.setHours(0, 0, 0, 0);
 
         // Fetch routine first, then fetch tasks
-        fetchRoutine(day, function () {
-            fetchTasks(day);
+        fetchRoutine(daySelected, function () {
+            fetchTasks(daySelected);
             unsavedChanges = false;
         });
 
@@ -1250,7 +1252,7 @@ $(document).ready(function () {
             if (taskSrc === 'rtn') {
                 task = allTskRtn.find(t => t.id === taskId);
                 flag = true;
-            } else if (taskSrc === 'tsk') {
+            } else if (taskSrc === 'tsk') {                
                 task = allTasks.find(t => t.id === taskId);
                 flag = true;
             } else {
@@ -2632,98 +2634,124 @@ function createGapTask(titleText) {
     });
 
     document.getElementById('moreButton').addEventListener('click', function () {
-        const overlay = document.getElementById('overlay');
-        const taskDetailContainer = document.getElementById('taskDetail');
+    const overlay = document.getElementById('overlay');
+    const taskDetailContainer = document.getElementById('taskDetail');
 
-        // Clear existing content
-        taskDetailContainer.innerHTML = '';
+    // Clear existing content
+    taskDetailContainer.innerHTML = '';
 
-        // Create Template Button (centered horizontally)
-        const createTemplateButton = document.createElement('button');
-        createTemplateButton.className = 'btn btn-primary d-block mx-auto mb-4';
-        createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
-        createTemplateButton.addEventListener('click', function () {
-            renderTemplateCreator(); // Call the new function to show the template creator
-        });
+    // Create Template Button (centered horizontally)
+    const createTemplateButton = document.createElement('button');
+    createTemplateButton.className = 'btn btn-primary d-block mx-auto mb-4';
+    createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
+    createTemplateButton.addEventListener('click', function () {
+        renderTemplateCreator(); // Call the new function to show the template creator
+    });
 
-        // Scrollable List Container for Templates
-        const listContainer = document.createElement('div');
-        listContainer.className = 'border rounded p-3 mb-4';
-        listContainer.style.maxHeight = '200px';
-        listContainer.style.overflowY = 'auto';
+    // Scrollable List Container for Templates
+    const listContainer = document.createElement('div');
+    listContainer.className = 'border rounded p-3 mb-4';
+    listContainer.style.maxHeight = '200px';
+    listContainer.style.overflowY = 'auto';
 
-        // Dummy Template Items
-        const dummyTemplates = [
-            { id: 1, name: 'Morning Routine', tasks: 5 },
-            { id: 2, name: 'Work Block', tasks: 3 },
-            { id: 3, name: 'Evening Wind-Down', tasks: 4 },
-            { id: 4, name: 'Workout Plan', tasks: 6 },
-            { id: 5, name: 'Weekend Prep', tasks: 2 }
-        ];
+    // Loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'text-center my-3';
+    loadingIndicator.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+    listContainer.appendChild(loadingIndicator);
 
-        const ul = document.createElement('ul');
-        ul.className = 'list-group';
+    // Append elements that don't depend on the templates
+    taskDetailContainer.appendChild(createTemplateButton);
+    taskDetailContainer.appendChild(listContainer);
 
-        let selectedTemplateId = null;
+    // Show overlay and task detail immediately
+    overlay.style.display = 'block';
+    taskDetailContainer.style.display = 'block';
 
-        dummyTemplates.forEach(template => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item d-flex justify-content-between align-items-center';
-            const checkboxId = `template-${template.id}`;
-            li.innerHTML = `
-                <div>
-                    <input type="radio" class="form-check-input me-2" id="${checkboxId}" name="selectedTemplate">
-                    <label class="form-check-label" for="${checkboxId}">${template.name}</label>
-                </div>
-                <span class="badge bg-secondary rounded-pill">${template.tasks} tasks</span>
-            `;
-            ul.appendChild(li);
+    let selectedTemplateId = null;
+    let templates = []; // Store templates for later use
 
-            const radio = li.querySelector('input[type="radio"]');
-            radio.addEventListener('change', function () {
-                selectedTemplateId = this.checked ? template.id : null;
+    // Fetch templates from API
+    fetchRoutineTemplates()
+        .then(fetchedTemplates => {
+            templates = fetchedTemplates;
+            
+            // Remove loading indicator
+            listContainer.innerHTML = '';
+            
+            const ul = document.createElement('ul');
+            ul.className = 'list-group';
+
+            if (templates.length === 0) {
+                const noTemplates = document.createElement('div');
+                noTemplates.className = 'text-center text-muted py-3';
+                noTemplates.textContent = 'No templates available';
+                listContainer.appendChild(noTemplates);
+            } else {
+                templates.forEach(template => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    const checkboxId = `template-${template.id}`;
+                    li.innerHTML = `
+                        <div>
+                            <input type="radio" class="form-check-input me-2" id="${checkboxId}" name="selectedTemplate">
+                            <label class="form-check-label" for="${checkboxId}">${template.name}</label>
+                        </div>
+                        <span class="badge bg-secondary rounded-pill">${template.tasks} tasks</span>
+                    `;
+                    ul.appendChild(li);
+
+                    const radio = li.querySelector('input[type="radio"]');
+                    radio.addEventListener('change', function () {
+                        selectedTemplateId = this.checked ? template.id : null;
+                    });
+                });
+
+                listContainer.appendChild(ul);
+            }
+
+            // Buttons Container (Import Selected and Cancel)
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'd-flex justify-content-end';
+
+            const importButton = document.createElement('button');
+            importButton.className = 'btn btn-success me-2';
+            importButton.innerHTML = `<i class="bi bi-box-arrow-in-down" id="importBtn"></i> Import Selected`;
+            importButton.addEventListener('click', function () {
+                if (selectedTemplateId) {
+                    // Fetch routine first, then fetch tasks
+                    fetchRoutineTemplateDetails(daySelected, function () {
+                        fetchTasks(daySelected);
+                        unsavedChanges = false;
+                    }, selectedTemplateId);
+                    overlay.style.display = 'none';
+                    taskDetailContainer.style.display = 'none';
+                    // Here you would typically do something with the selected template
+                } else {
+                    alert('Please select a template to import.');
+                }
             });
-        });
 
-        listContainer.appendChild(ul);
-
-        // Buttons Container (Import Selected and Cancel)
-        const buttonsContainer = document.createElement('div');
-        buttonsContainer.className = 'd-flex justify-content-end';
-
-        const importButton = document.createElement('button');
-        importButton.className = 'btn btn-success me-2';
-        importButton.innerHTML = `<i class="bi bi-box-arrow-in-down"></i> Import Selected`;
-        importButton.addEventListener('click', function () {
-            if (selectedTemplateId) {
-                const selectedTemplate = dummyTemplates.find(t => t.id === selectedTemplateId);
-                console.log('Importing template:', selectedTemplate);
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'btn btn-outline-secondary';
+            cancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+            cancelButton.addEventListener('click', function () {
                 overlay.style.display = 'none';
                 taskDetailContainer.style.display = 'none';
-            } else {
-                alert('Please select a template to import.');
-            }
+            });
+
+            buttonsContainer.appendChild(importButton);
+            buttonsContainer.appendChild(cancelButton);
+
+            taskDetailContainer.appendChild(buttonsContainer);
+        })
+        .catch(error => {
+            // If there's an error, show error message but keep the UI functional
+            listContainer.innerHTML = '<div class="alert alert-danger">Failed to load templates. Please try again.</div>';
+            
+            // You could optionally show the dummy templates here as a fallback
+            // renderDummyTemplates();
         });
-
-        const cancelButton = document.createElement('button');
-        cancelButton.className = 'btn btn-outline-secondary';
-        cancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
-        cancelButton.addEventListener('click', function () {
-            overlay.style.display = 'none';
-            taskDetailContainer.style.display = 'none';
-        });
-
-        buttonsContainer.appendChild(importButton);
-        buttonsContainer.appendChild(cancelButton);
-
-        // Append all elements to taskDetailContainer
-        taskDetailContainer.appendChild(createTemplateButton);
-        taskDetailContainer.appendChild(listContainer);
-        taskDetailContainer.appendChild(buttonsContainer);
-
-        // Show overlay and task detail
-        overlay.style.display = 'block';
-        taskDetailContainer.style.display = 'block';
 
         function renderTemplateCreator() {
             // Clear existing content
@@ -2740,7 +2768,7 @@ function createGapTask(titleText) {
             nameContainer.className = 'mb-4';
             nameContainer.innerHTML = `
                 <label for="templateName" class="form-label fw-bold">Template Name:</label>
-                <input type="text" class="form-control" id="templateName" placeholder="Enter template name">
+                <input type="text" class="form-control" id="templateName" placeholder="Enter template name" autocomplete="off">
             `;
 
             // Scrollable Task List Container
@@ -2754,8 +2782,8 @@ function createGapTask(titleText) {
 
 
             const scheduleList = document.getElementById("schedule-list");
-            const allTasks = Array.from(scheduleList.querySelectorAll(".task-item"));
-            const dummyTasks = getRepetitiveTasks(allTasks);
+            const allTaskItems = Array.from(scheduleList.querySelectorAll(".task-item"));
+            const dummyTasks = getRepetitiveTasks(allTaskItems);
 
             dummyTasks.forEach(taskItem => {
                 const taskId = taskItem.dataset.id;
@@ -2933,6 +2961,119 @@ function createGapTask(titleText) {
 
         return `${formattedHours}:${formattedMinutes} ${ampm}`;
     };
+
+    async function fetchRoutineTemplates() {
+        try {
+            const response = await fetch(rtn_template_url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            
+            return data.map(template => ({
+                id: template.id,
+                name: template.template_name,
+                tasks: template.taskCount
+            }));
+        } catch (error) {
+            console.error('Error fetching routine templates:', error);
+            throw error;
+            // Optionally return dummy templates as fallback:
+            // return dummyTemplates;
+        }
+    }
+
+    // Fetch routine template using AJAX
+    function fetchRoutineTemplateDetails(paramValue, callback, templateId) {
+        $.ajax({
+            url: `/api/get-routine-template/${templateId}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Clear existing items in the schedule list
+                $("#schedule-list").empty();
+                $("#time-slots").empty();
+                allTskRtn = [];
+                console.log(data)
+
+                // Check if the response contains templates with tasks
+                if (data !== 3 && data.tasks && data.tasks.length > 0) {
+                    // Assuming we're working with the first template's tasks
+                    // Adjust this if your data structure is different
+                    const templateTasks = data.tasks;
+                    
+                    if (templateTasks.length > 0) {
+                        // Loop through the tasks and populate the schedule list
+                        templateTasks.forEach(function (task) {
+                            // Adjust the date based on paramValue
+                            if (task.start_time) {
+                                const originalTime = new Date(task.start_time);
+                                const adjustedDate = new Date();
+                                
+                                // Reset to today or tomorrow at midnight (we'll add the time next)
+                                if (!paramValue) {
+                                    // Tomorrow - add 1 day
+                                    adjustedDate.setDate(adjustedDate.getDate() + 1);
+                                }
+                                
+                                // Get just the time components from original
+                                const originalHours = originalTime.getHours();
+                                const originalMinutes = originalTime.getMinutes();
+                                const originalSeconds = originalTime.getSeconds();
+                                
+                                // Apply original time to new date
+                                adjustedDate.setHours(originalHours);
+                                adjustedDate.setMinutes(originalMinutes);
+                                adjustedDate.setSeconds(originalSeconds);
+                                adjustedDate.setMilliseconds(0);
+                                
+                                // Update the task's start_time
+                                task.start_time = adjustedDate.toISOString();
+                            }
+                            
+                            // Create and add the task item
+                            const taskItem = createTaskListItem(task, "rtn");
+                            taskItem.attr('data-in-sch', 'true');
+                            $("#schedule-list").append(taskItem);
+                            
+                            // Add to allTskRtn array
+                            allTskRtn.push(task);
+                            
+                            // Attach click event listener
+                            taskItem.on('click', function(e) {
+                                const isMobile = window.innerWidth <= 768;
+                                
+                                if (!isMobile) {
+                                    showTaskDetail(task.id, "rtn", taskItem[0]);
+                                    return;
+                                }
+                                
+                                e.preventDefault();
+                                e.stopPropagation();
+                                showMobileActionButtons(task.id, "rtn", this, true);
+                            });
+                        });
+                        
+                        // Generate time slots
+                        updateTimeSlots();
+                    } else {
+                        showMessage('No tasks in this template!', 'info');
+                    }
+                } else {
+                    showMessage('No template found!', 'info');
+                }
+
+                // Invoke callback if provided
+                if (callback) {
+                    callback();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching routine template:", error);
+                showMessage('Failed to load template', 'error');
+            }
+        });
+    }
 
 
 });

@@ -254,7 +254,7 @@
                     <div style="text-align: center;">
                         <h1 class="fs-5">Edit Task</h1>
                     </div>
-                    <form id="taskForm" method="post" action="{% url 'edit_task' task.id %}">
+                    <form id="taskForm" method="post" action="{% url 'edit_task' task.id %}" autocomplete="off">
                         {% csrf_token %}
                         <!-- Task Type Selection -->
                         <div class="form-group">

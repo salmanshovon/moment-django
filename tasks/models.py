@@ -176,6 +176,19 @@ class Task(models.Model):
                 if 0 <= days_until_due <= task.notification_days and not task.in_routine:
                     filtered_tasks.append(task)
         return filtered_tasks
+    
+    @staticmethod
+    def get_repetitive_task_due_date_map(user: User) -> dict:
+        """
+        Returns a dictionary mapping task IDs to their due_dates for all active,
+        repetitive tasks belonging to the user.
+        """
+        repetitive_tasks = Task.objects.filter(
+            user=user,
+            is_repetitive=True,
+            is_active=True
+        )
+        return {task.id: task.due_date for task in repetitive_tasks}
 
 
 class ArchivedTask(models.Model):

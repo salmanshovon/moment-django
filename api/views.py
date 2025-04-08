@@ -11,6 +11,7 @@ from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from itertools import chain
+from rest_framework.exceptions import NotFound
 import pytz
 
 
@@ -289,6 +290,48 @@ class RoutineTemplateListView(generics.ListAPIView):
     def get_queryset(self):
         # Return only templates belonging to the authenticated user
         return RoutineTemplate.objects.filter(user=self.request.user)
+    
+
+class RoutineTemplateDetailView(generics.RetrieveAPIView):
+    queryset = RoutineTemplate.objects.all()
+    serializer_class = RoutineTemplateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """Restrict queryset to templates owned by the requesting user."""
+        return self.queryset.filter(user=self.request.user)
+
+    def get_object(self):
+        """Override to raise NotFound if the object doesn't belong to the user."""
+        try:
+            obj = self.get_queryset().get(id=self.kwargs['pk'])
+        except RoutineTemplate.DoesNotExist:
+            raise NotFound("RoutineTemplate not found.")
+        return obj
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        
+        # Get mapping of task IDs to their due dates
+        task_due_date_map = Task.get_repetitive_task_due_date_map(request.user)
+        
+        # Update each task's due_date if it exists in the map
+        updated_tasks = []
+        for task in data['tasks']:
+            task_id = task.get('id')
+            if task_id in task_due_date_map:
+                # Only update the due_date, keep all other fields the same
+                updated_task = {**task}  # Create a copy
+                updated_task['due_date'] = task_due_date_map[task_id].strftime('%Y-%m-%d')
+                updated_tasks.append(updated_task)
+            else:
+                # Keep task as-is if not found in repetitive tasks
+                updated_tasks.append(task)
+        
+        data['tasks'] = updated_tasks
+        return Response(data)
 
 #For irrigation (Temporary)
 from .serializers import IrrigateBasicSerializer
