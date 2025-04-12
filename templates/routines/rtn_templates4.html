@@ -1,0 +1,3049 @@
+<style>
+
+    /* Firefox Scrollbar Styling */
+    #repetitive-tasks,
+    #one-time-tasks,
+    .scroll-container {
+        scrollbar-width: thin; /* "auto" or "thin" */
+        scrollbar-color: #888 #f1f1f1; /* thumb and track color */
+    }
+
+    /* General Scrollbar Styling (WebKit) */
+    #repetitive-tasks::-webkit-scrollbar,
+    #one-time-tasks::-webkit-scrollbar,
+    .scroll-container::-webkit-scrollbar {
+        width: 8px; /* Adjust width as needed */
+    }
+
+    #repetitive-tasks::-webkit-scrollbar-track,
+    #one-time-tasks::-webkit-scrollbar-track,
+    .scroll-container::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light background for the track */
+        border-radius: 4px;
+    }
+
+    #repetitive-tasks::-webkit-scrollbar-thumb,
+    #one-time-tasks::-webkit-scrollbar-thumb,
+    .scroll-container::-webkit-scrollbar-thumb {
+        background: #888; /* Medium gray for the thumb */
+        border-radius: 4px;
+    }
+
+    #repetitive-tasks::-webkit-scrollbar-thumb:hover,
+    #one-time-tasks::-webkit-scrollbar-thumb:hover,
+    .scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Darker gray on hover */
+    }
+
+    .task-category-title {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px; /* Capsule shape */
+        color: white; /* Text color */
+        margin-bottom: 8px; /* Add some spacing */
+        align-self: flex-start;
+    }
+
+    .task-category-title.one-time {
+        background-color: rgb(55, 92, 172); /* One-time color */
+    }
+
+    .task-category-title.repetitive {
+        background-color: rgb(114, 31, 80); /* Repetitive color */
+    }
+
+    .task-category-title.misc {
+        background-color: black; /* Misc color */
+    }
+    .task-category{
+        margin-bottom: 10px;
+    }
+
+    .task-detail {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        font-size: 0.975rem;
+        width: 80vw;
+        /* Set width to 80% of the viewport width */
+        max-width: 500px;
+        /* Optional: set a maximum width */
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+
+    .task-list {
+        list-style: none;
+        padding: 0;
+        min-height: 250px;
+        /* border: 2px dashed #ccc; */
+        background-color: #88a9ca;
+        border: solid 2px #ccc;
+        border-radius: 8px;
+    }
+
+    #repetitive-tasks, #one-time-tasks {
+        overflow-y: auto;
+        flex: 1;
+        max-height: 70dvh;
+    }
+
+    .schedule-header {
+        font-size: 1.2rem; /* Adjust to match h5 size */
+        line-height: 1; /* Match h5's line height */
+    }
+
+    #misc-tasks {
+        min-height: 80px; /* Or any smaller height you prefer */
+        display: flex; /* Enable flexbox for the list */
+        flex-direction: row; /* Arrange items in a row */
+        justify-content: space-around; /* optional: align items to the start of the row*/
+        align-items: center; /* optional: align items vertically centered*/
+        list-style: none; /* Remove default list styling */
+    }
+
+
+
+    #misc-tasks .task-item:last-child {
+        margin-right: 0px; /* remove margin from last item*/
+    }
+
+    .task-item {
+        padding: 0.5rem;
+        margin-bottom: 5px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.7rem;
+        background-color: var(--task-bg-color);
+        margin-left: 3px;
+        margin-right: 3px;
+        margin-top: 3px;
+    }
+
+    .task-item .task-title {
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        /* Align icon and text vertically */
+        gap: 8px;
+        /* Space between icon and text */
+        font-size: 18px;
+        /* Adjust font size */
+        font-weight: 600;
+        /* Darker text for better readability */
+        margin-bottom: 8px;
+        /* Add space below the title */
+    }
+
+    .task-item .details {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        color:  #e0e0e0;
+        position: relative;
+    }
+
+    .task-item .details .separator {
+        width: 1px;
+        height: 0.9rem;
+        background-color: #e0e0e0;
+        bottom: 10px;
+    }
+
+    .task-item.one-time {
+        background-color: rgb(55, 92, 172);
+    }
+
+    .task-item.repetitive {
+        background-color: rgb(114, 31, 80);
+    }
+
+    .task-item.misc {
+        background-color: #1f1f1f;
+        white-space: nowrap; /* Prevent text wrapping */
+        min-height: 60px; /* Set a minimum height */
+        padding: 10px; /* Add padding for better spacing */
+        box-sizing: border-box; /* Include padding in width/height calculations */
+        display: flex; /* Use flexbox for alignment */
+        flex-direction: column; /* Stack children vertically */
+        justify-content: center; /* Center content vertically */
+        align-items: flex-start; /* Align content to the left */
+    }
+
+    .task-item.misc .task-title {
+        width: 100%; /* Occupy full width */
+        margin-bottom: 0px; /* Add space between title and details */
+    }
+
+    .task-item.misc .details {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: flex-start; /* Align details to the left */
+        width: 100%; /* Occupy full width */
+    }
+
+    .task-item.misc.x {
+        width: 100; /* Occupy full width of the container */
+    }
+
+    .task-item.misc.y {
+        width: 100%; /* Occupy full width of the container */
+        min-width: 0;
+    }
+
+    .badges-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* Space between badges */
+        margin-bottom: 0; /* Remove bottom margin */
+        justify-content: flex-end; /* Align badges to the bottom */
+        margin-left: auto;
+        overflow: visible; /* Allow badges to grow upwards */
+        position: absolute; /* Position relative to .details */
+        bottom: 0; /* Align to the bottom of .details */
+        right: 0; /* Align to the right of .details */
+    }
+
+    .badgex {
+        font-size: 0.625rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-left: auto;
+        margin-top: auto;
+    }
+
+    .category-badge {
+        color: #3d3d3d; /* Dark teal for text */
+        font-size: 0.625rem;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-weight: 500;
+        margin-left: auto;
+        margin-top: auto;
+    }
+
+    .badgex.Low {
+        background-color: #228B22; /* Darker Green */
+        color: #ffffff;
+    }
+
+    .badgex.Medium {
+        background-color: #FFD700; /* Darker Yellow/Gold */
+        color: #000000; /* Black text for better contrast */
+    }
+
+    .badgex.High {
+        background-color: #FF8C00; /* Darker Orange/Dark Goldenrod */
+        color: #ffffff;
+    }
+
+    .badgex.Critical {
+        background-color: #DC143C; /* Darker Red/Crimson */
+        color: #ffffff;
+    }
+
+    .badgex.Urgent {
+        background-color: #8B0000; /* Very Dark Red/Dark Red */
+        color: #ffffff;
+    }
+
+    .tasks {
+        height: 500px;
+        /* overflow-y: auto; */
+        min-width: 300px;
+        overflow-x: hidden;
+        /* height: calc(100vh - 40px); */
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .tasks > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .container-x {
+        height: calc(100dvh - 100px);
+        min-width: 900px;
+        /* overflow-x: auto; */
+    }
+
+    .schedule .dropzone{
+        background-color: #e8f0fe;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        min-height: 100%;
+    }
+
+    .tasks, .schedule {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .schedule {
+        /* height: calc(100vh - 40px);  */
+        width: 100%;
+        height: 100;
+
+    }
+
+    .dropdwon-date {
+        min-width: 120px; /* Ensures the dropdown has a fixed minimum width */
+    }
+
+    #selectedDateDisplay {
+        white-space: nowrap; /* Prevents text from wrapping */
+        overflow: hidden; /* Ensures it doesn’t break layout */
+        text-overflow: ellipsis; /* Adds '...' if text is too long */
+        max-width: 200px; /* Adjust as needed */
+        display: inline-block;
+    }
+
+    /* Time slots */
+    .time-slots {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .time-slot {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 2px solid #bbbbbb;
+        font-size: 0.8rem;
+        margin-top: 2px;
+        margin-bottom: 5px;
+    }
+    /* Container for time-column and schedule-list */
+    .scroll-container {
+        display: flex;
+        flex-grow: 1;
+        overflow-y: auto; /* Enable scrolling for the container */
+        height: calc(100vh - 260px); /* Adjust based on your layout */
+    }
+
+    /* Remove overflow-y from individual elements */
+    .time-column, #schedule-list {
+        overflow-y: visible; /* Disable individual scrolling */
+    }
+
+    .time-column {
+        width: 80px;
+        margin-top: 3px;
+    }
+
+    #schedule-list {
+        flex-grow: 1;
+    }
+
+    /* Dark Theme Styles */
+
+    body.dark-theme .col-md-5 {
+        background-color: black;
+    }
+
+  /* Dark Theme for Buttons */
+    body.dark-theme .btn-primary {
+        background-color: #0056b3; /* Keep primary button color */
+        color: #ffffff; /* Light text */
+    }
+
+    body.dark-theme .btn-primary:hover {
+        background-color: #004085; /* Darker hover color */
+    }
+
+    body.dark-theme .btn-outline-secondary {
+        border-color: #6c757d; /* Keep border color */
+        color: #e0e0e0; /* Keep text color */
+    }
+
+    body.dark-theme .btn-outline-secondary:hover {
+        background-color: #6c757d; /* Keep hover background color */
+        color: #ffffff; /* Light text */
+    }
+
+    body.dark-theme .tasks, body.dark-theme .schedule {
+        background:rgba(73, 73, 73, 0.5);
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+    }
+
+    body.dark-theme .schedule .dropzone {
+        background-color: #7c7c7c;
+    }
+
+    body.dark-theme .task-list {
+        background-color: #384755;
+    }
+
+    /* Dark theme styling for dropdown date input */
+    body.dark-theme .dropdwon-date {
+        background-color: #333; /* Dark input background */
+        color: #fff; /* Light text */
+        border: 1px solid #555; /* Subtle border */
+        border-radius: 5px;
+    }
+
+    /* Adjust placeholder text for better visibility */
+    body.dark-theme .dropdwon-date::placeholder {
+        color: #aaa; /* Light gray placeholder text */
+    }
+
+    /* Highlight on focus */
+    body.dark-theme .dropdwon-date:focus {
+        border-color: #888; /* Slightly lighter border on focus */
+        outline: none;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark Theme for Task Details */
+    body.dark-theme .task-detail {
+        background-color: #333;
+        /* Dark background */
+        color: #e0e0e0;
+        /* Light text */
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Dark Theme for Overlay */
+    body.dark-theme .overlay {
+        background: rgba(0, 0, 0, 0.7);
+        /* Darker overlay */
+    }
+
+    /* Dark theme styling for duration input container */
+    body.dark-theme .duration-hour,
+    body.dark-theme .duration-minute {
+        background-color: #5a5a5a; /* Dark input background */
+        color: #fff; /* Light text */
+        border: 1px solid #707070; /* Subtle border */
+        padding: 5px;
+        text-align: center;
+        border-radius: 5px;
+    }
+
+    /* Adjust input placeholders for better visibility */
+    body.dark-theme .duration-hour::placeholder,
+    body.dark-theme .duration-minute::placeholder {
+        color: #aaa; /* Lighter placeholder text */
+    }
+
+    /* Style the container text */
+    body.dark-theme .bi-clock {
+        color: #bbb; /* Light gray icon */
+    }
+
+    body.dark-theme .duration-hour:focus,
+    body.dark-theme .duration-minute:focus {
+        border-color: #888; /* Highlight on focus */
+        outline: none;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark Theme Scrollbar Styling */
+    body.dark-theme #repetitive-tasks,
+    body.dark-theme #one-time-tasks,
+    body.dark-theme .scroll-container {
+        scrollbar-color: #555 #2d2d2d; /* Dark thumb and track */
+    }
+
+    body.dark-theme #repetitive-tasks::-webkit-scrollbar-track,
+    body.dark-theme #one-time-tasks::-webkit-scrollbar-track,
+    body.dark-theme .scroll-container::-webkit-scrollbar-track {
+        background: #2d2d2d; /* Dark background for the track */
+    }
+
+    body.dark-theme #repetitive-tasks::-webkit-scrollbar-thumb,
+    body.dark-theme #one-time-tasks::-webkit-scrollbar-thumb,
+    body.dark-theme .scroll-container::-webkit-scrollbar-thumb {
+        background: #555; /* Medium dark gray for the thumb */
+    }
+
+    body.dark-theme #repetitive-tasks::-webkit-scrollbar-thumb:hover,
+    body.dark-theme #one-time-tasks::-webkit-scrollbar-thumb:hover,
+    body.dark-theme .scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #777; /* Lighter gray on hover for better visibility */
+    }
+
+    .panel-toggle-ribbon {
+        display: none;
+    }
+
+body.dark-theme #templateName {
+    background-color: #585858;
+    border-color: #4a5568;
+    color: #d4d4d4;
+}
+
+body.dark-theme #templateName::placeholder {
+    color: #d4d4d4;
+}
+
+body.dark-theme .taskListContainer {
+    background-color: #7c7c7c;
+    border-color: #4a5568 !important;
+}
+
+body.dark-theme .list-group-item {
+    background-color: #585858;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+body.dark-theme .list-group-item .text-muted {
+    color: #cccccc !important;
+}
+
+
+body.dark-theme .form-control:focus {
+    background-color: #b3b3b3;
+    color: #e2e8f0;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 0.25rem rgba(66, 153, 225, 0.25);
+}
+
+/* Mobile styles (applies to screens smaller than 768px) */
+@media (max-width: 767.98px) {
+  /* Override container padding for mobile */
+  .container-x {
+    padding: 0 !important;
+    overflow-x: hidden;
+    min-width: 300px !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Make left section full width and override any min-width */
+  .col-md-7 {
+    width: 100% !important;
+    min-width: 200px !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .scroll-container{
+    height: calc(100dvh - 250px);
+  }
+  
+  /* Right section styling - initially hidden */
+  .col-md-5 {
+    position: fixed !important;
+    right: -100%;
+    top: 0;
+    height: 100vh !important;
+    width: 80% !important; /* Adjust width of slide-out panel */
+    background: white;
+    z-index: 998;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    padding: 1rem;
+    top: 61px !important;
+    height: calc(100dvh - 66px) !important;
+  }
+  
+  /* Ribbon to toggle right panel */
+  .panel-toggle-ribbon {
+    display: block;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #6c757d;
+    color: white;
+    padding: 10px 5px;
+    border-radius: 5px 0 0 5px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  
+  /* When panel is active */
+  .panel-active .col-md-5 {
+    right: 0 !important;
+  }
+  
+  /* Adjust schedule section height */
+  .schedule {
+    height: calc(100dvh - 100px) !important; /* Adjust based on your header height */
+  }
+  
+  /* Remove any horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  .schedule-header {
+    display: none;
+  }
+
+  .time-column {
+    width: 62px; 
+  }
+
+  #misc-tasks {
+    flex-direction: column;
+  }
+
+}
+    
+@media (max-width: 768px) {
+    .task-item .details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .task-item .details .separator {
+      display: none;
+    }
+  }
+
+  /* Add to your CSS */
+.selected-for-actions {
+    box-shadow: 0 0 8px rgba(0, 255, 21, 0.925);
+    position: relative; /* Ensures glow appears above overlay */
+}
+
+/* Mobile Action Buttons Overlay */
+.mobile-actions-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+.mobile-actions-container {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    transition: all 0.3s ease-out;
+}
+
+.mobile-actions-container.spread {
+    width: 150px;
+    height: 150px;
+}
+
+.mobile-action-btn {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: none;
+    font-size: 18px;
+    transition: all 0.3s ease-out;
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.mobile-action-btn.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.mobile-action-btn.up {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+}
+
+.mobile-action-btn.up.visible {
+    transform: translateX(-50%) scale(1);
+}
+
+.mobile-action-btn.down {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+}
+
+.mobile-action-btn.down.visible {
+    transform: translateX(-50%) scale(1);
+}
+
+.mobile-action-btn.left {
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scale(0.5);
+}
+
+.mobile-action-btn.left.visible {
+    transform: translateY(-50%) scale(1);
+}
+
+.mobile-action-btn.right {
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) scale(0.5);
+}
+
+.mobile-action-btn.right.visible {
+    transform: translateY(-50%) scale(1);
+}
+
+.mobile-action-btn.center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: #007bff;
+    color: white;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+</style>
+
+</head>
+<body>
+<div class="container-x p-1">
+    <div class="row h-100 g-2">
+        <!-- Schedule Section (Left) -->
+        <div class="col-12 col-md-7 d-flex">
+            <div class="schedule h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="schedule-header mb-0">Template Editor</div>
+                </div>
+                <div class="d-flex flex-grow-1 border-top">
+                    <div class="scroll-container">
+                        <div class="time-column">
+                            <div id="time-slots"></div>
+                        </div>
+                        <ul id="schedule-list" class="task-list dropzone flex-grow-1" data-type="schedule"></ul>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" id="saveButton" type="submit">
+                        <i class="bi bi-save me-2"></i>Save
+                    </button>
+                    <button class="btn btn-outline-secondary me-2" id="cancelButton">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                    <div class="ms-auto">
+                        <button class="btn btn-secondary" id="moreButton">
+                            <i class="bi bi-three-dots me-2"></i>More
+                        </button>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+        
+        
+
+        <!-- Tasks Section (Right) -->
+        <div class="col-12 col-md-5 h-100">
+            <div class="tasks h-100">
+                <div class="task-category">
+                    <p class="task-category-title repetitive"><i class="bi bi-arrow-repeat"></i> Repetitive Tasks</p>
+                    <ul id="repetitive-tasks" class="task-list" data-type="repetitive">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Detail Overlay -->
+<div class="overlay" id="overlay" style="display: none;"></div>
+<div class="task-detail" id="taskDetail" style="display: none;"></div>
+<div class="passBoard" id="passBoard" style="display: none;"></div>
+
+
+<script>
+    // ----------------------------adding new scripts above------------------
+    $(document).ready(function () {
+        // URL to fetch tasks (Django URL name: get_sch_tasks)
+        const task_url = "{% url 'get_sch_tasks' %}";
+        const routine_url = "{% url 'routine_view' %}";
+        const rtn_template_url = "{% url 'rtn_template_list' %}";
+        let unsavedChanges = false;
+        let day = true;
+    
+        // Global array to store all tasks
+        let selectedDayStartTime = new Date(); // Initialize with today's date
+        let allTasks = [];
+        let allTskRtn = [];
+        let allMscRtn = [];
+        let daySelected = true;
+        let allMisc = [
+            {
+                id: 1,
+                title: "Break",
+                duration: 30 // Duration in minutes
+            },
+            {
+                id: 2,
+                title: "Relax",
+                duration: 20 // Duration in minutes
+            },
+            {
+                id: 3,
+                title: "Sleep",
+                duration: 180 // Duration in minutes
+            }
+        ];
+    
+        let routine_date;
+    
+    
+        function formatDate1(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+    
+        // Function to format date
+        function formatDate(dateString) {
+        const date = new Date(dateString);
+        
+        // Define short month names
+        const shortMonth = date.toLocaleString('en-US', { month: 'short' });
+    
+        // Extract day and year
+        const day = date.getDate();
+        const year = date.getFullYear();
+    
+        return `${day}-${shortMonth}-${year}`;
+        }
+    
+        // Function to create a separator
+        function createSeparator() {
+          const separator = document.createElement('div');
+          separator.className = 'separator';
+          return separator;
+        }
+    
+        function updateDateDisplay() {
+            const dateSelector = document.getElementById('dateSelector');
+            const dateDisplay = document.getElementById('selectedDateDisplay');
+            let selectedDate = new Date();
+    
+            if (dateSelector.value === "tomorrow") {
+                selectedDate.setDate(selectedDate.getDate() + 1);
+                daySelected = false;
+            } else {
+                daySelected = true;
+            }
+    
+            // Set the selectedDayStartTime to the beginning of the selected day
+            selectedDayStartTime = new Date(selectedDate);
+            selectedDayStartTime.setHours(0, 0, 0, 0);
+    
+            // Fetch routine first, then fetch tasks
+            fetchRoutine(daySelected, function () {
+                fetchTasks(daySelected);
+                unsavedChanges = false;
+            });
+    
+            dateDisplay.textContent = formatDate1(selectedDate);
+            makeMiscTasks();
+        }
+    
+        function getDateDifference(value, givenDate) {
+            // Convert the given date to a Date object
+            const date = new Date(givenDate);
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+    
+            // Set time to midnight for accurate day comparison
+            today.setHours(0, 0, 0, 0);
+            tomorrow.setHours(0, 0, 0, 0);
+            date.setHours(0, 0, 0, 0);
+    
+            // Calculate the difference in days
+            const diffTime = date - (value === "today" ? today : tomorrow);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+            if (diffDays === 0) {
+                return `(${value.charAt(0).toUpperCase() + value.slice(1)})`;
+            } else {
+                return `(in ${diffDays} day${diffDays !== 1 ? 's' : ''} from ${value})`;
+            }
+        }
+    
+        // Initial date display
+        updateDateDisplay();
+    
+        // Update date display on dropdown change
+        document.getElementById('dateSelector').addEventListener('change', updateDateDisplay);
+    
+        // Function to get priority label based on priority value
+        function getPriorityLabel(priority) {
+            switch (priority) {
+                case 5:
+                    return "Urgent";
+                case 4:
+                    return "Critical";
+                case 3:
+                    return "High";
+                case 2:
+                    return "Medium";
+                case 1:
+                    return "Low";
+                default:
+                    return "Unknown";
+            }
+        }
+    
+    
+        function createTaskListItem(task, source) {
+            // Create a task item with necessary attributes
+            const taskItem = $("<li></li>")
+                .addClass("task-item")
+                .attr("draggable", "true")
+                .attr("data-id", task.id) // Use task_id from the task
+                .attr("data-item-type", task.is_repetitive ? "repetitive" : "onetime")
+                .attr("data-src", source) // Add the data-src attribute
+                .addClass(task.is_repetitive ? "repetitive" : "one-time");
+    
+            // Task Title with Icon
+            const title = document.createElement('h4');
+            title.className = 'task-title'; // Add a class for styling
+            title.innerHTML = `
+                <span class="title-icon"><i class="bi bi-card-heading"></i></span>
+                <span class="title-text">${task.title}</span>
+            `;
+    
+            // Task Details Container
+            const details = document.createElement('div');
+            details.className = 'details';
+    
+            // Duration with Icon
+            const duration = document.createElement('span');
+            duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+    
+            // Due Date with Icon
+            let dueDate = null;
+            if (task.is_repetitive) {
+                dueDate = document.createElement('span');
+                dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> Due: ${formatDate(task.due_date)} | (${getRepeatFrequencyText(task.frequency_interval)})`; // Icon for repetitive tasks
+            } else {
+                dateValue = document.getElementById('dateSelector');
+                dueDate = document.createElement('span');
+                dueDate.innerHTML = `<i class="bi bi-calendar-event"></i> Due: ${formatDate(task.due_date)} - ${task.due_time ? formatTime(task.due_time) : 'anytime'} | ${getDateDifference(dateValue.value, task.due_date)}`; // Icon for due date
+            }
+    
+            // Append elements to details
+            details.appendChild(duration);
+            details.appendChild(createSeparator());
+            details.appendChild(dueDate);
+    
+            // Badges Container (for category and priority)
+            const badgesContainer = document.createElement('div');
+            badgesContainer.className = 'badges-container';
+    
+            // Category Badge with Icon
+            const categoryBadge = document.createElement('span');
+            categoryBadge.className = `badgex category-badge`;
+            categoryBadge.innerHTML = `<i class="bi bi-tag"></i> ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
+            // Check if task.color exists and apply it as background color
+            if (task.color) {
+                categoryBadge.style.backgroundColor = task.color;
+            }
+    
+            // Priority Badge with Icon
+            const priorityBadge = document.createElement('span');
+            priorityBadge.className = `badgex ${getPriorityLabel(task.priority)}`;
+            priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`; // Icon for priority
+    
+            // Append badges to the badges container
+            badgesContainer.appendChild(categoryBadge);
+            badgesContainer.appendChild(priorityBadge);
+            details.appendChild(badgesContainer);
+    
+            // Append both lines to the task item
+            taskItem.append(title);
+            taskItem.append(details);
+    
+            return taskItem;
+        }
+    
+        // Fetch routine using AJAX
+        function fetchRoutine(paramValue, callback) {
+            $.ajax({
+                url: routine_url,
+                method: "GET",
+                data: { param: paramValue }, // Pass param value dynamically
+                dataType: "json",
+                success: function (data) {
+                    // Clear existing items in the schedule list
+                    $("#schedule-list").empty();
+                    $("#time-slots").empty();
+                    allTskRtn = [];
+                    allMscRtn = [];
+    
+                    // Check if the response contains tasks
+                    if (data !== 3 && data.tasks && data.tasks.length > 0) {
+                        // Loop through the tasks and populate the schedule list
+                        routine_date = data.updated_at;
+                        data.tasks.forEach(function (task) {
+                            let taskItem;
+                            let src;
+                            if (task.is_task) {
+                                allTskRtn.push(task);
+                                src = 'rtn';
+                                taskItem = createTaskListItem(task, "rtn"); // Call the function
+                                // Add data-in-sch attribute for tasks where is_task is true
+                                taskItem.attr('data-in-sch', 'true');
+                            } else {
+                                allMscRtn.push(task);
+                                src = 'msc';
+                                taskItem = createMiscTask(task, task.id, "x");
+                            }
+    
+                            // Append the task item to the schedule list
+                            $("#schedule-list").append(taskItem);
+    
+                            // Attach click event listener to the task item
+                            taskItem.on('click', function(e) {
+                                // Check if device is mobile (touch device)
+                                const isMobile = window.innerWidth <= 768;
+                                
+                                if (!isMobile) {
+                                    // Desktop behavior - always show details
+                                    showTaskDetail(task.id, src, taskItem[0]);
+                                    return;
+                                }
+                                
+                                // Mobile behavior - show action buttons
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                // Determine if item is in schedule list or tasks container
+                                const isInSchedule = this.closest('#schedule-list') !== null;
+                                
+                                showMobileActionButtons(task.id, src, this, isInSchedule);
+                            });
+                        });
+                        // Call updateTimeSlots to generate time slots after adding tasks
+                        updateTimeSlots();
+                    } else {
+                        showMessage('No tasks added!', 'info');
+                    }
+    
+                    // Invoke the callback function after `fetchRoutine` completes
+                    if (callback) {
+                        callback();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching routine:", error);
+                }
+            });
+        }
+    
+        // Fetch tasks using AJAX
+        function fetchTasks(paramValue) {
+            $.ajax({
+                url: task_url,
+                method: "GET",
+                data: { param: paramValue }, // Pass param value dynamically
+                dataType: "json",
+                success: function (data) {
+                    // Clear existing items in the lists
+                    $("#one-time-tasks").empty();
+                    $("#repetitive-tasks").empty();
+    
+                    // Store tasks in the global array
+                    allTasks = [...data];
+    
+                    // Sort tasks by priority (5 at the top, 1 at the bottom)
+                    data.sort((a, b) => b.priority - a.priority);
+    
+                    // Loop through the sorted tasks and populate the lists
+                    data.forEach(function (task) {
+    
+                        // Define the keys to compare
+                        const keysToCompare = ['duration', 'category', 'priority', 'is_repetitive', 'frequency_interval', 'color'];
+    
+                        // Find the task in allTskRtn with the same id
+                        const taskInAllTskRtn = allTskRtn.find(t => t.id === task.id);
+    
+                        // If the task is found in allTskRtn
+                        if (taskInAllTskRtn) {
+                            // Check if all the specified keys have the same values in both task and taskInAllTskRtn
+                            const areValuesSame = keysToCompare.every(key => task[key] === taskInAllTskRtn[key]);
+    
+                            // If all values are the same, return
+                            if (areValuesSame) {
+                                return; // Skip this iteration
+                            }
+                        }
+    
+                        const taskItem = createTaskListItem(task, "tsk");
+    
+                        // Append to the appropriate list based on is_repetitive
+                        if (task.is_repetitive) {
+                            $("#repetitive-tasks").append(taskItem);
+                        } else {
+                            $("#one-time-tasks").append(taskItem);
+                        }
+    
+                        // Attach click event listener to the task item
+                        taskItem.on('click', function(e) {
+                            // Check if device is mobile (touch device)
+                            const isMobile = window.innerWidth <= 768;
+                            
+                            if (!isMobile) {
+                                // Desktop behavior - always show details
+                                showTaskDetail(task.id, 'tsk', taskItem[0]);
+                                return;
+                            }
+                            
+                            // Mobile behavior - show action buttons
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Determine if item is in schedule list or tasks container
+                            const isInSchedule = this.closest('#schedule-list') !== null;
+                            
+                            showMobileActionButtons(task.id, 'tsk', this, isInSchedule);
+                        });
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching tasks:", error);
+                }
+            });
+        }
+    
+        function makeMiscTasks(){
+            $("#misc-tasks").empty();
+            allMisc.forEach(function (task) {
+                const id = task.id;
+                const taskItem = createMiscTask(task, id, "y");
+                $("#misc-tasks").append(taskItem);
+                // Attach click event listener to the task item
+                taskItem.on('click', function(e) {
+                    
+                    // Check if device is mobile (touch device)
+                    const isMobile = window.innerWidth <= 768;
+                    
+                    if (!isMobile) {
+                        // Desktop behavior - always show details
+                        showTaskDetail(task.id, 'msc', this);
+                        return;
+                    }
+                    
+                    // Mobile behavior - show action buttons
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Determine if item is in schedule list or tasks container
+                    const isInSchedule = this.closest('#schedule-list') !== null;
+                    
+                    showMobileActionButtons(task.id, 'msc', this, isInSchedule);
+                });
+            })
+        }
+    
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // 03, 04, etc.
+            const day = String(date.getDate()).padStart(2, '0'); // 01, 02, ..., 31
+            return `${year}-${month}-${day}`; // "2025-03-31" (local date, no timezone)
+        }
+    
+    
+        // POST request to save the schedule
+    
+        document.getElementById('saveButton').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const scheduleListItems = document.querySelectorAll('#schedule-list li');
+            const selectedDate = document.getElementById('dateSelector').value;
+            const today = new Date();
+            let forDate;
+    
+            if (selectedDate === 'today') {
+                forDate = formatLocalDate(today); // "2025-03-31" (even if UTC is 30-3-2025)
+            } else if (selectedDate === 'tomorrow') {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                forDate = formatLocalDate(tomorrow); // "2025-04-01" (local date)
+            } else {
+                console.error('Invalid date selection.');
+                return;
+            }
+    
+            // Prepare tasks data
+            const tasks = Array.from(scheduleListItems).map(item => {
+                const taskId = parseInt(item.getAttribute('data-id'));
+                const taskSrc = item.getAttribute('data-src');
+                let task;
+                let flag;
+    
+                if (taskSrc === 'rtn') {
+                    task = allTskRtn.find(t => t.id === taskId);
+                    flag = true;
+                } else if (taskSrc === 'tsk') {                
+                    task = allTasks.find(t => t.id === taskId);
+                    flag = true;
+                } else {
+                    task = allMscRtn.find(t => t.id === taskId);
+                    flag = false;
+                }
+                if (task && flag) {
+                    return {
+                        start_time: task.start_time,
+                        duration: task.duration,
+                        id: task.id, 
+                        title: task.title,
+                        category: task.category,
+                        priority: task.priority,
+                        is_repetitive: task.is_repetitive,
+                        frequency_interval: task.frequency_interval,
+                        due_date: task.due_date,
+                        due_time: task.due_time,
+                        color: task.color,
+                        is_task: true,
+                        is_fixed: task.is_fixed,
+                    };
+                } else if (task && !flag) {
+                    return {
+                        start_time: task.start_time,
+                        duration: task.duration,
+                        title: task.title,
+                        id: task.id,
+                        is_task: false,
+                    }
+                } else {
+                    console.error(`Task with ID ${taskId} not found!`);
+                    return null;
+                }
+            }).filter(task => task !== null); // Filter out null tasks
+    
+            // Check if there are valid tasks to save
+            if (tasks.length === 0) {
+                showMessage('No tasks to save', 'error');
+                return;
+            }
+    
+            // Send data to the backend
+            const post_url = "{% url 'routine_save' %}";
+            fetch(post_url, { // Replace with your actual API endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    for_date: forDate,
+                    tasks: tasks,
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                showMessage(data.message, 'success');
+                fetchNotifications();
+                fetchRoutine(day);
+                fetchTasks(day);
+            })
+            .catch(error => {
+                console.error('Error saving routine:', error);
+                alert('Failed to save routine. Please try again.'); // Provide user feedback
+            });
+        });
+    
+        // ENDING OF NEW FUNCTIONS
+    
+        // Function to show task detail
+        async function showTaskDetail(taskId, source, item) {
+            try {
+                let taskDetail;
+                let flag;
+    
+                // Determine which array to search based on the source parameter
+                switch (source) {
+                case 'tsk':
+                    taskDetail = allTasks.find(task => task.id === taskId);
+                    flag = true;
+                    break;
+                case 'rtn':
+                    taskDetail = allTskRtn.find(task => task.id === taskId);
+                    flag = true;
+                    break;
+                case 'msc':
+                    if (taskId.toString().length === 1) {
+                        taskDetail = allMisc.find(task => task.id === taskId);
+                    } else {
+                        taskDetail = allMscRtn.find(task => task.id === taskId);
+                    }
+                    flag = false;
+                    break;
+                default:
+                    throw new Error('Invalid source parameter');
+                }
+    
+                // Check if the task was found
+                if (!taskDetail) {
+                throw new Error('Task not found');
+                }
+    
+                // Render the task details
+                renderTaskDetail(taskDetail, flag, source, item);
+            } catch (error) {
+                console.error('Error fetching task details:', error);
+            }
+        }
+    
+        function getCSRFToken() {
+          return document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        }
+    
+        // Function to format time
+        function formatTime(timeString) {
+          const time = new Date(`1970-01-01T${timeString}`);
+          return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+    
+        function formatDuration(minutes) {
+          if (minutes === null || minutes === undefined) {
+            return "N/A"; // Handle cases where duration is not available
+          }
+    
+          const hours = Math.floor(minutes / 60);
+          const remainingMinutes = minutes % 60;
+    
+          const formattedHours = String(hours).padStart(2, '0');
+          const formattedMinutes = String(remainingMinutes).padStart(2, '0');
+          if (formattedHours === `00`) {
+            return `${formattedMinutes} Minutes`;
+          } else {
+            return `${formattedHours}h ${formattedMinutes}m`;
+          }
+    
+        }
+    
+        // Function to delete task
+        async function delTask(taskId) {
+          const csrftoken = getCSRFToken();
+          try {
+            const response = await fetch(`/api/task-delete/${taskId}/`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,  // Add CSRF token header
+                // Add authentication token if required
+                // 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+              },
+            });
+    
+            if (!response.ok) {
+              throw new Error('Failed to delete!');
+            }
+    
+            const res = await response.json();
+            showMessage(res.message, 'success')
+            const wardiv = document.querySelector('.warningdiv')
+            const overlay = document.getElementById('overlay'); 
+            if (wardiv) {
+              wardiv.remove(); // Completely deletes the element
+            }
+            overlay.style.display = 'none';
+            updateDateDisplay();
+    
+          } catch (error) {
+            showMessage(error, 'error')
+          }
+        }
+    
+        function renderTaskDetail(task, flag, src, item) {
+            const overlay = document.getElementById('overlay');
+            const taskDetailContainer = document.getElementById('taskDetail');
+    
+            // Clear existing content
+            taskDetailContainer.innerHTML = '';
+    
+            // Create and append elements
+            const title = document.createElement('h4');
+            title.innerHTML = `<i class="bi bi-check-square"></i> ${task.title}`; // Icon for title
+    
+            const durationContainer = createDurationInput(task.duration);
+    
+            // Append title and duration
+            taskDetailContainer.appendChild(title);
+            taskDetailContainer.appendChild(durationContainer);
+    
+            // Add fixed time toggle and start time fields when item.data-in-sch is true
+            let fixedTimeToggle, startTimeContainer;
+            if (item.dataset.inSch === "true" && item.dataset.src !== "msc") {
+                // Fixed time toggle
+                fixedTimeToggle = document.createElement('div');
+                fixedTimeToggle.className = 'form-check form-switch mt-2';
+                fixedTimeToggle.innerHTML = `
+                    <input class="form-check-input" type="checkbox" id="fixedTimeToggle">
+                    <label class="form-check-label" for="fixedTimeToggle">Fixed Time</label>
+                `;
+    
+                if (task.is_fixed) {
+                    fixedTimeToggle.querySelector('#fixedTimeToggle').checked = true;
+                }
+                
+                // Create start time container
+                startTimeContainer = createStartTimeInput(task.start_time);
+                
+                taskDetailContainer.appendChild(fixedTimeToggle);
+                taskDetailContainer.appendChild(startTimeContainer);
+    
+                // Add event listeners for start time fields
+                const startHour = startTimeContainer.querySelector('#startHour');
+                const startMin = startTimeContainer.querySelector('#startMin');
+                const startAmPm = startTimeContainer.querySelector('#startAmPm');
+                const toggleInput = fixedTimeToggle.querySelector('#fixedTimeToggle');
+    
+                [startHour, startMin, startAmPm].forEach(field => {
+                    field.addEventListener('change', () => {
+                        toggleInput.checked = true;
+                    });
+                });
+            }
+    
+            if (flag) {
+                const category = document.createElement('p');
+                category.innerHTML = `<i class="bi bi-tag"></i> Category: ${task.category ? task.category : 'Uncategorized'}`;
+    
+                const priority = document.createElement('p');
+                priority.innerHTML = `<i class="bi bi-exclamation-circle"></i> Priority: ${getPriorityLabel(task.priority)}`;
+    
+                taskDetailContainer.appendChild(category);
+                taskDetailContainer.appendChild(priority);
+            }
+    
+            // Okay Button
+            const okayButton = document.createElement('button');
+            okayButton.className = 'btn btn-primary';
+            okayButton.innerHTML = `<i class="bi bi-check-circle"></i> Okay`;
+            okayButton.onclick = function () {
+                const is_fixed = fixedTimeToggle?.querySelector('#fixedTimeToggle')?.checked || false;
+                closeTaskDetail(durationContainer, task.id, src, item, startTimeContainer, is_fixed);
+            };
+            okayButton.style.marginRight = '10px';
+    
+            // Append Okay button
+            taskDetailContainer.appendChild(okayButton);
+    
+            // Only show Edit and Delete buttons if flag is false
+            if (flag) {
+                const editButton = document.createElement('button');
+                editButton.className = 'btn btn-outline-secondary';
+                editButton.innerHTML = `<i class="bi bi-pencil"></i> Edit`;
+                editButton.style.marginRight = '10px';
+    
+                const editurl = `/task/edit_task/${task.id}/`;
+    
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger';
+                deleteButton.innerHTML = `<i class="bi bi-trash"></i> Delete`;
+    
+                deleteButton.addEventListener('click', function () {
+                    const taskDetail = document.querySelector('.task-detail');
+                    const warningDiv = document.createElement('div');
+                    const bdy = document.getElementById('new-content');
+                    warningDiv.className = 'warningdiv';
+                    warningDiv.innerHTML = `
+                        <div class="text-center">
+                            <h5 class="mb-3">Deleting Task: <strong>${task.title}</strong></h5>
+                            <p class="mb-2">Are you sure you want to delete this task?</p>
+                            <p class="text-muted small mb-4">*This action can't be undone.</p>
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-danger yes-button me-3">Delete</button>
+                                <button class="btn btn-outline-secondary no-button">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+    
+                    taskDetail.style.display = 'none';
+                    bdy.appendChild(warningDiv);
+    
+                    const noButton = warningDiv.querySelector('.no-button');
+                    noButton.addEventListener('click', function () {
+                        warningDiv.style.display = 'none';
+                        taskDetail.style.display = 'block';
+                        warningDiv.remove();
+                    });
+    
+                    const yesButton = warningDiv.querySelector('.yes-button');
+                    yesButton.onclick = () => delTask(task.id);
+                });
+    
+                editButton.addEventListener('click', function () {
+                    $(document).trigger('contentUpdated', [editurl, '#new-content', true]);
+                });
+    
+                // Append Edit and Delete buttons
+                taskDetailContainer.appendChild(editButton);
+                taskDetailContainer.appendChild(deleteButton);
+            }
+    
+            // Show overlay and task detail
+            overlay.style.display = 'block';
+            taskDetailContainer.style.display = 'block';
+        }
+    
+        // Function to create start time input widget
+        function createStartTimeInput(startTime) {
+            const startTimeContainer = document.createElement('div');
+            startTimeContainer.innerHTML = `<i class="bi bi-clock"></i> Start Time: `;
+    
+            const hourInput = document.createElement('input');
+            hourInput.type = 'number';
+            hourInput.min = '1';
+            hourInput.max = '12';
+            hourInput.placeholder = 'HH';
+            hourInput.style.width = '50px';
+            hourInput.id = 'startHour';
+            hourInput.classList.add('start-hour');
+            hourInput.addEventListener('input', handleInput2);
+    
+            const minuteInput = document.createElement('input');
+            minuteInput.type = 'number';
+            minuteInput.min = '0';
+            minuteInput.max = '59';
+            minuteInput.placeholder = 'MM';
+            minuteInput.style.width = '50px';
+            minuteInput.id = 'startMin';
+            minuteInput.classList.add('start-minute');
+            minuteInput.addEventListener('input', handleInput2);
+    
+            const ampmSelect = document.createElement('select');
+            ampmSelect.id = 'startAmPm';
+            ampmSelect.innerHTML = `
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            `;
+            ampmSelect.style.width = '60px';
+    
+            if (startTime) {
+                const date = new Date(startTime);
+                let hours = date.getHours();
+                const minutes = date.getMinutes();
+                const period = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                hourInput.value = hours;
+                minuteInput.value = String(minutes).padStart(2, '0');
+                ampmSelect.value = period;
+            }
+    
+            startTimeContainer.appendChild(hourInput);
+            startTimeContainer.appendChild(document.createTextNode(' : '));
+            startTimeContainer.appendChild(minuteInput);
+            startTimeContainer.appendChild(document.createTextNode(' '));
+            startTimeContainer.appendChild(ampmSelect);
+    
+            startTimeContainer.style.marginBottom = '15px';
+            startTimeContainer.style.marginTop = '15px';
+    
+            return startTimeContainer;
+        }
+    
+    
+    
+    
+        // Function to create duration element
+        function createDurationInput(durationInMinutes) {
+            const durationContainer = document.createElement('div');
+            durationContainer.innerHTML = `<i class="bi bi-clock"></i> Duration: `;
+    
+            const hoursInput = document.createElement('input');
+            hoursInput.type = 'number';
+            hoursInput.min = '0';
+            hoursInput.placeholder = 'Hours';
+            hoursInput.style.width = '50px';
+            hoursInput.classList.add('duration-hour'); // Add class for event listener
+    
+            const minutesInput = document.createElement('input');
+            minutesInput.type = 'number';
+            minutesInput.min = '0';
+            minutesInput.max = '59';
+            minutesInput.placeholder = 'Minutes';
+            minutesInput.style.width = '50px';
+            minutesInput.classList.add('duration-minute'); // Add class for event listener
+    
+            const hours = Math.floor(durationInMinutes / 60);
+            const minutes = durationInMinutes % 60;
+    
+            hoursInput.value = hours;
+            minutesInput.value = minutes;
+    
+            durationContainer.appendChild(hoursInput);
+            durationContainer.appendChild(document.createTextNode(' hr '));
+            durationContainer.appendChild(minutesInput);
+            durationContainer.appendChild(document.createTextNode(' min'));
+            durationContainer.style.marginBottom = '15px';
+            durationContainer.style.marginTop = '15px';
+    
+            // Attach event listeners to inputs
+            hoursInput.addEventListener('input', handleInput);
+            minutesInput.addEventListener('input', handleInput);
+    
+            return durationContainer;
+        }
+    
+    
+        function closeTaskDetail(durationContainer, taskId, taskSrc, item, startTimeContainer, is_fixed) {
+            const overlay = document.getElementById('overlay');
+            const taskDetailContainer = document.getElementById('taskDetail');
+            const updatedDuration = getDurationInMinutes(durationContainer);
+    
+            let startTimeISO = null;
+    
+            // If is_fixed is true, extract and store the start time
+            if (is_fixed) {
+                // Get the selected date from the dropdown
+                const dateSelector = document.getElementById('dateSelector');
+                const selectedDate = dateSelector?.value;
+                const hour = parseInt(startTimeContainer.querySelector('#startHour')?.value || 0, 10);
+                const minute = parseInt(startTimeContainer.querySelector('#startMin')?.value || 0, 10);
+                const period = startTimeContainer.querySelector('#startAmPm')?.value || 'AM';
+    
+                // Convert to 24-hour format
+                let hours24 = hour % 12;
+                if (period === 'PM') hours24 += 12;
+    
+                let targetDate = new Date(); // Default to today
+    
+                if (selectedDate === 'tomorrow') {
+                    // Create a new Date object for tomorrow
+                    targetDate = new Date();
+                    targetDate.setDate(targetDate.getDate() + 1);
+                }
+    
+                // Set the hours, minutes, seconds, and milliseconds on the target date
+                targetDate.setHours(hours24, minute, 0, 0);
+    
+                // Convert to ISO string (in UTC)
+                startTimeISO = targetDate.toISOString();
+            }
+    
+            // Add duration and start_time (only if is_fixed is true) to the appropriate task array
+            let taskIndex = -1;
+            if (taskSrc === "rtn") {
+                taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                if (taskIndex !== -1) {
+                    allTskRtn[taskIndex].duration = updatedDuration;
+                    if (is_fixed) {
+                        allTskRtn[taskIndex].start_time = startTimeISO;
+                    }
+                    allTskRtn[taskIndex].is_fixed = is_fixed;
+                }
+            } else if (taskSrc === "tsk") {
+                taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
+                if (taskIndex !== -1) {
+                    allTasks[taskIndex].duration = updatedDuration;
+                    if (is_fixed) {
+                        allTasks[taskIndex].start_time = startTimeISO;
+                    }
+                    allTasks[taskIndex].is_fixed = is_fixed;
+                }
+            } else {
+                if (taskId.toString().length === 1) {
+                    taskIndex = allMisc.findIndex(task => task.id === parseInt(taskId, 10));
+                    if (taskIndex !== -1) {
+                        allMisc[taskIndex].duration = updatedDuration;
+                    }
+                } else {
+                    taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                    if (taskIndex !== -1) {
+                        allMscRtn[taskIndex].duration = updatedDuration;
+                    }
+                }
+            }
+    
+            updateTaskDuration(taskId, updatedDuration, item);
+    
+            // Hide overlay and task detail
+            overlay.style.display = 'none';
+            taskDetailContainer.style.display = 'none';
+            updateTimeSlots();
+        }
+    
+    
+        // Function to get duration in minutes
+        function getDurationInMinutes(durationContainer) {
+            const hoursInput = durationContainer.querySelector('input[placeholder="Hours"]');
+            const minutesInput = durationContainer.querySelector('input[placeholder="Minutes"]');
+    
+            if (!hoursInput || !minutesInput) {
+                console.error("Hours or minutes input not found in duration container.");
+                return 0; // Or handle the error as needed
+            }
+    
+            const hours = parseInt(hoursInput.value) || 0; // Parse hours, default to 0 if invalid
+            const minutes = parseInt(minutesInput.value) || 0; // Parse minutes, default to 0 if invalid
+    
+            return hours * 60 + minutes;
+        }
+    
+    
+        function updateTaskDuration(taskId, duration, item) {
+            // Helper function to update the duration of a task item
+            function updateDuration(taskItem, newDuration) {
+                const durationElement = taskItem.querySelector('.details span:first-child');
+                if (durationElement) {
+                    durationElement.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(newDuration)}`;
+                }
+            }
+            // Check if the provided 'item' is a valid DOM element
+            if (item && item.nodeType === Node.ELEMENT_NODE) {
+                // Update the duration directly on the provided item
+                updateDuration(item, duration);
+            } else {
+                // If 'item' is not a valid element, log an error message
+                console.error("Invalid task item provided to updateTaskDuration.");
+            }
+        }
+    
+        const dropzones = document.querySelectorAll(".task-list");
+    
+        dropzones.forEach(zone => {
+            zone.addEventListener("dragover", function (event) {
+                event.preventDefault();
+                const dragging = document.querySelector(".dragging");
+                if (!dragging) return;
+    
+                const draggingType = dragging.dataset.itemType;
+                const destinationType = zone.dataset.type;
+    
+                // 🚫 Prevent dropping into 'misc-tasks' unless it's a 'misc' item
+                if (zone.id === "misc-tasks" && draggingType !== "misc") return;
+    
+                // ✅ If item is from 'misc-tasks', only allow dropping into 'schedule-list'
+                if (dragging.dataset.fromMisc === "true" && zone.id !== "schedule-list") {
+                    zone.classList.add("border-danger");
+                    return;
+                }
+    
+                if (destinationType === "schedule" || destinationType === draggingType) {
+                    const afterElement = getDragAfterElement(zone, event.clientY);
+                    if (afterElement == null) {
+                        zone.appendChild(dragging);
+                    } else {
+                        zone.insertBefore(dragging, afterElement);
+                    }
+                } else {
+                    zone.classList.add("border-danger");
+                }
+            });
+    
+            zone.addEventListener("drop", function (event) {
+                event.preventDefault();
+                const dragging = document.querySelector(".dragging");
+                if (!dragging) return;
+    
+                dragging.classList.remove("dragging");
+                dragging.style.opacity = "1";
+                zone.classList.remove("border-danger");
+    
+                // Add data-in-sch="true" when dropped in schedule-list
+                if (zone.id === "schedule-list") {
+                    dragging.dataset.inSch = "true";
+                    updateTimeSlots();
+                } 
+                // Remove data-in-sch when dropped anywhere else
+                else {
+                    delete dragging.dataset.inSch;
+                    // Handle destroy conditions
+                    if (
+                        (zone.id === "misc-tasks" && dragging.dataset.itemType === "misc") ||
+                        (dragging.dataset.fromMisc === "true" && zone.id !== "schedule-list")
+                    ) {
+                        const taskIdToRemove = parseInt(dragging.dataset.id);
+                        allMscRtn = allMscRtn.filter(task => task.id !== taskIdToRemove);
+                        dragging.remove();
+                        updateTimeSlots();
+                        return;
+                    }
+                    if (zone.id === "one-time-tasks" || zone.id === "repetitive-tasks") {
+                        updateTimeSlots();
+                    }
+                }
+            });
+    
+            zone.addEventListener("dragleave", function () {
+                zone.classList.remove("over");
+                zone.classList.remove("border-danger");
+            });
+        });
+    
+        // Function to make an element draggable
+        function makeDraggable(task) {
+            task.setAttribute("draggable", "true");
+    
+            task.addEventListener("dragstart", function (event) {
+                event.dataTransfer.setData("text/plain", event.target.dataset.id);
+    
+                // 🟢 If dragging from 'misc-tasks', create a new independent item
+                if (event.target.closest("#misc-tasks")) {
+                    const taskId = event.target.getAttribute("data-id");
+                    const task = allMisc.find(task => task.id == taskId);
+    
+                    if (task) {
+                        const newId = Date.now();
+                        const xx = createMiscTask(task, newId, "x");
+                        newItem = xx[0];
+    
+                        const passBoard = document.getElementById("passBoard");
+                        passBoard.appendChild(newItem);
+    
+                        newItem.classList.add("dragging");
+                        newItem.dataset.fromMisc = "true";
+                        newItem.onclick = function () {
+                            showTaskDetail(newId, 'msc', newItem);
+                        }
+    
+                        event.target.style.opacity = "1";
+                        setTimeout(() => newItem.style.opacity = "0", 0);
+                        event.target = newItem;
+    
+                        const newTaskForMscRtn = { ...task, id: newId };
+                        allMscRtn.push(newTaskForMscRtn);
+                    }
+                } else {
+                    event.target.classList.add("dragging");
+                    setTimeout(() => event.target.style.opacity = "0", 0);
+                }
+            });
+    
+            task.addEventListener("dragend", function (event) {
+                const dragging = document.querySelector(".dragging");
+                if (dragging) {
+                    dragging.classList.remove("dragging");
+                    dragging.style.opacity = "1";
+    
+                    // 🗑️ Destroy if it wasn't dropped anywhere (e.g., outside valid zones)
+                    if (!dragging.parentElement || dragging.parentElement === document.body) {
+                        dragging.remove();
+                    }
+                }
+            });
+        }
+    
+        // Function to get the correct insertion point in the list
+        function getDragAfterElement(zone, y) {
+            const draggableElements = [...zone.querySelectorAll(".task-item:not(.dragging)")];
+    
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - (box.top + box.height / 2);
+                return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    
+        // Attach draggable functionality to existing task items
+        document.querySelectorAll(".task-item").forEach(makeDraggable);
+    
+        // Observe dynamically added tasks
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1 && node.classList.contains("task-item")) {
+                        makeDraggable(node);
+                    }
+                });
+            });
+        });
+    
+        dropzones.forEach(zone => {
+            observer.observe(zone, { childList: true });
+        });
+    
+    
+        // Function to create a brand new task item with the same attributes
+        function createMiscTask(task, newId, className) {
+            // Create a task item with necessary attributes
+            const taskItem = $("<li></li>")
+                .addClass("task-item misc") // Add 'misc' class
+                .addClass(className) // Add the provided class name
+                .attr("draggable", "true")
+                .attr("data-id", newId) // Use the new ID provided
+                .attr("data-item-type", "misc") // Always set as 'misc'
+                .attr("data-src", "msc"); // Always set as 'msc'
+    
+            // Task Title with Relaxing Icon (zzz icon)
+            const title = document.createElement('h4');
+            title.className = 'task-title'; // Add a class for styling
+            title.innerHTML = `
+                <span class="title-icon"><i class="bi bi-emoji-dizzy"></i></span>
+                <span class="title-text">${task.title}</span>
+            `;
+    
+            // Task Details Container
+            const details = document.createElement('div');
+            details.className = 'details';
+    
+            // Duration with Icon
+            const duration = document.createElement('span');
+            duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`;
+            duration.style.marginRight = 'auto';
+            
+            // Badges Container (for category and priority)
+            const badgesContainer = document.createElement('div');
+            badgesContainer.className = 'badges-container';
+    
+            // Category Badge with Icon
+            const categoryBadge = document.createElement('span');
+            categoryBadge.className = `badgex category-badge`;
+            categoryBadge.innerHTML = `<i class="bi bi-tag"></i> Misc`; // Icon for category
+            categoryBadge.style.backgroundColor = '#ffffff';
+            badgesContainer.appendChild(categoryBadge);
+    
+            // Append duration to details
+            details.appendChild(duration);
+            details.appendChild(badgesContainer);
+    
+            // Append both lines to the task item
+            taskItem.append(title);
+            taskItem.append(details);
+    
+            return taskItem;
+        }
+    
+        function sortFixedTimeScheduleItems() {
+            const scheduleList = document.getElementById("schedule-list");
+            const taskItems = Array.from(scheduleList.children); // Use children instead of querySelectorAll to maintain order
+            
+            if (!taskItems.length) {
+                return;
+            }
+    
+            // Create an array to hold the sorted order
+            const sortedItems = [];
+            const fixedTasksWithTime = [];
+            
+            // First pass: identify fixed tasks with valid times
+            taskItems.forEach(item => {
+                if (item.classList.contains("task-item")) {
+                    const taskId = item.dataset.id;
+                    const taskSrc = item.dataset.src;
+                    const taskData = getTaskDataById(taskId, taskSrc);
+                    
+                    if (taskData && taskData.is_fixed && taskData.start_time) {
+                        const startTime = new Date(taskData.start_time);
+                        if (startTime instanceof Date && !isNaN(startTime)) {
+                            fixedTasksWithTime.push({
+                                item: item,
+                                startTime: startTime
+                            });
+                            return; // Skip adding to sortedItems for now
+                        }
+                    }
+                }
+                // Add non-fixed items and fixed items without times to the sorted array immediately
+                sortedItems.push(item);
+            });
+    
+            // If no fixed tasks to sort, we're done
+            if (fixedTasksWithTime.length <= 1) {
+                return;
+            }
+    
+            // Sort the fixed tasks by time
+            fixedTasksWithTime.sort((a, b) => a.startTime - b.startTime);
+    
+            // Second pass: insert fixed tasks at their original positions (but now sorted)
+            let fixedIndex = 0;
+            const finalItems = [];
+            
+            for (const item of taskItems) {
+                if (item.classList.contains("task-item")) {
+                    const taskId = item.dataset.id;
+                    const taskSrc = item.dataset.src;
+                    const taskData = getTaskDataById(taskId, taskSrc);
+                    
+                    if (taskData && taskData.is_fixed && taskData.start_time) {
+                        // This is a fixed task with time - insert the next one from our sorted array
+                        if (fixedIndex < fixedTasksWithTime.length) {
+                            finalItems.push(fixedTasksWithTime[fixedIndex].item);
+                            fixedIndex++;
+                        }
+                        continue;
+                    }
+                }
+                // For non-fixed items, keep them in their original position
+                finalItems.push(item);
+            }
+    
+            // If we have any remaining fixed tasks (shouldn't happen), add them at the end
+            while (fixedIndex < fixedTasksWithTime.length) {
+                finalItems.push(fixedTasksWithTime[fixedIndex].item);
+                fixedIndex++;
+            }
+    
+            // Update the DOM
+            scheduleList.innerHTML = '';
+            finalItems.forEach(item => scheduleList.appendChild(item));
+    
+        }
+    
+    
+        function createGapTask(titleText) {
+            // Create a task item with theme-aware classes
+            const taskItem = $("<li></li>")
+                .addClass("task-item gap list-group-item d-flex align-items-center justify-content-center")
+                .attr("data-item-type", "gap")
+                .attr("data-is_gap", "true")
+                .addClass("bg-body-secondary") // Uses theme-aware background
+                .addClass("border border-secondary-subtle") // Theme-aware border
+                .css({
+                    "height": "70px",
+                    "border-radius": "0.375rem",
+                    "margin-bottom": "4px"
+                });
+    
+            // Create title with theme-aware text color
+            const title = document.createElement('h4');
+            title.className = 'task-title mb-0 text-body-secondary fw-medium'; // Theme-aware text color
+            
+            // Add icon with theme-aware color
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-clock me-2 text-body-secondary'; // Theme-aware icon color
+            
+            title.textContent = titleText;
+            title.prepend(icon);
+            taskItem.append(title);
+    
+            return taskItem;
+        }
+    
+        function updateGaps() {
+            const scheduleList = document.getElementById("schedule-list");
+            
+            // Remove all previous gap elements
+            scheduleList.querySelectorAll(".task-item.gap").forEach(gapItem => {
+                gapItem.remove();
+            });
+    
+            let lastEndTime = new Date(selectedDayStartTime);
+            let taskItems = Array.from(scheduleList.querySelectorAll(".task-item"));
+    
+            taskItems.forEach((taskItem, index) => {
+                const taskId = taskItem.dataset.id;
+                const taskSrc = taskItem.dataset.src;
+                const taskData = getTaskDataById(taskId, taskSrc);
+    
+                if (taskData) {
+                    let startTime;
+    
+                    // Handle fixed-time tasks and detect gaps
+                    if (taskData.is_fixed && taskData.start_time) {
+                        const fixedStartTime = new Date(taskData.start_time);
+                        const gapMinutes = (fixedStartTime - lastEndTime) / 60000;
+    
+                        if (gapMinutes > 0) {                       
+                            // Create a gap task
+                            const gapTaskItem = createGapTask(`Idle - ${formatDuration(gapMinutes)}`);
+                            gapTaskItem.attr("data-duration", gapMinutes); // Store duration
+                            
+                            // Insert gap task before the current task item
+                            $(taskItem).before(gapTaskItem);
+                        }
+    
+                        startTime = fixedStartTime;
+                    } else {
+                        startTime = lastEndTime; // Non-fixed tasks start where the last one ended
+                    }
+    
+                    const durationMinutes = taskData.duration;
+                    lastEndTime = new Date(startTime.getTime() + durationMinutes * 60000);
+                }
+            });
+        }
+    
+    
+        // Function to calculate and update time slots
+        function updateTimeSlots() {
+            sortFixedTimeScheduleItems();
+            const scheduleList = document.getElementById("schedule-list");
+            const timeSlotsContainer = document.getElementById("time-slots");
+            const dropzone = document.querySelector(".schedule .dropzone");
+    
+            // Update gaps first
+            updateGaps();
+    
+            timeSlotsContainer.innerHTML = ""; // Clear previous time slots
+            let totalHeight = 0;
+            let counter = 0;
+            let currentTime = new Date(selectedDayStartTime);
+            let lastEndTime = new Date(selectedDayStartTime);
+            let is_shuffled = false;
+            let prevTask = null;
+            let lastItem = null;
+    
+            let taskItems = scheduleList.querySelectorAll(".task-item");
+            // setSerialAttribute(taskItems);
+    
+            // Convert NodeList to Array for easier manipulation
+            let taskItemArray = Array.from(scheduleList.querySelectorAll(".task-item"));
+    
+            taskItemArray.forEach((taskItem, index) => {
+                const taskId = taskItem.dataset.id;
+                const taskSrc = taskItem.dataset.src;
+                const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false }; // Handle gaps with no taskId
+    
+                if (taskData) {
+                    counter += 1;
+                    const taskHeight = taskItem.getBoundingClientRect().height;
+                    totalHeight += taskHeight + 4;
+    
+                    let startTime = currentTime;
+                    let endTime;
+    
+                    // Handle fixed-time tasks
+                    if (taskData.is_fixed && taskData.start_time) {
+                        startTime = new Date(taskData.start_time);
+                        const gapMinutes = (startTime - lastEndTime) / 60000;
+                        if (gapMinutes < 0) {
+                            const overlapMinutes = Math.abs(gapMinutes);
+                            if (prevTask && prevTask.taskData.is_fixed) {
+                                prevTask.taskData.duration -= overlapMinutes;
+                                is_shuffled = true;
+                                updateTaskDuration2(prevTask.taskId, prevTask.taskSrc, prevTask.taskData.duration, lastItem);
+                            } else if (prevTask) {
+                                is_shuffled = true;
+                                if (taskItem && lastItem && scheduleList.contains(taskItem) && scheduleList.contains(lastItem)) {
+                                    scheduleList.insertBefore(taskItem, lastItem);
+                                } else {
+                                    console.error("Could not find or manipulate DOM elements for shuffling.");
+                                    startTime = new Date(taskData.start_time);
+                                }
+                            }
+                        }
+                    }
+    
+                    const durationMinutes = taskData.duration;
+                    endTime = new Date(startTime.getTime() + durationMinutes * 60000);
+    
+                    const formatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                    const startTimeString = startTime.toLocaleTimeString([], formatOptions).toUpperCase();
+                    const endTimeString = endTime.toLocaleTimeString([], formatOptions).toUpperCase();
+    
+                    // Update task data (skip for gaps, which have no taskId)
+                    if (taskId) {
+                        const startTime24hr = startTime.toISOString();
+                        let taskIndex = -1;
+    
+                        if (taskSrc === "rtn") {
+                            taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                            if (taskIndex !== -1) {
+                                allTskRtn[taskIndex].start_time = startTime24hr;
+                                if (allTskRtn[taskIndex].is_fixed === undefined) allTskRtn[taskIndex].is_fixed = false;
+                            }
+                        } else if (taskSrc === "tsk") {
+                            taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
+                            if (taskIndex !== -1) {
+                                allTasks[taskIndex].start_time = startTime24hr;
+                                if (allTasks[taskIndex].is_fixed === undefined) allTasks[taskIndex].is_fixed = false;
+                            }
+                        } else {
+                            taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                            if (taskIndex !== -1) {
+                                allMscRtn[taskIndex].start_time = startTime24hr;
+                            }
+                        }
+                    }
+    
+                    const timeSlotDiv = document.createElement("div");
+                    timeSlotDiv.classList.add("time-slot");
+                    if (taskItem.classList.contains("gap")) timeSlotDiv.classList.add("gap-slot"); // Style gaps differently
+                    timeSlotDiv.style.height = `${taskHeight + 4}px`;
+    
+                    const startTimeSpan = document.createElement("span");
+                    startTimeSpan.textContent = startTimeString;
+    
+                    const endTimeSpan = document.createElement("span");
+                    endTimeSpan.textContent = endTimeString;
+    
+                    timeSlotDiv.appendChild(startTimeSpan);
+                    timeSlotDiv.appendChild(endTimeSpan);
+                    timeSlotsContainer.appendChild(timeSlotDiv);
+    
+                    prevTask = taskId ? {
+                        taskId: taskId,
+                        taskSrc: taskSrc,
+                        taskData: { ...taskData }
+                    } : null; // Skip prevTask for gaps
+                    lastItem = taskItem;
+    
+                    currentTime = endTime;
+                    lastEndTime = endTime;
+    
+                    if (is_shuffled) {
+                        updateTimeSlots();
+                        return;
+                    }
+                }
+            });
+    
+            dropzone.style.height = `${totalHeight + counter * 5}px`;
+            unsavedChanges = true;
+        }
+    
+        // Helper function to update task duration in source array
+        function updateTaskDuration2(taskId, taskSrc, newDuration, taskItem) {
+            let taskIndex = -1;
+            if (taskSrc === "rtn") {
+                taskIndex = allTskRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                if (taskIndex !== -1) {
+                    allTskRtn[taskIndex].duration = newDuration;
+                }
+            } else if (taskSrc === "tsk") {
+                taskIndex = allTasks.findIndex(task => task.id === parseInt(taskId, 10));
+                if (taskIndex !== -1) {
+                    allTasks[taskIndex].duration = newDuration;
+                }
+            } else {
+                taskIndex = allMscRtn.findIndex(task => task.id === parseInt(taskId, 10));
+                if (taskIndex !== -1) {
+                    allMscRtn[taskIndex].duration = newDuration;
+                }
+            }
+            updateTaskDuration(taskId, newDuration, taskItem);
+            updateTimeSlots();
+        }
+    
+        function getRepeatFrequencyText(interval) {
+            if (interval === 1) {
+                return "Reapeats Daily";
+            } else if (interval === 7) {
+                return "Repeats Weekly";
+            } else if (interval === 30 || interval === 31) { // Assuming 30 or 31 represents monthly
+                return "Repeats Monthly";
+            } else if (interval === 365 || interval === 366) { // Assuming 365 or 366 represents yearly
+                return "Repeats Yearly";
+            } else if (interval && interval % 1 === 0 && interval > 0) { // Check if interval is a positive integer
+                return `Repeats every ${interval} days`;
+            } else {
+                return "Undefined";
+            }
+        }
+    
+    
+        // Function to fetch task data by ID (now using the global arrays and taskSrc)
+        function getTaskDataById(taskId, taskSrc) {
+            if (taskSrc === "rtn") {
+                return allTskRtn.find(task => task.id === parseInt(taskId));
+            } else if (taskSrc === 'tsk') {
+                return allTasks.find(task => task.id === parseInt(taskId));
+            } else {
+                return allMscRtn.find(task => task.id === parseInt(taskId));
+            }
+        }
+    
+        function handleInput(event) {
+            const inputValue = event.target.value;
+            const numericValue = inputValue.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    
+            let value = parseInt(numericValue, 10);
+    
+            if (isNaN(value)) {
+                value = ''; // Clear the field if input is not a number
+            } else {
+                if (event.target.classList.contains('duration-hour')) {
+                    // Hour field for duration (0-23)
+                    if (value < 0) value = 0;
+                    if (value > 23) value = 23;
+                } else if (event.target.classList.contains('duration-minute')) {
+                    // Minute field for duration (0-59)
+                    if (value < 0) value = 0;
+                    if (value > 59) value = 59;
+                    value = value.toString().padStart(2, '0'); // Ensure two digits
+                }
+            }
+    
+            event.target.value = value;
+        };
+    
+        function handleInput2(event) {
+            const inputValue = event.target.value;
+            const numericValue = inputValue.replace(/[^0-9]/g, '');
+            let value = parseInt(numericValue, 10);
+    
+            if (isNaN(value)) {
+                value = '';
+            } else {
+                if (event.target.classList.contains('start-hour')) {
+                    if (value < 1) value = 1;
+                    if (value > 12) value = 12;
+                } else if (event.target.classList.contains('start-minute')) {
+                    if (value < 0) value = 0;
+                    if (value > 59) value = 59;
+                    value = value.toString().padStart(2, '0');
+                }
+            }
+    
+            event.target.value = value;
+        }
+    
+    
+    
+        function setupTaskPanelToggle() {
+            const toggleRibbon = document.createElement('div');
+            toggleRibbon.className = 'panel-toggle-ribbon';
+            toggleRibbon.textContent = 'Tasks';
+    
+            const container = document.getElementById('new-content'); 
+            if (container) {
+                container.appendChild(toggleRibbon);
+            } else {
+                console.warn('Element with ID "new-content" not found.');
+            }
+    
+            toggleRibbon.addEventListener('click', function() {
+                document.body.classList.toggle('panel-active');
+                this.textContent = document.body.classList.contains('panel-active') ? 'Close' : 'Tasks';
+            });
+        }
+    
+    
+        function showMobileActionButtons(taskId, type, element, isInSchedule) {
+            element.classList.add('selected-for-actions');
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'mobile-actions-overlay';
+    
+            // Create actions container
+            const container = document.createElement('div');
+            container.className = 'mobile-actions-container';
+    
+            // Position container directly over the clicked element
+            const rect = element.getBoundingClientRect();
+            container.style.left = `${rect.left + rect.width / 2 - 70}px`;
+            container.style.top = `${rect.top + rect.height / 2 - 70}px`;
+    
+            // Create center button
+            const centerBtn = document.createElement('button');
+            centerBtn.className = 'mobile-action-btn center';
+            centerBtn.dataset.action = 'details';
+            centerBtn.textContent = '...';
+    
+            // Create directional buttons
+            const upBtn = document.createElement('button');
+            upBtn.className = 'mobile-action-btn up';
+            upBtn.dataset.action = 'up';
+            upBtn.textContent = '↑';
+    
+            const downBtn = document.createElement('button');
+            downBtn.className = 'mobile-action-btn down';
+            downBtn.dataset.action = 'down';
+            downBtn.textContent = '↓';
+    
+            const directionBtn = document.createElement('button');
+            directionBtn.className = `mobile-action-btn ${isInSchedule ? 'right' : 'left'}`;
+            directionBtn.dataset.action = isInSchedule ? 'right' : 'left';
+            directionBtn.textContent = isInSchedule ? '→' : '←';
+    
+            // Add buttons to container
+            if (!(type === 'msc' && !isInSchedule)) { // only add up and down when not msc and not in schedule
+                container.appendChild(upBtn);
+                container.appendChild(downBtn);
+            }
+            container.appendChild(directionBtn);
+            container.appendChild(centerBtn);
+    
+            // Add to DOM
+            overlay.appendChild(container);
+            document.body.appendChild(overlay);
+    
+            // Trigger animation after a small delay
+            setTimeout(() => {
+                container.classList.add('spread');
+                if (!(type === 'msc' && !isInSchedule)) {
+                    upBtn.classList.add('visible');
+                    downBtn.classList.add('visible');
+                }
+                directionBtn.classList.add('visible');
+            }, 10);
+    
+            // Handle button clicks
+            const handleAction = (action) => {
+                switch (action) {
+                    case 'up':
+                        moveTaskUp(element);
+                        break;
+                    case 'down':
+                        moveTaskDown(element);
+                        break;
+                    case 'left':
+                        overlay.remove();
+                        element.classList.remove('selected-for-actions');
+                        moveTaskLeft(element);
+                        break;
+                    case 'right':
+                        overlay.remove();
+                        element.classList.remove('selected-for-actions');
+                        moveTaskRight(element);
+                        break;
+                    case 'details':
+                        overlay.remove();
+                        element.classList.remove('selected-for-actions');
+                        showTaskDetail(taskId, type, element);
+                        break;
+                }
+            };
+    
+            // Add event listeners
+            centerBtn.addEventListener('click', () => handleAction('details'));
+            if (!(type === 'msc' && !isInSchedule)) {
+                upBtn.addEventListener('click', () => handleAction('up'));
+                downBtn.addEventListener('click', () => handleAction('down'));
+            }
+            directionBtn.addEventListener('click', () => handleAction(isInSchedule ? 'right' : 'left'));
+    
+            // Close overlay when clicking outside
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) {
+                    // Reverse animation before removing
+                    element.classList.remove('selected-for-actions');
+                    container.classList.remove('spread');
+                    if (!(type === 'msc' && !isInSchedule)) {
+                        upBtn.classList.remove('visible');
+                        downBtn.classList.remove('visible');
+                    }
+                    directionBtn.classList.remove('visible');
+    
+                    setTimeout(() => {
+                        overlay.remove();
+                    }, 300);
+                }
+            });
+        }
+    
+        function moveTaskUp(element) {
+            const parent = element.parentElement;
+            if (!parent) return;
+            
+            const prevElement = element.previousElementSibling;
+            if (prevElement) {
+                parent.insertBefore(element, prevElement);
+                updateTimeSlots();
+            }
+        }
+    
+        function moveTaskDown(element) {
+            const parent = element.parentElement;
+            if (!parent) return;
+            
+            const nextElement = element.nextElementSibling;
+            if (nextElement) {
+                parent.insertBefore(nextElement, element);
+                updateTimeSlots();
+            }
+        }
+    
+        function moveTaskRight(element) {
+            // If it's a misc task, destroy it
+            if (element.dataset.itemType === 'misc') {
+                const taskIdToRemove = parseInt(element.dataset.id);
+                allMscRtn = allMscRtn.filter(task => task.id !== taskIdToRemove);
+                element.remove();
+                updateTimeSlots();
+                return;
+            }
+            
+            // Determine destination list based on task type
+            const destinationId = element.dataset.itemType === 'onetime' ? 
+                'one-time-tasks' : 'repetitive-tasks';
+            const destination = document.getElementById(destinationId);
+            
+            // Remove from schedule and add to appropriate list
+            element.remove();
+            destination.appendChild(element);
+            delete element.dataset.inSch;
+            updateTimeSlots();
+        }
+    
+        function moveTaskLeft(element) {
+            const scheduleList = document.getElementById('schedule-list');
+            
+            // If it's a misc task, we need to clone it from misc-tasks
+            if (element.dataset.itemType === 'misc') {
+                const taskId = element.dataset.id;
+                const task = allMisc.find(t => t.id == taskId);
+                
+                if (task) {
+                    // Create new ID and clone
+                    const newId = Date.now();
+                    const newTask = createMiscTask(task, newId, 'x')[0];
+                    
+                    // Add to schedule
+                    scheduleList.appendChild(newTask);
+                    makeDraggable(newTask);
+                    
+                    // Add to allMscRtn
+                    allMscRtn.push({...task, id: newId});
+                    
+                    // Attach click event listener to the task item
+                    $(newTask).on('click', function(e) {
+                        
+                        // Check if device is mobile (touch device)
+                        const isMobile = window.innerWidth <= 768;
+                        
+                        if (!isMobile) {
+                            // Desktop behavior - always show details
+                            showTaskDetail(newId, 'msc', this);
+                            return;
+                        }
+                        
+                        // Mobile behavior - show action buttons
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Determine if item is in schedule list or tasks container
+                        const isInSchedule = this.closest('#schedule-list') !== null;
+                        
+                        showMobileActionButtons(newId, 'msc', this, isInSchedule);
+                    });
+                }
+            } else {
+                // For non-misc tasks, just move to schedule
+                element.remove();
+                scheduleList.appendChild(element);
+                element.dataset.inSch = 'true';
+            }
+            
+            updateTimeSlots();
+        }
+    
+        setupTaskPanelToggle();
+    
+        document.getElementById('cancelButton').addEventListener('click', function(event) {
+            // unsavedChanges = false;
+            if (!unsavedChanges) {
+                $(document).trigger('contentUpdated', ["{% url 'home' %}", '#new-content', true]);
+                return false;
+            }
+    
+            // If there are unsaved changes, show a warning
+            const bdy = document.getElementById('new-content');
+            const existingWarning = document.querySelector('.warningdiv');
+            if (existingWarning) return; // Avoid multiple prompts
+    
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'warningdiv mt-4';
+    
+            warningDiv.innerHTML = `
+                <div class="text-center">
+                    <h5 class="mb-3">Unsaved Changes</h5>
+                    <p class="mb-2">You have unsaved changes. Are you sure you want to leave?</p>
+                    <p class="text-muted small mb-4">*Your changes will be lost.</p>
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-danger me-3" id="confirmLeaveBtn">Yes, Leave</button>
+                        <button class="btn btn-outline-secondary" id="stayBtn">Stay</button>
+                    </div>
+                </div>
+            `;
+    
+            bdy.appendChild(warningDiv);
+    
+            // Button actions
+            document.getElementById('stayBtn').addEventListener('click', function () {
+                warningDiv.remove();
+            });
+    
+            document.getElementById('confirmLeaveBtn').addEventListener('click', function () {
+                $(document).trigger('contentUpdated', ["{% url 'home' %}", '#new-content', true]);
+                warningDiv.remove();
+            });
+    
+            return false; // Prevent default behavior (e.g., from button)
+        });
+    
+        document.getElementById('moreButton').addEventListener('click', function () {
+            const overlay = document.getElementById('overlay');
+            const taskDetailContainer = document.getElementById('taskDetail');
+    
+            // Clear existing content
+            taskDetailContainer.innerHTML = '';
+    
+            // Create Template Button (centered horizontally)
+            const createTemplateButton = document.createElement('button');
+            createTemplateButton.className = 'btn btn-primary d-block mx-auto mb-4';
+            createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
+            createTemplateButton.addEventListener('click', function () {
+                renderTemplateCreator(); // Call the new function to show the template creator
+            });
+    
+            // Scrollable List Container for Templates
+            const listContainer = document.createElement('div');
+            listContainer.className = 'border rounded p-3 mb-4';
+            listContainer.style.maxHeight = '200px';
+            listContainer.style.overflowY = 'auto';
+    
+            // Loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'text-center my-3';
+            loadingIndicator.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            listContainer.appendChild(loadingIndicator);
+    
+            // Append elements that don't depend on the templates
+            taskDetailContainer.appendChild(createTemplateButton);
+            taskDetailContainer.appendChild(listContainer);
+    
+            // Show overlay and task detail immediately
+            overlay.style.display = 'block';
+            taskDetailContainer.style.display = 'block';
+    
+            let selectedTemplateId = null;
+            let templates = []; // Store templates for later use
+    
+            // Fetch templates from API
+            fetchRoutineTemplates()
+            .then(fetchedTemplates => {
+                templates = fetchedTemplates;
+                
+                // Remove loading indicator
+                listContainer.innerHTML = '';
+                
+                const ul = document.createElement('ul');
+                ul.className = 'list-group';
+    
+                if (templates.length === 0) {
+                    const noTemplates = document.createElement('div');
+                    noTemplates.className = 'text-center text-muted py-3';
+                    noTemplates.textContent = 'No templates available';
+                    listContainer.appendChild(noTemplates);
+                } else {
+                    templates.forEach(template => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        const checkboxId = `template-${template.id}`;
+                        li.innerHTML = `
+                            <div>
+                                <input type="radio" class="form-check-input me-2" id="${checkboxId}" name="selectedTemplate">
+                                <label class="form-check-label" for="${checkboxId}">${template.name}</label>
+                            </div>
+                            <span class="badge bg-secondary rounded-pill">${template.tasks} tasks</span>
+                        `;
+                        ul.appendChild(li);
+    
+                        const radio = li.querySelector('input[type="radio"]');
+                        radio.addEventListener('change', function () {
+                            selectedTemplateId = this.checked ? template.id : null;
+                        });
+                    });
+    
+                    listContainer.appendChild(ul);
+                }
+    
+                // Buttons Container (Import Selected and Cancel)
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'd-flex justify-content-end';
+    
+                const importButton = document.createElement('button');
+                importButton.className = 'btn btn-success me-2';
+                importButton.innerHTML = `<i class="bi bi-box-arrow-in-down" id="importBtn"></i> Import Selected`;
+                importButton.addEventListener('click', function () {
+                    if (selectedTemplateId) {
+                        // Fetch routine first, then fetch tasks
+                        fetchRoutineTemplateDetails(daySelected, function () {
+                            fetchTasks(daySelected);
+                            unsavedChanges = false;
+                        }, selectedTemplateId);
+                        overlay.style.display = 'none';
+                        taskDetailContainer.style.display = 'none';
+                        // Here you would typically do something with the selected template
+                    } else {
+                        alert('Please select a template to import.');
+                    }
+                });
+    
+                const cancelButton = document.createElement('button');
+                cancelButton.className = 'btn btn-outline-secondary';
+                cancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+                cancelButton.addEventListener('click', function () {
+                    overlay.style.display = 'none';
+                    taskDetailContainer.style.display = 'none';
+                });
+    
+                buttonsContainer.appendChild(importButton);
+                buttonsContainer.appendChild(cancelButton);
+    
+                taskDetailContainer.appendChild(buttonsContainer);
+            })
+            .catch(error => {
+                // If there's an error, show error message but keep the UI functional
+                listContainer.innerHTML = '<div class="alert alert-danger">Failed to load templates. Please try again.</div>';
+                
+                // You could optionally show the dummy templates here as a fallback
+                // renderDummyTemplates();
+            });
+    
+            function renderTemplateCreator() {
+                // Clear existing content
+                taskDetailContainer.innerHTML = '';
+    
+                // Responsive sizing
+                const isMobile = window.matchMedia("(max-width: 768px)").matches;
+                taskDetailContainer.style.width = isMobile ? '90vw' : '600px'; // Full width on mobile, fixed on desktop
+                taskDetailContainer.style.maxHeight = isMobile ? '90vh' : '80vh'; // Slightly smaller on mobile
+                taskDetailContainer.style.overflowY = 'auto';
+    
+                // Template Name Input
+                const nameContainer = document.createElement('div');
+                nameContainer.className = 'mb-4';
+                nameContainer.innerHTML = `
+                    <label for="templateName" class="form-label fw-bold">Template Name:</label>
+                    <input type="text" class="form-control" id="templateName" placeholder="Enter template name" autocomplete="off">
+                `;
+    
+                // Scrollable Task List Container
+                const taskListContainer = document.createElement('div');
+                taskListContainer.className = 'border rounded p-3 mb-4';
+                taskListContainer.style.maxHeight = isMobile ? '60vh' : '300px'; // Larger height on mobile
+                taskListContainer.style.overflowY = 'auto';
+    
+                const taskUl = document.createElement('ul');
+                taskUl.className = 'list-group';
+    
+    
+                const scheduleList = document.getElementById("schedule-list");
+                const allTaskItems = Array.from(scheduleList.querySelectorAll(".task-item"));
+                const dummyTasks = getRepetitiveTasks(allTaskItems);
+    
+                dummyTasks.forEach(taskItem => {
+                    const taskId = taskItem.dataset.id;
+                    const taskSrc = taskItem.dataset.src;
+                    const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false };
+    
+                    
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.setAttribute('data-id', taskId);
+                    li.setAttribute('data-src', taskSrc);
+                    li.innerHTML = `
+                        <div>
+                            <span class="fw-medium">${taskData.title}</span>
+                            <small class="text-muted d-block">Start: ${getTimeFromISO(taskData.start_time)} | Duration: ${formatDuration(taskData.duration)} min</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    `;
+                    taskUl.appendChild(li);
+    
+                    const removeButton = li.querySelector('button');
+                    removeButton.addEventListener('click', function () {
+                        li.remove();
+                    });
+                });
+    
+                taskListContainer.appendChild(taskUl);
+    
+                // Buttons Container (Save and Cancel)
+                const creatorButtonsContainer = document.createElement('div');
+                creatorButtonsContainer.className = 'd-flex justify-content-end';
+    
+                const saveButton = document.createElement('button');
+                saveButton.className = 'btn btn-primary me-2';
+                saveButton.innerHTML = `<i class="bi bi-save" id="templateSaveBtn"></i> Save`;
+                saveButton.addEventListener('click', function () {
+                    const templateName = document.getElementById('templateName').value.trim();
+                    if (!templateName) {
+                        alert('Please enter a template name.');
+                        return;
+                    }
+                    console.log('Saving template:', templateName);
+    
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    const ListItems = document.querySelectorAll('.list-group li');
+    
+                    // Prepare tasks data
+                    const tasks = Array.from(ListItems).map(item => {
+                        const taskId = parseInt(item.getAttribute('data-id'));
+                        const taskSrc = item.getAttribute('data-src');
+                        let task;
+                        let flag;
+    
+                        if (taskSrc === 'rtn') {
+                            task = allTskRtn.find(t => t.id === taskId);
+                            flag = true;
+                        } else if (taskSrc === 'tsk') {
+                            task = allTasks.find(t => t.id === taskId);
+                            flag = true;
+                        } else {
+                            task = allMscRtn.find(t => t.id === taskId);
+                            flag = false;
+                        }
+                        if (task && flag) {
+                            return {
+                                start_time: task.start_time,
+                                duration: task.duration,
+                                id: task.id, 
+                                title: task.title,
+                                category: task.category,
+                                priority: task.priority,
+                                is_repetitive: task.is_repetitive,
+                                frequency_interval: task.frequency_interval,
+                                due_date: task.due_date,
+                                due_time: task.due_time,
+                                color: task.color,
+                                is_task: true,
+                                is_fixed: true,
+                            };
+                        } else if (task && !flag) {
+                            return {
+                                start_time: task.start_time,
+                                duration: task.duration,
+                                title: task.title,
+                                id: task.id,
+                                is_task: false,
+                                is_fixed: true,
+                            }
+                        } else {
+                            console.error(`Task with ID ${taskId} not found!`);
+                            return null;
+                        }
+                    }).filter(task => task !== null); // Filter out null tasks
+    
+                    // Check if there are valid tasks to save
+                    if (tasks.length === 0) {
+                        showMessage('No tasks to save', 'error');
+                        return;
+                    }
+    
+                    // Send data to the backend
+                    const post_url = "{% url 'save_routine_template' %}";
+                    fetch(post_url, { // Replace with your actual API endpoint
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                        },
+                        body: JSON.stringify({
+                            template_name: templateName,
+                            tasks: tasks,
+                        }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showMessage('Template Saved!', 'success');
+                        overlay.style.display = 'none';
+                        taskDetailContainer.style.display = 'none';
+                        taskDetailContainer.style.width = '';
+                        taskDetailContainer.style.maxHeight = '';
+                        taskDetailContainer.style.overflowY = '';
+                    })
+                    .catch(error => {
+                        console.error('Error saving routine:', error);
+                        showMessage('Failed to save routine!', 'error'); // Provide user feedback
+                    });
+                });
+    
+                const creatorCancelButton = document.createElement('button');
+                creatorCancelButton.className = 'btn btn-outline-secondary';
+                creatorCancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
+                creatorCancelButton.addEventListener('click', function () {
+                    overlay.style.display = 'none';
+                    taskDetailContainer.style.display = 'none';
+                    taskDetailContainer.style.width = '';
+                    taskDetailContainer.style.maxHeight = '';
+                    taskDetailContainer.style.overflowY = '';
+                });
+    
+                creatorButtonsContainer.appendChild(saveButton);
+                creatorButtonsContainer.appendChild(creatorCancelButton);
+    
+                // Append all elements to taskDetailContainer
+                taskDetailContainer.appendChild(nameContainer);
+                taskDetailContainer.appendChild(taskListContainer);
+                taskDetailContainer.appendChild(creatorButtonsContainer);
+    
+                // Ensure overlay and container are visible
+                overlay.style.display = 'block';
+                taskDetailContainer.style.display = 'block';
+            }
+        });
+    
+        function getRepetitiveTasks(taskList) {
+            return $(taskList).filter(function() {
+                return $(this).attr("data-item-type") === "repetitive";
+            }).get();
+        };
+    
+        function getTimeFromISO(isoString) {
+            const date = new Date(isoString);
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 === 0 ? 12 : hours % 12; // Handle 12 AM/PM
+    
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    
+            return `${formattedHours}:${formattedMinutes} ${ampm}`;
+        };
+    
+        async function fetchRoutineTemplates() {
+            try {
+                const response = await fetch(rtn_template_url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                
+                return data.map(template => ({
+                    id: template.id,
+                    name: template.template_name,
+                    tasks: template.taskCount
+                }));
+            } catch (error) {
+                console.error('Error fetching routine templates:', error);
+                throw error;
+                // Optionally return dummy templates as fallback:
+                // return dummyTemplates;
+            }
+        }
+    
+        // Fetch routine template using AJAX
+        function fetchRoutineTemplateDetails(paramValue, callback, templateId) {
+            $.ajax({
+                url: `/api/get-routine-template/${templateId}`,
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    // Clear existing items in the schedule list
+                    $("#schedule-list").empty();
+                    $("#time-slots").empty();
+                    allTskRtn = [];
+                    console.log(data)
+    
+                    // Check if the response contains templates with tasks
+                    if (data !== 3 && data.tasks && data.tasks.length > 0) {
+                        // Assuming we're working with the first template's tasks
+                        // Adjust this if your data structure is different
+                        const templateTasks = data.tasks;
+                        
+                        if (templateTasks.length > 0) {
+                            // Loop through the tasks and populate the schedule list
+                            templateTasks.forEach(function (task) {
+                                // Adjust the date based on paramValue
+                                if (task.start_time) {
+                                    const originalTime = new Date(task.start_time);
+                                    const adjustedDate = new Date();
+                                    
+                                    // Reset to today or tomorrow at midnight (we'll add the time next)
+                                    if (!paramValue) {
+                                        // Tomorrow - add 1 day
+                                        adjustedDate.setDate(adjustedDate.getDate() + 1);
+                                    }
+                                    
+                                    // Get just the time components from original
+                                    const originalHours = originalTime.getHours();
+                                    const originalMinutes = originalTime.getMinutes();
+                                    const originalSeconds = originalTime.getSeconds();
+                                    
+                                    // Apply original time to new date
+                                    adjustedDate.setHours(originalHours);
+                                    adjustedDate.setMinutes(originalMinutes);
+                                    adjustedDate.setSeconds(originalSeconds);
+                                    adjustedDate.setMilliseconds(0);
+                                    
+                                    // Update the task's start_time
+                                    task.start_time = adjustedDate.toISOString();
+                                }
+                                
+                                // Create and add the task item
+                                const taskItem = createTaskListItem(task, "rtn");
+                                taskItem.attr('data-in-sch', 'true');
+                                $("#schedule-list").append(taskItem);
+                                
+                                // Add to allTskRtn array
+                                allTskRtn.push(task);
+                                
+                                // Attach click event listener
+                                taskItem.on('click', function(e) {
+                                    const isMobile = window.innerWidth <= 768;
+                                    
+                                    if (!isMobile) {
+                                        showTaskDetail(task.id, "rtn", taskItem[0]);
+                                        return;
+                                    }
+                                    
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    showMobileActionButtons(task.id, "rtn", this, true);
+                                });
+                            });
+                            
+                            // Generate time slots
+                            updateTimeSlots();
+                        } else {
+                            showMessage('No tasks in this template!', 'info');
+                        }
+                    } else {
+                        showMessage('No template found!', 'info');
+                    }
+    
+                    // Invoke callback if provided
+                    if (callback) {
+                        callback();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching routine template:", error);
+                    showMessage('Failed to load template', 'error');
+                }
+            });
+        }
+    
+    
+    });
+    
+    
+    </script>
+
+
+    {% load static %}
+    <script src="{% static 'js/dash_check.js' %}"></script>

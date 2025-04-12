@@ -739,7 +739,7 @@ body.dark-theme .form-control:focus {
         <div class="col-12 col-md-7 d-flex">
             <div class="schedule h-100 d-flex flex-column">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="schedule-header mb-0">Task Scheduler</div>
+                    <div class="schedule-header mb-0">Template Editor</div>
                     <div class="d-flex align-items-center">
                         <div class="ms-3">
                             <span>For&nbsp;</span>
@@ -868,23 +868,23 @@ $(document).ready(function () {
 
     // Function to format date
     function formatDate(dateString) {
-    const date = new Date(dateString);
-    
-    // Define short month names
-    const shortMonth = date.toLocaleString('en-US', { month: 'short' });
+        const date = new Date(dateString);
+        
+        // Define short month names
+        const shortMonth = date.toLocaleString('en-US', { month: 'short' });
 
-    // Extract day and year
-    const day = date.getDate();
-    const year = date.getFullYear();
+        // Extract day and year
+        const day = date.getDate();
+        const year = date.getFullYear();
 
-    return `${day}-${shortMonth}-${year}`;
-    }
+        return `${day}-${shortMonth}-${year}`;
+        }
 
-    // Function to create a separator
-    function createSeparator() {
-      const separator = document.createElement('div');
-      separator.className = 'separator';
-      return separator;
+        // Function to create a separator
+        function createSeparator() {
+        const separator = document.createElement('div');
+        separator.className = 'separator';
+        return separator;
     }
 
     function updateDateDisplay() {
@@ -2061,34 +2061,34 @@ $(document).ready(function () {
     }
 
 
-    function createGapTask(titleText) {
-        // Create a task item with theme-aware classes
-        const taskItem = $("<li></li>")
-            .addClass("task-item gap list-group-item d-flex align-items-center justify-content-center")
-            .attr("data-item-type", "gap")
-            .attr("data-is_gap", "true")
-            .addClass("bg-body-secondary") // Uses theme-aware background
-            .addClass("border border-secondary-subtle") // Theme-aware border
-            .css({
-                "height": "70px",
-                "border-radius": "0.375rem",
-                "margin-bottom": "4px"
-            });
+function createGapTask(titleText) {
+    // Create a task item with theme-aware classes
+    const taskItem = $("<li></li>")
+        .addClass("task-item gap list-group-item d-flex align-items-center justify-content-center")
+        .attr("data-item-type", "gap")
+        .attr("data-is_gap", "true")
+        .addClass("bg-body-secondary") // Uses theme-aware background
+        .addClass("border border-secondary-subtle") // Theme-aware border
+        .css({
+            "height": "70px",
+            "border-radius": "0.375rem",
+            "margin-bottom": "4px"
+        });
 
-        // Create title with theme-aware text color
-        const title = document.createElement('h4');
-        title.className = 'task-title mb-0 text-body-secondary fw-medium'; // Theme-aware text color
-        
-        // Add icon with theme-aware color
-        const icon = document.createElement('i');
-        icon.className = 'bi bi-clock me-2 text-body-secondary'; // Theme-aware icon color
-        
-        title.textContent = titleText;
-        title.prepend(icon);
-        taskItem.append(title);
+    // Create title with theme-aware text color
+    const title = document.createElement('h4');
+    title.className = 'task-title mb-0 text-body-secondary fw-medium'; // Theme-aware text color
+    
+    // Add icon with theme-aware color
+    const icon = document.createElement('i');
+    icon.className = 'bi bi-clock me-2 text-body-secondary'; // Theme-aware icon color
+    
+    title.textContent = titleText;
+    title.prepend(icon);
+    taskItem.append(title);
 
-        return taskItem;
-    }
+    return taskItem;
+}
 
     function updateGaps() {
         const scheduleList = document.getElementById("schedule-list");
@@ -2634,45 +2634,45 @@ $(document).ready(function () {
     });
 
     document.getElementById('moreButton').addEventListener('click', function () {
-        const overlay = document.getElementById('overlay');
-        const taskDetailContainer = document.getElementById('taskDetail');
+    const overlay = document.getElementById('overlay');
+    const taskDetailContainer = document.getElementById('taskDetail');
 
-        // Clear existing content
-        taskDetailContainer.innerHTML = '';
+    // Clear existing content
+    taskDetailContainer.innerHTML = '';
 
-        // Create Template Button (centered horizontally)
-        const createTemplateButton = document.createElement('button');
-        createTemplateButton.className = 'btn btn-primary d-block mx-auto mb-4';
-        createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
-        createTemplateButton.addEventListener('click', function () {
-            renderTemplateCreator(); // Call the new function to show the template creator
-        });
+    // Create Template Button (centered horizontally)
+    const createTemplateButton = document.createElement('button');
+    createTemplateButton.className = 'btn btn-primary d-block mx-auto mb-4';
+    createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
+    createTemplateButton.addEventListener('click', function () {
+        renderTemplateCreator(); // Call the new function to show the template creator
+    });
 
-        // Scrollable List Container for Templates
-        const listContainer = document.createElement('div');
-        listContainer.className = 'border rounded p-3 mb-4';
-        listContainer.style.maxHeight = '200px';
-        listContainer.style.overflowY = 'auto';
+    // Scrollable List Container for Templates
+    const listContainer = document.createElement('div');
+    listContainer.className = 'border rounded p-3 mb-4';
+    listContainer.style.maxHeight = '200px';
+    listContainer.style.overflowY = 'auto';
 
-        // Loading indicator
-        const loadingIndicator = document.createElement('div');
-        loadingIndicator.className = 'text-center my-3';
-        loadingIndicator.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
-        listContainer.appendChild(loadingIndicator);
+    // Loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'text-center my-3';
+    loadingIndicator.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+    listContainer.appendChild(loadingIndicator);
 
-        // Append elements that don't depend on the templates
-        taskDetailContainer.appendChild(createTemplateButton);
-        taskDetailContainer.appendChild(listContainer);
+    // Append elements that don't depend on the templates
+    taskDetailContainer.appendChild(createTemplateButton);
+    taskDetailContainer.appendChild(listContainer);
 
-        // Show overlay and task detail immediately
-        overlay.style.display = 'block';
-        taskDetailContainer.style.display = 'block';
+    // Show overlay and task detail immediately
+    overlay.style.display = 'block';
+    taskDetailContainer.style.display = 'block';
 
-        let selectedTemplateId = null;
-        let templates = []; // Store templates for later use
+    let selectedTemplateId = null;
+    let templates = []; // Store templates for later use
 
-        // Fetch templates from API
-        fetchRoutineTemplates()
+    // Fetch templates from API
+    fetchRoutineTemplates()
         .then(fetchedTemplates => {
             templates = fetchedTemplates;
             

@@ -198,27 +198,19 @@ class HomeView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         is_out = request.headers.get('isOut')
-        print(f'Is Out: {is_out}')
         
-        # Debug user verification status
-        print(f'User Verified: {request.user.profile.is_verified}')
         
         if not request.user.profile.is_verified:
-            print("User not verified, redirecting to OTP validation.")
             return redirect('validate_otp')
         
-        print(f'X-Requested-With Header: {request.headers.get("X-Requested-With")}')
         
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             # Compare is_out as string or convert to boolean
             if is_out and is_out.lower() == 'true':
-                print("User is out, redirecting to home.")
                 return redirect('home')
             else:
-                print("Rendering template:", self.template_name)
                 return render(request, self.template_name)
         else:
-            print("Rendering dashbase.html")
             return render(request, 'dashbase.html')
 
     

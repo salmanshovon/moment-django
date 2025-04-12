@@ -41,8 +41,6 @@ class OneTimeTaskForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        print(f'RAW DATA: {self.data}')
-        print(f"Cleaned data from super().clean(): {cleaned_data}")
 
         # Extract data from the form
         due_time = self.data.get('due_time')
