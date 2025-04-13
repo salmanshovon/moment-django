@@ -2694,8 +2694,8 @@ $(document).ready(function () {
                     const checkboxId = `template-${template.id}`;
                     li.innerHTML = `
                         <div>
-                            <input type="radio" class="form-check-input me-2" id="${checkboxId}" name="selectedTemplate">
-                            <label class="form-check-label" for="${checkboxId}">${template.name}</label>
+                            <input type="radio" class="form-check-input me-2" id="${checkboxId}" name="selectedTemplate" style="cursor: pointer;">
+                            <label class="form-check-label" for="${checkboxId}" style="cursor: pointer;">${template.name}</label>
                         </div>
                         <span class="badge bg-secondary rounded-pill">${template.tasks} tasks</span>
                     `;
@@ -2784,41 +2784,53 @@ $(document).ready(function () {
             const scheduleList = document.getElementById("schedule-list");
             const allTaskItems = Array.from(scheduleList.querySelectorAll(".task-item"));
             const dummyTasks = getRepetitiveTasks(allTaskItems);
+            let btnEnabler = false;
 
-            dummyTasks.forEach(taskItem => {
-                const taskId = taskItem.dataset.id;
-                const taskSrc = taskItem.dataset.src;
-                const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false };
+            if (dummyTasks.length === 0) {
+                const noTasks = document.createElement('div');
+                noTasks.className = 'text-center text-muted py-3';
+                noTasks.textContent = 'No Repetitive Tasks in the Scheduler';
+                taskListContainer.appendChild(noTasks);
+            } else {
+                const taskUl = document.createElement('ul');
+                btnEnabler = true;
+                taskUl.className = 'list-group';
 
-                
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                li.setAttribute('data-id', taskId);
-                li.setAttribute('data-src', taskSrc);
-                li.innerHTML = `
-                    <div>
-                        <span class="fw-medium">${taskData.title}</span>
-                        <small class="text-muted d-block">Start: ${getTimeFromISO(taskData.start_time)} | Duration: ${formatDuration(taskData.duration)} min</small>
-                    </div>
-                    <button class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-x"></i>
-                    </button>
-                `;
-                taskUl.appendChild(li);
+                dummyTasks.forEach(taskItem => {
+                    const taskId = taskItem.dataset.id;
+                    const taskSrc = taskItem.dataset.src;
+                    const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false };
 
-                const removeButton = li.querySelector('button');
-                removeButton.addEventListener('click', function () {
-                    li.remove();
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.setAttribute('data-id', taskId);
+                    li.setAttribute('data-src', taskSrc);
+                    li.innerHTML = `
+                        <div>
+                            <span class="fw-medium">${taskData.title}</span>
+                            <small class="text-muted d-block">Start: ${getTimeFromISO(taskData.start_time)} | Duration: ${formatDuration(taskData.duration)} min</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    `;
+                    taskUl.appendChild(li);
+
+                    const removeButton = li.querySelector('button');
+                    removeButton.addEventListener('click', function () {
+                        li.remove();
+                    });
                 });
-            });
 
-            taskListContainer.appendChild(taskUl);
+                taskListContainer.appendChild(taskUl);
+            }
 
             // Buttons Container (Save and Cancel)
             const creatorButtonsContainer = document.createElement('div');
             creatorButtonsContainer.className = 'd-flex justify-content-end';
 
             const saveButton = document.createElement('button');
+            saveButton.disabled = !btnEnabler;
             saveButton.className = 'btn btn-primary me-2';
             saveButton.innerHTML = `<i class="bi bi-save" id="templateSaveBtn"></i> Save`;
             saveButton.addEventListener('click', function () {
