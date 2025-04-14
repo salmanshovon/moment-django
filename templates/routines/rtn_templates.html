@@ -809,14 +809,16 @@ body.dark-theme .form-control:focus {
 <script>
 $(document).ready(function () {
     // URL to fetch tasks (Django URL name: get_sch_tasks)
-    const task_url = "{% url 'get_sch_tasks' %}";
+    const task_url = "{% url 'get_tmp_tasks' %}";
     const routine_url = "{% url 'routine_view' %}";
     const rtn_template_url = "{% url 'rtn_template_list' %}";
+
     let unsavedChanges = false;
+    let isUpdate = false;
+    let updateId;
 
 
     let selectedDate = new Date();
-    let daySelected = true;
     let day = true;
 
     // Global array to store all tasks
@@ -1000,6 +1002,7 @@ $(document).ready(function () {
         createTemplateButton.innerHTML = `<i class="bi bi-plus-circle"></i> Create Template`;
         createTemplateButton.addEventListener('click', function () {
             renderTemplateNameEditor(); // Call the new function to show the template creator
+            startNewTemplate();
         });
 
         // Scrollable List Container for Templates
@@ -1077,8 +1080,8 @@ $(document).ready(function () {
                 importButton.addEventListener('click', function () {
                     if (selectedTemplateId) {
                         // Fetch routine first, then fetch tasks
-                        fetchRoutineTemplateDetails(daySelected, function () {
-                            fetchTasks(daySelected);
+                        fetchRoutineTemplateDetails(function () {
+                            fetchTasks();
                             unsavedChanges = false;
                         }, selectedTemplateId);
                         overlay.style.display = 'none';
@@ -1152,7 +1155,7 @@ $(document).ready(function () {
                     const yesButton = warningDiv.querySelector('.yes-button');
                     yesButton.addEventListener('click', function() {
                         // Call delete function
-                        deleteTemplate(selectedTemplateId);
+                        delTemplate(selectedTemplateId);
                         warningDiv.remove();
                     });
                 });
@@ -1172,196 +1175,6 @@ $(document).ready(function () {
                 // You could optionally show the dummy templates here as a fallback
                 // renderDummyTemplates();
             });
-
-            function renderTemplateCreator() {
-                // Clear existing content
-                taskDetailContainer.innerHTML = '';
-
-                // Responsive sizing
-                const isMobile = window.matchMedia("(max-width: 768px)").matches;
-                taskDetailContainer.style.width = isMobile ? '90vw' : '600px'; // Full width on mobile, fixed on desktop
-                taskDetailContainer.style.maxHeight = isMobile ? '90vh' : '80vh'; // Slightly smaller on mobile
-                taskDetailContainer.style.overflowY = 'auto';
-
-                // Template Name Input
-                const nameContainer = document.createElement('div');
-                nameContainer.className = 'mb-4';
-                nameContainer.innerHTML = `
-                    <label for="templateName" class="form-label fw-bold">Template Name:</label>
-                    <input type="text" class="form-control" id="templateName" placeholder="Enter template name" autocomplete="off">
-                `;
-
-                // Scrollable Task List Container
-                const taskListContainer = document.createElement('div');
-                taskListContainer.className = 'border rounded p-3 mb-4';
-                taskListContainer.style.maxHeight = isMobile ? '60vh' : '300px'; // Larger height on mobile
-                taskListContainer.style.overflowY = 'auto';
-
-                const taskUl = document.createElement('ul');
-                taskUl.className = 'list-group';
-
-
-                const scheduleList = document.getElementById("schedule-list");
-                const allTaskItems = Array.from(scheduleList.querySelectorAll(".task-item"));
-                const dummyTasks = getRepetitiveTasks(allTaskItems);
-
-                dummyTasks.forEach(taskItem => {
-                    const taskId = taskItem.dataset.id;
-                    const taskSrc = taskItem.dataset.src;
-                    const taskData = taskId ? getTaskDataById(taskId, taskSrc) : { duration: parseInt(taskItem.dataset.duration, 10), is_fixed: false };
-
-                    
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    li.setAttribute('data-id', taskId);
-                    li.setAttribute('data-src', taskSrc);
-                    li.innerHTML = `
-                        <div>
-                            <span class="fw-medium">${taskData.title}</span>
-                            <small class="text-muted d-block">Start: ${getTimeFromISO(taskData.start_time)} | Duration: ${formatDuration(taskData.duration)} min</small>
-                        </div>
-                        <button class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-x"></i>
-                        </button>
-                    `;
-                    taskUl.appendChild(li);
-
-                    const removeButton = li.querySelector('button');
-                    removeButton.addEventListener('click', function () {
-                        li.remove();
-                    });
-                });
-
-                taskListContainer.appendChild(taskUl);
-
-                // Buttons Container (Save and Cancel)
-                const creatorButtonsContainer = document.createElement('div');
-                creatorButtonsContainer.className = 'd-flex justify-content-end';
-
-                const saveButton = document.createElement('button');
-                saveButton.className = 'btn btn-primary me-2';
-                saveButton.innerHTML = `<i class="bi bi-save" id="templateSaveBtn"></i> Save`;
-                saveButton.addEventListener('click', function () {
-                    const templateName = document.getElementById('templateName').value.trim();
-                    if (!templateName) {
-                        alert('Please enter a template name.');
-                        return;
-                    }
-                    console.log('Saving template:', templateName);
-
-                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                    const ListItems = document.querySelectorAll('.list-group li');
-
-                    // Prepare tasks data
-                    const tasks = Array.from(ListItems).map(item => {
-                        const taskId = parseInt(item.getAttribute('data-id'));
-                        const taskSrc = item.getAttribute('data-src');
-                        let task;
-                        let flag;
-
-                        if (taskSrc === 'rtn') {
-                            task = allTskRtn.find(t => t.id === taskId);
-                            flag = true;
-                        } else if (taskSrc === 'tsk') {
-                            task = allTasks.find(t => t.id === taskId);
-                            flag = true;
-                        } else {
-                            task = allMscRtn.find(t => t.id === taskId);
-                            flag = false;
-                        }
-                        if (task && flag) {
-                            return {
-                                start_time: task.start_time,
-                                duration: task.duration,
-                                id: task.id, 
-                                title: task.title,
-                                category: task.category,
-                                priority: task.priority,
-                                is_repetitive: task.is_repetitive,
-                                frequency_interval: task.frequency_interval,
-                                due_date: task.due_date,
-                                due_time: task.due_time,
-                                color: task.color,
-                                is_task: true,
-                                is_fixed: true,
-                            };
-                        } else if (task && !flag) {
-                            return {
-                                start_time: task.start_time,
-                                duration: task.duration,
-                                title: task.title,
-                                id: task.id,
-                                is_task: false,
-                                is_fixed: true,
-                            }
-                        } else {
-                            console.error(`Task with ID ${taskId} not found!`);
-                            return null;
-                        }
-                    }).filter(task => task !== null); // Filter out null tasks
-
-                    // Check if there are valid tasks to save
-                    if (tasks.length === 0) {
-                        showMessage('No tasks to save', 'error');
-                        return;
-                    }
-
-                    // Send data to the backend
-                    const post_url = "{% url 'save_routine_template' %}";
-                    fetch(post_url, { // Replace with your actual API endpoint
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken,
-                        },
-                        body: JSON.stringify({
-                            template_name: templateName,
-                            tasks: tasks,
-                        }),
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        showMessage('Template Saved!', 'success');
-                        overlay.style.display = 'none';
-                        taskDetailContainer.style.display = 'none';
-                        taskDetailContainer.style.width = '';
-                        taskDetailContainer.style.maxHeight = '';
-                        taskDetailContainer.style.overflowY = '';
-                    })
-                    .catch(error => {
-                        console.error('Error saving routine:', error);
-                        showMessage('Failed to save routine!', 'error'); // Provide user feedback
-                    });
-                });
-
-                const creatorCancelButton = document.createElement('button');
-                creatorCancelButton.className = 'btn btn-outline-secondary';
-                creatorCancelButton.innerHTML = `<i class="bi bi-x-circle"></i> Cancel`;
-                creatorCancelButton.addEventListener('click', function () {
-                    overlay.style.display = 'none';
-                    taskDetailContainer.style.display = 'none';
-                    taskDetailContainer.style.width = '';
-                    taskDetailContainer.style.maxHeight = '';
-                    taskDetailContainer.style.overflowY = '';
-                });
-
-                creatorButtonsContainer.appendChild(saveButton);
-                creatorButtonsContainer.appendChild(creatorCancelButton);
-
-                // Append all elements to taskDetailContainer
-                taskDetailContainer.appendChild(nameContainer);
-                taskDetailContainer.appendChild(taskListContainer);
-                taskDetailContainer.appendChild(creatorButtonsContainer);
-
-                // Ensure overlay and container are visible
-                overlay.style.display = 'block';
-                taskDetailContainer.style.display = 'block';
-            }
         };
 
         async function fetchRoutineTemplates() {
@@ -1387,13 +1200,15 @@ $(document).ready(function () {
 
 
     // Fetch routine template using AJAX
-    function fetchRoutineTemplateDetails(paramValue, callback, templateId) {
+    function fetchRoutineTemplateDetails(callback, templateId) {
         $.ajax({
             url: `/api/get-routine-template/${templateId}`,
             method: "GET",
             dataType: "json",
             success: function (data) {
 
+                isUpdate = true;
+                updateId = templateId;
                 // Update the template name in the header
                 const currentTemplateNameElement = document.getElementById("currentTemplateName");
                 if (currentTemplateNameElement && data.template_name) {
@@ -1415,16 +1230,10 @@ $(document).ready(function () {
                     if (templateTasks.length > 0) {
                         // Loop through the tasks and populate the schedule list
                         templateTasks.forEach(function (task) {
-                            // Adjust the date based on paramValue
+                            // Adjust the date based on today's date (paramValue is always true)
                             if (task.start_time) {
                                 const originalTime = new Date(task.start_time);
                                 const adjustedDate = new Date();
-                                
-                                // Reset to today or tomorrow at midnight (we'll add the time next)
-                                if (!paramValue) {
-                                    // Tomorrow - add 1 day
-                                    adjustedDate.setDate(adjustedDate.getDate() + 1);
-                                }
                                 
                                 // Get just the time components from original
                                 const originalHours = originalTime.getHours();
@@ -1485,16 +1294,6 @@ $(document).ready(function () {
         });
     };
 
-    // Function to fetch task data by ID (now using the global arrays and taskSrc)
-    function getTaskDataById(taskId, taskSrc) {
-        if (taskSrc === "rtn") {
-            return allTskRtn.find(task => task.id === parseInt(taskId));
-        } else if (taskSrc === 'tsk') {
-            return allTasks.find(task => task.id === parseInt(taskId));
-        } else {
-            return allMscRtn.find(task => task.id === parseInt(taskId));
-        }
-    }
 
     function createGapTask(titleText) {
         // Create a task item with theme-aware classes
@@ -1570,9 +1369,86 @@ $(document).ready(function () {
         });
     }
 
+    function sortFixedTimeScheduleItems() {
+        const scheduleList = document.getElementById("schedule-list");
+        const taskItems = Array.from(scheduleList.children); // Use children instead of querySelectorAll to maintain order
+        
+        if (!taskItems.length) {
+            return;
+        }
+
+        // Create an array to hold the sorted order
+        const sortedItems = [];
+        const fixedTasksWithTime = [];
+        
+        // First pass: identify fixed tasks with valid times
+        taskItems.forEach(item => {
+            if (item.classList.contains("task-item")) {
+                const taskId = item.dataset.id;
+                const taskSrc = item.dataset.src;
+                const taskData = getTaskDataById(taskId, taskSrc);
+                
+                if (taskData && taskData.is_fixed && taskData.start_time) {
+                    const startTime = new Date(taskData.start_time);
+                    if (startTime instanceof Date && !isNaN(startTime)) {
+                        fixedTasksWithTime.push({
+                            item: item,
+                            startTime: startTime
+                        });
+                        return; // Skip adding to sortedItems for now
+                    }
+                }
+            }
+            // Add non-fixed items and fixed items without times to the sorted array immediately
+            sortedItems.push(item);
+        });
+
+        // If no fixed tasks to sort, we're done
+        if (fixedTasksWithTime.length <= 1) {
+            return;
+        }
+
+        // Sort the fixed tasks by time
+        fixedTasksWithTime.sort((a, b) => a.startTime - b.startTime);
+
+        // Second pass: insert fixed tasks at their original positions (but now sorted)
+        let fixedIndex = 0;
+        const finalItems = [];
+        
+        for (const item of taskItems) {
+            if (item.classList.contains("task-item")) {
+                const taskId = item.dataset.id;
+                const taskSrc = item.dataset.src;
+                const taskData = getTaskDataById(taskId, taskSrc);
+                
+                if (taskData && taskData.is_fixed && taskData.start_time) {
+                    // This is a fixed task with time - insert the next one from our sorted array
+                    if (fixedIndex < fixedTasksWithTime.length) {
+                        finalItems.push(fixedTasksWithTime[fixedIndex].item);
+                        fixedIndex++;
+                    }
+                    continue;
+                }
+            }
+            // For non-fixed items, keep them in their original position
+            finalItems.push(item);
+        }
+
+        // If we have any remaining fixed tasks (shouldn't happen), add them at the end
+        while (fixedIndex < fixedTasksWithTime.length) {
+            finalItems.push(fixedTasksWithTime[fixedIndex].item);
+            fixedIndex++;
+        }
+
+        // Update the DOM
+        scheduleList.innerHTML = '';
+        finalItems.forEach(item => scheduleList.appendChild(item));
+
+    }
+
     // Function to calculate and update time slots
     function updateTimeSlots() {
-        // sortFixedTimeScheduleItems();
+        sortFixedTimeScheduleItems();
         const scheduleList = document.getElementById("schedule-list");
         const timeSlotsContainer = document.getElementById("time-slots");
         const dropzone = document.querySelector(".schedule .dropzone");
@@ -1723,11 +1599,10 @@ $(document).ready(function () {
     }
 
     // Fetch tasks using AJAX
-    function fetchTasks(paramValue) {
+    function fetchTasks() {
         $.ajax({
             url: task_url,
             method: "GET",
-            data: { param: paramValue }, // Pass param value dynamically
             dataType: "json",
             success: function (data) {
                 // Clear existing items in the repetitive tasks list
@@ -1840,7 +1715,7 @@ $(document).ready(function () {
             } else if (taskSrc === 'tsk') {
                 return allTasks.find(task => task.id === parseInt(taskId));
             } else {
-                return allMscRtn.find(task => task.id === parseInt(taskId));
+                return null;
             }
         }
     
@@ -2794,6 +2669,171 @@ $(document).ready(function () {
         // Update the displayed name
         templateNameElement.textContent = newName;
     }
+
+
+    // Function to delete task
+    async function delTemplate(templateId) {
+        const csrftoken = getCSRFToken();
+        try {
+            const response = await fetch(`/api/template-delete/${templateId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken, // Add CSRF token header
+                    // Add authentication token if required
+                    // 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete!');
+            }
+
+            const res = await response.json();
+            showMessage(res.message, 'success');
+            const wardiv = document.querySelector('.warningdiv');
+            if (wardiv) {
+                wardiv.remove(); // Completely deletes the element
+            }
+            initializeList();
+            // $(document).trigger('contentUpdated', ['/routine/template-editor/', '#new-content', true]);
+        } catch (error) {
+            showMessage(error, 'error');
+        }
+    }
+
+    function startNewTemplate() {
+        isUpdate = false;
+        fetchTasks();
+    }
+
+    // POST request to save the schedule
+    document.getElementById('saveButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const scheduleListAllItems = document.querySelectorAll('#schedule-list li');
+        const scheduleListItems = getRepetitiveTasks(scheduleListAllItems);
+        const templateName = document.getElementById('currentTemplateName').textContent.trim();
+
+        if (!templateName || templateName === 'Untitled Template') {
+            showMessage('Please enter a valid template name', 'error');
+            return;
+        }
+
+        // Prepare tasks data
+        const tasks = Array.from(scheduleListItems).map(item => {
+            const taskId = parseInt(item.getAttribute('data-id'));
+            const taskSrc = item.getAttribute('data-src');
+            let task;
+            let flag;
+
+            if (taskSrc === 'rtn') {
+                task = allTskRtn.find(t => t.id === taskId);
+                flag = true;
+            } else if (taskSrc === 'tsk') {                
+                task = allTasks.find(t => t.id === taskId);
+                flag = true;
+            } else {
+                task = null;
+                flag = false;
+            }
+            
+            if (task && flag) {
+                return {
+                    start_time: task.start_time,
+                    duration: task.duration,
+                    id: task.id, 
+                    title: task.title,
+                    category: task.category,
+                    priority: task.priority,
+                    is_repetitive: task.is_repetitive,
+                    frequency_interval: task.frequency_interval,
+                    due_date: task.due_date,
+                    due_time: task.due_time,
+                    color: task.color,
+                    is_task: true,
+                    is_fixed: true,
+                };
+            } else if (task && !flag) {
+                return {
+                    start_time: task.start_time,
+                    duration: task.duration,
+                    title: task.title,
+                    id: task.id,
+                    is_task: false,
+                    is_fixed: true,
+                }
+            } else {
+                console.error(`Task with ID ${taskId} not found!`);
+                return null;
+            }
+        }).filter(task => task !== null);
+
+        // Check if there are valid tasks to save
+        if (tasks.length === 0) {
+            showMessage('No tasks to save', 'error');
+            return;
+        }
+
+        // Determine the URL and method based on whether we're updating or creating
+        let post_url, method;
+        if (isUpdate && updateId) {
+            post_url = `/api/update-template/${updateId}/`;
+            method = 'PUT';
+        } else {
+            post_url = "{% url 'save_routine_template' %}";
+            method = 'POST';
+        }
+
+        // Prepare the request body
+        const requestBody = {
+            template_name: templateName,
+            tasks: tasks,
+        };
+
+        // Add template_id if we're updating
+        if (isUpdate && updateId) {
+            requestBody.id = updateId;
+        }
+
+        // Send data to the backend
+        fetch(post_url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify(requestBody),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const message = isUpdate ? 'Template Updated Successfully!' : 'Template Saved Successfully!';
+            showMessage(message, 'success');
+            
+            // If this was a new template, we might want to update the UI to reflect that it's now an existing template
+            if (!isUpdate && data.id) {
+                document.getElementById('saveButton').setAttribute('data-is-update', 'true');
+                document.getElementById('saveButton').setAttribute('data-template-id', data.id);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving template:', error);
+            const message = isUpdate ? 'Failed to update template. Please try again.' : 'Failed to save template. Please try again.';
+            showMessage(message, 'error');
+        });
+    });
+
+    function getRepetitiveTasks(taskList) {
+        return $(taskList).filter(function() {
+            return $(this).attr("data-item-type") === "repetitive";
+        }).get();
+    };
         
     initializeList();
     setupTaskPanelToggle();

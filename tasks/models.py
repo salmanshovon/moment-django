@@ -189,6 +189,14 @@ class Task(models.Model):
             is_active=True
         )
         return {task.id: task.due_date for task in repetitive_tasks}
+    
+    @staticmethod
+    def get_repetitive_tasks(user):
+        """
+        Returns all repetitive tasks for a given user, regardless of
+        notification days and due date.
+        """
+        return Task.objects.filter(user=user, is_repetitive=True)
 
 
 class ArchivedTask(models.Model):

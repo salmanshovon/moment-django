@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView, NotificationsView, NotificationUpdateView, PublicTaskListAPIView, BulkCreateTasksFromPublicTasks
-from .views import TimelineView, RoutineTemplateCreateView, RoutineTemplateListView, RoutineTemplateDetailView
+from .views import TimelineView, RoutineTemplateCreateView, RoutineTemplateListView, RoutineTemplateDetailView, RtnTemplateDeleteAPIView, TemplateTasksView, RoutineTemplateUpdateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -13,7 +13,7 @@ urlpatterns = [
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('task-delete/<int:pk>/', TaskDeleteAPIView.as_view(), name='delete_task'),
     path('update-sort/', UpdateSortPreferenceView.as_view(), name='update_sort'),
-    path('get-scheduling-tasks', SchedulerTasksView.as_view(), name='get_sch_tasks'),
+    path('get-scheduling-tasks/', SchedulerTasksView.as_view(), name='get_sch_tasks'),
     path('routine-save/', RoutineCreateUpdateView.as_view(), name='routine_save'),
     path('routine-view/', RoutineDetailView.as_view(), name='routine_view'),
     path('notification/', NotificationsView.as_view(), name='get_notifications'),
@@ -24,6 +24,9 @@ urlpatterns = [
     path('save-routine-template/', RoutineTemplateCreateView.as_view(), name='save_routine_template'),
     path('routine-template-list/', RoutineTemplateListView.as_view(), name='rtn_template_list'),
     path('get-routine-template/<int:pk>', RoutineTemplateDetailView.as_view(), name='get_routine_template'),
+    path('template-delete/<int:pk>/', RtnTemplateDeleteAPIView.as_view(), name='delete_template'),
+    path('get-template-tasks/', TemplateTasksView.as_view(), name='get_tmp_tasks'),
+    path('update-template/<int:template_id>/', RoutineTemplateUpdateView.as_view(), name='update_template'),
     # temporary irrigation:
     path('ir-get/', IrrigateSettingsAPI.as_view(), name='irrigation-settings'),
     path('ir-put/', NodeMCUAckAPI.as_view(), name='nodemcu-ack'),

@@ -10,6 +10,7 @@ from .serializers import RoutineTemplateSerializer, RoutineTemplateListSerialize
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from itertools import chain
 from rest_framework.exceptions import NotFound
 import pytz
@@ -27,6 +28,14 @@ class SchedulerTasksView(generics.ListAPIView):
         # Use the static method `get_user_tasks` to fetch the tasks
         param = param.lower() == 'true'  # True if 'true', False if 'false'
         return Task.get_user_tasks(user, param=param)
+    
+class TemplateTasksView(generics.ListAPIView):
+    serializer_class = TaskList
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Task.get_repetitive_tasks(user)
 
 class TaskListAPIView(generics.ListAPIView):
     serializer_class = TaskList
@@ -89,6 +98,17 @@ class TaskDeleteAPIView(generics.DestroyAPIView):
         self.perform_destroy(instance)
         return Response({'message': 'Task deleted successfully!'},status=status.HTTP_200_OK)
     
+
+class RtnTemplateDeleteAPIView(generics.DestroyAPIView):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return RoutineTemplate.objects.filter(user=self.request.user)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({'message': 'Template deleted successfully!'},status=status.HTTP_200_OK)
 
 class UpdateSortPreferenceView(APIView):
     permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can access this view
@@ -281,6 +301,20 @@ class RoutineTemplateCreateView(CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class RoutineTemplateUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, template_id):
+        """
+        Fully update a RoutineTemplate by its ID.
+        """
+        template = get_object_or_404(RoutineTemplate, id=template_id, user=request.user)
+        serializer = RoutineTemplateSerializer(template, data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(taskCount=len(serializer.validated_data.get('tasks', [])))
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
 class RoutineTemplateListView(generics.ListAPIView):
