@@ -1,0 +1,994 @@
+<style>
+    /* Container for the checkbox and title */
+    .title-wrapper {
+      display: flex;
+      align-items: center; /* Vertically center the items */
+    }
+  
+    /* Checkbox container */
+    .task-selector-container {
+      display: inline-block;
+      margin-right: 10px; /* Space between checkbox and title */
+      padding-bottom: 9px;
+    }
+  
+    /* Checkbox styling */
+    .task-selector {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+  
+    .task-title {
+      display: flex;
+      align-items: center;
+      /* Align icon and text vertically */
+      gap: 8px;
+      /* Space between icon and text */
+      font-size: 18px;
+      /* Adjust font size */
+      font-weight: 600;
+      /* Make the title bold */
+      color: #333;
+      /* Darker text for better readability */
+      margin-bottom: 12px;
+      /* Add space below the title */
+    }
+  
+    .title-icon {
+      font-size: 20px;
+      /* Slightly larger icon */
+      color: #002752;
+      /* Icon color matching your theme */
+    }
+  
+    .title-text {
+      flex: 1;
+      /* Allow text to take remaining space */
+    }
+  
+    /* Custom CSS for Search Bar and Sort Button */
+    .search-bar {
+      flex-grow: 1;
+      /* Ensures the search bar takes up remaining space */
+      position: relative;
+      /* Required for absolute positioning of the button */
+    }
+  
+    .search-bar input {
+      width: 100%;
+      /* Full width */
+      padding-right: 2rem;
+      /* Space for the search icon */
+      background-color: #ffffff;
+      /* White background */
+      color: #495057;
+      /* Dark text */
+      border: 1px solid #e0e0e0;
+      /* Light border */
+    }
+  
+    /* Custom styles for the search button */
+    .search-button {
+      background-color: #e9ecef;
+      /* Match the default Bootstrap input background color */
+      border: 1px solid #e0e0e0;
+      /* Remove the border */
+      padding: 0.25rem 0.5rem;
+      /* Adjust padding to match the input */
+      color: #6c757d;
+      /* Match the icon color to the input placeholder color */
+      transition: background-color 0.2s, color 0.2s;
+      /* Smooth hover effect */
+      position: absolute;
+      /* Position the button absolutely within the search bar */
+      top: 50%;
+      /* Center vertically */
+      right: 1px;
+      /* Adjust horizontal position */
+      transform: translateY(-50%);
+      /* Fine-tune vertical centering */
+    }
+  
+    .search-button:hover {
+      background-color: #dee2e6;
+      /* Slightly darker background on hover */
+      color: #495057;
+      /* Slightly darker icon color on hover */
+    }
+  
+    .task-container {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+  
+    @media (max-width: 768px) {
+      .task-container {
+        flex-direction: column;
+      }
+    }
+  
+    /* General Scrollbar Styling (WebKit) */
+    .task-list::-webkit-scrollbar {
+      width: 8px;
+      /* Adjust width as needed */
+    }
+  
+    .task-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      /* Light background for the track */
+      border-radius: 4px;
+    }
+  
+    .task-list::-webkit-scrollbar-thumb {
+      background: #888;
+      /* Medium gray for the thumb */
+      border-radius: 4px;
+    }
+  
+    .task-list::-webkit-scrollbar-thumb:hover {
+      background: #555;
+      /* Darker gray on hover */
+    }
+  
+    /* Firefox Scrollbar Styling (Limited) */
+    .task-list {
+      scrollbar-width: thin;
+      /* For Firefox */
+      scrollbar-color: #888 #f1f1f1;
+      /* Thumb and track colors */
+    }
+  
+    .outerbox {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      /* Ensure both outerboxes take equal space */
+      gap: 2px;
+      /* Add spacing between the header and task list */
+    }
+  
+    .task-list {
+      flex: 1;
+      padding: 1rem;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      max-height: calc(100dvh - 33dvh);
+      overflow-y: auto;
+      position: relative;
+    }
+  
+    .task-list h3 {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      /* Stay above the scrolling content */
+      margin: 0;
+      /* Remove default margin */
+      background-color: inherit;
+      /* Inherit background color from parent */
+      padding: 0;
+      /* Remove default padding */
+    }
+  
+    .task-list h3 .fs-4 {
+      background-color: rgb(141, 11, 11);
+      /* Or rgb(61, 38, 190) for the other header */
+      color: white;
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 0;
+      /* Remove default margin */
+      display: block;
+      /* Ensure the div behaves as a block element */
+    }
+  
+    .task-card {
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-size: 0.975rem;
+      background-color: var(--task-bg-color);
+    }
+  
+    .task-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+    }
+  
+  
+    .task-card .details {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: #6c757d;
+    }
+  
+    .task-card .details .separator {
+      width: 1px;
+      height: 0.75rem;
+      background-color: #e0e0e0;
+    }
+  
+    @media (max-width: 768px) {
+      .task-card .details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+  
+      .task-card .details .separator {
+        display: none;
+      }
+  
+      .task-list {
+        max-height: 65dvh;
+      }
+    }
+  
+    .task-detail {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      font-size: 0.975rem;
+      width: 80vw;
+      /* Set width to 80% of the viewport width */
+      max-width: 500px;
+      /* Optional: set a maximum width */
+    }
+  
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+    }
+  
+    .badgex {
+      font-size: 0.625rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+  
+    .badgex.Low {
+      background-color: #228B22;
+      /* Darker Green */
+      color: #ffffff;
+    }
+  
+    .badgex.Medium {
+      background-color: #FFD700;
+      /* Darker Yellow/Gold */
+      color: #000000;
+      /* Black text for better contrast */
+    }
+  
+    .badgex.High {
+      background-color: #FF8C00;
+      /* Darker Orange/Dark Goldenrod */
+      color: #ffffff;
+    }
+  
+    .badgex.Critical {
+      background-color: #DC143C;
+      /* Darker Red/Crimson */
+      color: #ffffff;
+    }
+  
+    .badgex.Urgent {
+      background-color: #8B0000;
+      /* Very Dark Red/Dark Red */
+      color: #ffffff;
+    }
+  
+    /* Buttons */
+  
+    .task-actions {
+      display: flex;
+      /* Use Flexbox for layout */
+      justify-content: space-between;
+      /* Push buttons to the left and counter to the right */
+      align-items: center;
+      /* Vertically center the items */
+      padding: 10px;
+      /* Add some padding for spacing */
+      border-top: 1px solid #e0e0e0;
+      /* Optional: Add a border at the top */
+      background-color: #f9f9f9;
+      /* Optional: Add a light background */
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  
+    .task-actions .btn {
+      margin-right: 10px;
+      /* Add spacing between buttons */
+    }
+  
+    #taskCounter {
+      font-weight: bold;
+      /* Make the counter text bold */
+      color: #333;
+      /* Set the text color */
+    }
+  
+  
+    /* Dark Theme Styles */
+    body.dark-theme {
+      background-color: #121212;
+      /* Dark background */
+      color: #e0e0e0;
+      /* Light text */
+    }
+  
+    /* Dark Theme */
+    body.dark-theme .search-input {
+      background-color: #333; /* Dark background */
+      color: #e0e0e0; /* Light text */
+      border: 1px solid #444; /* Dark border */
+    }
+  
+    body.dark-theme .search-button {
+      background-color: #444; /* Darker background for dark mode */
+      color: #e0e0e0; /* Light icon color for dark mode */
+      border: #444;
+    }
+  
+    body.dark-theme .search-button:hover {
+      background-color: #555; /* Slightly lighter background on hover */
+      color: #ffffff; /* Brighter icon color on hover */
+    }
+  
+    body.dark-theme .search-input::placeholder {
+      color: #e0e0e0;
+      /* White or light-colored placeholder text */
+      opacity: 1;
+      /* Ensure full opacity for consistent visibility */
+    }
+  
+    body.dark-theme .task-card {
+        background-color: var(--task-dark-bg-color);
+    }
+  
+    /* Dark Theme for Separator */
+    body.dark-theme .task-card .details .separator {
+      background-color: #555;
+      /* Darker separator */
+    }
+  
+    body.dark-theme .task-card:hover {
+      box-shadow: 0 2px 4px rgba(255, 255, 255, 0.55);
+    }
+  
+    /* Dark Theme for Buttons */
+    body.dark-theme .btn-primary {
+      background-color: #0056b3; /* Keep primary button color */
+      color: #ffffff; /* Light text */
+    }
+  
+    body.dark-theme .btn-primary:hover {
+      background-color: #004085; /* Darker hover color */
+    }
+  
+    body.dark-theme .btn-outline-secondary {
+      border-color: #6c757d; /* Keep border color */
+      color: #e0e0e0; /* Keep text color */
+    }
+  
+    body.dark-theme .btn-outline-secondary:hover {
+      background-color: #6c757d; /* Keep hover background color */
+      color: #ffffff; /* Light text */
+    }
+  
+    /* Dark Theme for Task List */
+    body.dark-theme .task-list {
+      background-color: #222;
+      /* Dark background */
+      border-color: #444;
+      /* Darker border */
+    }
+  
+    /* Dark Theme for Task Details */
+    body.dark-theme .task-detail {
+      background-color: #333;
+      /* Dark background */
+      color: #e0e0e0;
+      /* Light text */
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.5);
+    }
+  
+    /* Dark Theme for Separator */
+    body.dark-theme .task-card .details .separator {
+      background-color: #555;
+      /* Darker separator */
+    }
+  
+    body.dark-theme .task-list .details {
+      color: #e0e0e0;
+    }
+  
+    /* Dark Theme for Task Title */
+    body.dark-theme .task-title {
+      color: #e0e0e0;
+      /* Light text */
+    }
+  
+    body.dark-theme .title-icon {
+      color: #e0e0e0;
+    }
+  
+    /* Dark Theme for Overlay */
+    body.dark-theme .overlay {
+      background: rgba(0, 0, 0, 0.7);
+      /* Darker overlay */
+    }
+  
+    /* Dark Theme for Scrollbar */
+    body.dark-theme .task-list::-webkit-scrollbar-track {
+      background: #444;
+      /* Dark track */
+    }
+  
+    body.dark-theme .task-list::-webkit-scrollbar-thumb {
+      background: #666;
+      /* Light thumb */
+    }
+  
+    body.dark-theme .task-list {
+      scrollbar-color: #666 #444;
+      /* Thumb and track colors for Firefox */
+    }
+  
+    body.dark-theme .task-actions {
+      background-color: #353535;
+    }
+  
+    body.dark-theme #taskCounter {
+      color: #e0e0e0;
+    }
+  
+    .counter-nav {
+        margin-left: auto;
+    }
+
+    @media (max-width: 768px) {
+        .counter-nav {
+            margin: auto;
+        }
+    }
+  </style>
+<div class="container p-0 shadow-sm rounded" style="max-width: 800px;">
+    <!-- Search Bar-->
+    <div class="d-flex align-items-center gap-3 w-100" style="margin-bottom: 1rem;">
+        <!-- Search Bar -->
+        <div class="flex-grow-1 position-relative">
+            <form id="searchForm">
+                <input type="text" id="searchInput" class="form-control form-control-sm search-input"
+                    placeholder="Search tasks...">
+                <!-- Search btn Icon -->
+                <button type="submit" id="searchButton"
+                    class="btn btn-sm position-absolute top-50 end-0 translate-middle-y search-button">
+                    <i class="fas fa-search search-icon"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="task-container">
+        <div class="outerbox flex-column">
+            <h3>
+                <div class='fs-4'
+                    style='text-align: center; background-color: rgb(61, 38, 190); color: white; padding: 10px; border-radius: 8px;'>
+                    Archived Tasks
+                </div>
+            </h3>
+            <div class="task-list">
+                <div id="tasks"></div>
+            </div>
+            <!-- Buttons and Counter -->
+            <div class="task-actions d-flex flex-column align-items-stretch mt-3">
+                <!-- Buttons, counter, and pagination -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <div class="d-flex gap-2">
+                        <button id="deleteSelectedBtn" class="btn btn-danger">Delete Selected</button>
+                        <a href="{% url 'view_task' %}" class="btn btn-outline-secondary ajax-nav" style="text-decoration: none;"
+                            onclick="$(document).trigger('contentUpdated', [this.href, '#new-content', true]); return false;">
+                            Cancel
+                        </a>
+                    </div>
+                    
+                    <span id="taskCounter" class="ms-auto ms-md-0">Selected: 0</span>
+
+                    <div class="counter-nav">
+                        <nav aria-label="Task pagination" class="d-block d-md-inline-block mt-2 mt-md-0">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">« Prev</span>
+                                    </a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Page 1 of 10</span>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">Next »</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+  <!-- Task Detail Overlay -->
+  <div class="overlay" id="overlay" style="display: none;"></div>
+  <div class="task-detail" id="taskDetail" style="display: none;">
+  </div>
+  
+  <script>
+  
+    function initializeTaskManager() {
+      // Fetch tasks from the backend
+      let tasksData = [];
+      fetchTasks();
+  
+        // Function to fetch tasks with pagination support
+        async function fetchTasks(page = 1, itemsPerPage = 30, query = '') {
+            try {
+                const url = new URL('{% url "arc_task_list" %}', window.location.origin);
+                
+                url.searchParams.append('page', page);
+                url.searchParams.append('page_size', itemsPerPage);
+                
+                if (query) {
+                    url.searchParams.append('q', query); // ✅ match with backend
+                }
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch tasks');
+                }
+
+                const data = await response.json();
+                tasksData = [...data.results];
+                renderTasks(tasksData);
+
+                return {
+                    currentPage: page,
+                    totalPages: Math.ceil(data.count / itemsPerPage),
+                    totalItems: data.count,
+                    itemsPerPage: itemsPerPage
+                };
+
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+                return null;
+            }
+        }
+
+  
+      function renderTasks(tasks) {
+        const tasksContainer = document.querySelector('#tasks');
+  
+        // Clear existing tasks
+        tasksContainer.innerHTML = '';
+  
+        // Render tasks or "No Task Here" message
+        if (tasks.length > 0) {
+          tasks.forEach(task => {
+            const taskCard = createTaskCard(task); // Create the task card element
+            tasksContainer.appendChild(taskCard); // Append original to mobile
+          });
+        } else {
+          const noTaskMessage = document.createElement('div');
+          noTaskMessage.textContent = 'No Task Here';
+          noTaskMessage.style.textAlign = 'center';
+          noTaskMessage.style.color = '#888';
+          noTaskMessage.style.padding = '1rem';
+  
+          tasksContainer.appendChild(noTaskMessage); // Append to tasks container
+        }
+      }
+  
+  
+  
+      function createTaskCard(task) {
+            const taskCard = document.createElement('div');
+            taskCard.className = `task-card task-${task.id}`;
+
+            // Add a checkbox for selection
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'task-selector';
+            checkbox.value = task.id; // Set the value to the task ID
+
+            // Wrap the checkbox in a container for styling
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'task-selector-container';
+            checkboxContainer.appendChild(checkbox);
+
+            // Task Title with Icon and Checkbox
+            const title = document.createElement('h4');
+            title.className = 'task-title';
+
+            // Create a wrapper for the checkbox and title
+            const titleWrapper = document.createElement('div');
+            titleWrapper.className = 'title-wrapper';
+            titleWrapper.appendChild(checkboxContainer);
+            titleWrapper.appendChild(title);
+
+            // Add the title icon and text
+            title.innerHTML += `
+                <span class="title-icon"><i class="bi bi-card-heading"></i></span>
+                <span class="title-text">${task.title}</span>
+            `;
+
+            // Add the rest of the task card content
+            if (task.color) {
+                const darkerColor = darkenHexColor(task.color, 0.1);
+                taskCard.style.setProperty('--task-bg-color', task.color);
+                taskCard.style.setProperty('--task-dark-bg-color', darkerColor);
+            }
+
+            // Task Details Container
+            const details = document.createElement('div');
+            details.className = 'details';
+
+            // Duration with Icon
+            const duration = document.createElement('span');
+            duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`;
+
+            // Category with Icon
+            const category = document.createElement('span');
+            category.innerHTML = `<i class="bi bi-tag"></i> ${task.category ? task.category : 'Uncategorized'}`;
+
+            // Archived Date with Icon (replaces frequency interval)
+            const archivedAt = document.createElement('span');
+            if (task.archived_at) {
+                archivedAt.innerHTML = `<i class="bi bi-archive"></i> Archived: ${formatDate(task.archived_at)}`;
+            } else {
+                archivedAt.innerHTML = `<i class="bi bi-archive"></i> Not archived`;
+            }
+
+            // Priority Badge with Icon
+            const priorityBadge = document.createElement('span');
+            priorityBadge.className = `badgex ${getPriorityLabel(task.priority)}`;
+            priorityBadge.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${getPriorityLabel(task.priority)} Priority`;
+            priorityBadge.style.marginLeft = 'auto';
+
+            // Append elements to details
+            details.appendChild(duration);
+            details.appendChild(createSeparator());
+            details.appendChild(category);
+            details.appendChild(createSeparator());
+            details.appendChild(archivedAt);
+            details.appendChild(createSeparator());
+            details.appendChild(priorityBadge);
+
+            // Append elements to task card
+            taskCard.appendChild(titleWrapper);
+            taskCard.appendChild(details);
+
+            checkbox.onclick = (e) => {
+                e.stopPropagation(); // Prevent the card's onclick event from firing
+                handleTaskSelection(task.id, checkbox.checked); // Handle selection logic
+            };
+
+            // Add onclick event to the task card (excluding the checkbox)
+            taskCard.onclick = (e) => {
+                if (!e.target.classList.contains('task-selector')) {
+                showTaskDetail(task.id);
+                }
+            };
+
+            return taskCard;
+        }
+
+        // Helper function to format date (you may need to adjust this based on your date format)
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
+        }
+  
+      // Function to create a separator
+      function createSeparator() {
+        const separator = document.createElement('div');
+        separator.className = 'separator';
+        return separator;
+      }
+  
+      // Dark color for dark theme background
+      function darkenHexColor(hex, factor) {
+        // Remove the '#' if it exists
+        hex = hex.replace(/^#/, '');
+  
+        // Parse the HEX into RGB components
+        let r = parseInt(hex.slice(0, 2), 16) / 255;
+        let g = parseInt(hex.slice(2, 4), 16) / 255;
+        let b = parseInt(hex.slice(4, 6), 16) / 255;
+  
+        // Convert RGB to HSL
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+  
+        if (max === min) {
+          h = s = 0; // achromatic
+        } else {
+          let d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+          }
+          h /= 6;
+        }
+  
+        // Adjust lightness to make the color darker
+        l = l * factor;
+  
+        // Slightly increase saturation to make the color richer
+        s = Math.min(s * 1.2, 1); // Limit saturation to 1 to avoid oversaturation
+  
+        // Convert HSL back to RGB
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+  
+        // Convert RGB back to HEX
+        r = Math.round(r * 255);
+        g = Math.round(g * 255);
+        b = Math.round(b * 255);
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).padStart(6, '0')}`;
+      }
+  
+      function hue2rgb(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      }
+  
+      // Function to get priority label
+      function getPriorityLabel(priority) {
+        switch (priority) {
+          case 1:
+            return 'Low';
+          case 2:
+            return 'Medium';
+          case 3:
+            return 'High';
+          case 4:
+            return 'Urgent';
+          case 5:
+            return 'Critical';
+          default:
+            return '';
+        }
+      }
+  
+      function formatDuration(minutes) {
+        if (minutes === null || minutes === undefined) {
+          return "Duration: N/A"; // Handle cases where duration is not available
+        }
+  
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+  
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(remainingMinutes).padStart(2, '0');
+        if (formattedHours === `00`) {
+          return `Duration: ${formattedMinutes} Minutes`;
+        } else {
+          return `Duration: ${formattedHours}h ${formattedMinutes}m`;
+        }
+  
+      }
+  
+      const selectedTasks = new Set(); // Track selected task IDs
+      const taskCounter = document.getElementById('taskCounter');
+      const addSelectedBtn = document.getElementById('addSelectedBtn');
+      // Attach the function to the "Add Selected" button
+      addSelectedBtn.addEventListener('click', sendSelectedTasksToServer);
+  
+      function handleTaskSelection(taskId, isSelected) {
+        if (isSelected) {
+          selectedTasks.add(taskId); // Add task ID to the set
+        } else {
+          selectedTasks.delete(taskId); // Remove task ID from the set
+        }
+        taskCounter.textContent = `Selected: ${selectedTasks.size}`;
+      }
+  
+      // Function to show task detail
+      async function showTaskDetail(taskId) {
+        try {
+          // Find the task in the local tasksData array
+          const taskDetail = tasksData.find(task => task.id === taskId);
+          
+          if (!taskDetail) {
+            throw new Error('Task not found');
+          }
+  
+          renderTaskDetail(taskDetail);
+        } catch (error) {
+          console.error('Error fetching task details:', error);
+        }
+      }
+  
+      // Function to render task detail
+        function renderTaskDetail(task) {
+            const overlay = document.getElementById('overlay');
+            const taskDetailContainer = document.getElementById('taskDetail');
+
+            // Clear existing content
+            taskDetailContainer.innerHTML = '';
+
+            // Create and append elements
+            const title = document.createElement('h4');
+            title.innerHTML = `<i class="bi bi-card-heading"></i> ${task.title}`; // Icon for title
+
+            const duration = document.createElement('p');
+            duration.innerHTML = `<i class="bi bi-clock"></i> ${formatDuration(task.duration)}`; // Icon for duration
+
+            const category = document.createElement('p');
+            category.innerHTML = `<i class="bi bi-tag"></i> Category: ${task.category ? task.category : 'Uncategorized'}`; // Icon for category
+
+            const priority = document.createElement('p');
+            priority.innerHTML = `<i class="bi bi-exclamation-circle"></i> Priority: ${getPriorityLabel(task.priority)}`; // Icon for priority
+
+            // Due date with time if available
+            const dueDate = document.createElement('p');
+            if (task.due_date) {
+                let dueDateText = `<i class="bi bi-calendar-check"></i> Due: ${formatDate(task.due_date)}`;
+                if (task.due_time) {
+                dueDateText += ` at ${formatTime(task.due_time)}`;
+                }
+                dueDate.innerHTML = dueDateText;
+            } else {
+                dueDate.innerHTML = `<i class="bi bi-calendar-check"></i> Due: Not set`;
+            }
+
+            // Archived date if available
+            const archivedDate = document.createElement('p');
+            if (task.archived_at) {
+                archivedDate.innerHTML = `<i class="bi bi-archive"></i> Archived: ${formatDate(task.archived_at)}`;
+            } else {
+                archivedDate.innerHTML = `<i class="bi bi-archive"></i> Status: Active`;
+            }
+
+            const description = document.createElement('p');
+            description.innerHTML = `<i class="bi bi-card-text"></i> Description: ${task.description || 'No description'}`; // Icon for description
+
+            // Only Okay button
+            const okayButton = document.createElement('button');
+            okayButton.className = 'btn btn-primary';
+            okayButton.innerHTML = `<i class="bi bi-check-circle"></i> Okay`; // Icon for Okay button
+            okayButton.onclick = closeTaskDetail;
+
+            // Append elements to task detail container
+            taskDetailContainer.appendChild(title);
+            taskDetailContainer.appendChild(duration);
+            taskDetailContainer.appendChild(category);
+            taskDetailContainer.appendChild(priority);
+            taskDetailContainer.appendChild(dueDate);
+            taskDetailContainer.appendChild(archivedDate);
+            taskDetailContainer.appendChild(description);
+            taskDetailContainer.appendChild(okayButton);
+
+            // Show overlay and task detail
+            overlay.style.display = 'block';
+            taskDetailContainer.style.display = 'block';
+        }
+
+        // Function to format time
+        function formatTime(timeString) {
+            const time = new Date(`1970-01-01T${timeString}`);
+            return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+  
+      // search button function
+      // Get the form and input elements
+      const searchForm = document.getElementById('searchForm');
+      const searchInput = document.getElementById('searchInput');
+  
+      // Attach event listener to the form
+      searchForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+        const query = searchInput.value.trim(); // Get the search query
+        fetchTasks(1,20,query); // Fetch tasks with the search query
+      });
+  
+      // Async function to send selected task IDs to the server
+      async function sendSelectedTasksToServer() {
+        if (selectedTasks.size === 0) {
+          showMessage('No Task Selected!', 'error');
+          return;
+        }
+  
+        const payload = {
+          public_task_ids: Array.from(selectedTasks), // Convert Set to Array
+        };
+        const csrftoken = getCSRFToken();
+  
+        try {
+          const response = await fetch('{% url "import_tasks" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify(payload),
+          });
+  
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+  
+          const data = await response.json();
+  
+          // Handle success (e.g., show a success message)
+          showMessage(`${data.message}`, 'success');
+  
+          // Clear the selected tasks after successful creation
+          selectedTasks.clear();
+          const query = searchInput.value.trim(); // Get the search query
+          fetchTasks(query); // Fetch tasks with the search query
+          taskCounter.textContent = `Selected: ${selectedTasks.size}`;
+  
+  
+        } catch (error) {
+          console.error('Error:', error);
+          showMessage('Failed to create tasks. Please try again.', 'error');
+        }
+      }
+  
+      // Function to close task detail
+      function closeTaskDetail() {
+        const overlay = document.getElementById('overlay');
+        const taskDetailContainer = document.getElementById('taskDetail');
+  
+        // Hide overlay and task detail
+        overlay.style.display = 'none';
+        taskDetailContainer.style.display = 'none';
+      }
+    };
+    initializeTaskManager();
+  </script>
+  {% load static %}
+  <script src="{% static 'js/dash_check.js' %}"></script>

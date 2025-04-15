@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import TaskListAPIView, TaskDetailAPIView, TaskDeleteAPIView, UpdateSortPreferenceView, SchedulerTasksView, RoutineCreateUpdateView, RoutineDetailView, NotificationsView, NotificationUpdateView, PublicTaskListAPIView, BulkCreateTasksFromPublicTasks
-from .views import TimelineView, RoutineTemplateCreateView, RoutineTemplateListView, RoutineTemplateDetailView, RtnTemplateDeleteAPIView, TemplateTasksView, RoutineTemplateUpdateView
+from .views import TimelineView, RoutineTemplateCreateView, RoutineTemplateListView, RoutineTemplateDetailView, RtnTemplateDeleteAPIView, TemplateTasksView, RoutineTemplateUpdateView, ArchivedTaskListView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -27,6 +27,7 @@ urlpatterns = [
     path('template-delete/<int:pk>/', RtnTemplateDeleteAPIView.as_view(), name='delete_template'),
     path('get-template-tasks/', TemplateTasksView.as_view(), name='get_tmp_tasks'),
     path('update-template/<int:template_id>/', RoutineTemplateUpdateView.as_view(), name='update_template'),
+    path('archived-task-list/', ArchivedTaskListView.as_view(), name='arc_task_list'),
     # temporary irrigation:
     path('ir-get/', IrrigateSettingsAPI.as_view(), name='irrigation-settings'),
     path('ir-put/', NodeMCUAckAPI.as_view(), name='nodemcu-ack'),

@@ -202,5 +202,15 @@ class ImportTaskView(View):
     def get(self, request, *args, **kwargs):
         categories = TaskCategory.get_categories(user=request.user)
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return render(request, self.template_name, {"categories": categories})
+            return render(request, self.template_name)
+        return render(request, "dashbase.html")
+    
+@method_decorator(login_required(login_url="signin"), name="dispatch")
+class ArchivedTaskView(View):
+    template_name = "tasks/archived_task.html"
+
+    def get(self, request, *args, **kwargs):
+        categories = TaskCategory.get_categories(user=request.user)
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return render(request, self.template_name)
         return render(request, "dashbase.html")

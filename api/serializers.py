@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tasks.models import Task, PublicTask, TaskCategory
+from tasks.models import Task, PublicTask, TaskCategory, ArchivedTask
 from routines.models import Routine, Notification, RoutineTemplate
 from django.utils import timezone
 from users.models import UserSettings, Profile
@@ -299,6 +299,51 @@ class PublicTaskToTaskSerializer(serializers.Serializer):
         # Bulk create all tasks in one query
         Task.objects.bulk_create(tasks_to_create)
         return tasks_to_create
+    
+
+class ArchivedTaskSerializer(serializers.ModelSerializer):
+    category = serializers.SerializerMethodField()
+    color = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ArchivedTask
+        fields = [
+            'id',
+            'title',
+            'description',
+            'priority',
+            'category',
+            'color',
+            'task_merit',
+            'created_at',
+            'updated_at',
+            'duration',
+            'due_date',
+            'due_time',
+            'is_repetitive',
+            'frequency_interval',
+            'notification_days',
+            'archived_at'
+        ]
+        read_only_fields = fields  # All fields are read-only for archived tasks
+
+    def get_category(self, obj):
+        """
+        Returns the category title based on whether it's a public or custom category.
+        """
+        if obj.category:
+            if not obj.category.is_removed:  # Ignore removed public categories
+                return obj.category.category.title if obj.category.category else obj.category.custom_title
+        return None  # If no valid category exists
+
+    def get_color(self, obj):
+        """
+        Returns the category color based on whether it's a public or custom category.
+        """
+        if obj.category:
+            if not obj.category.is_removed:  # Ignore removed public categories
+                return getattr(obj.category.category, 'color', obj.category.custom_color or '#FFFFFF')
+        return '#FFFFFF'  # Default color if no category is found
     
 
 #Temporary 2 serializers for irrigation:

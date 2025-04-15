@@ -3,10 +3,11 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
-from tasks.models import Task, PublicTask
+from rest_framework.pagination import PageNumberPagination
+from tasks.models import Task, PublicTask, ArchivedTask
 from routines.models import Routine, Notification, RoutineTemplate
 from .serializers import TaskDetails, TaskList, UserSettingsSerializer, RoutineSerializer, NotificationSerializer, NotificationUpdateSerializer, PublicTaskList, PublicTaskToTaskSerializer
-from .serializers import RoutineTemplateSerializer, RoutineTemplateListSerializer
+from .serializers import RoutineTemplateSerializer, RoutineTemplateListSerializer, ArchivedTaskSerializer
 from users.models import UserSettings
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -366,6 +367,30 @@ class RoutineTemplateDetailView(generics.RetrieveAPIView):
         
         data['tasks'] = updated_tasks
         return Response(data)
+    
+
+class ArchivedTaskPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+class ArchivedTaskListView(generics.ListAPIView):
+    serializer_class = ArchivedTaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = ArchivedTaskPagination
+
+    def get_queryset(self):
+        # Base queryset - user's archived tasks
+        queryset = ArchivedTask.objects.filter(user=self.request.user)
+        
+        # Handle search query
+        search_query = self.request.query_params.get('q', None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query))
+        
+        return queryset.order_by('-archived_at')  # Newest first
 
 #For irrigation (Temporary)
 from .serializers import IrrigateBasicSerializer

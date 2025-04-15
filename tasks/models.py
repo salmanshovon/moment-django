@@ -225,6 +225,24 @@ class ArchivedTask(models.Model):
         verbose_name = "Archived Task"
         verbose_name_plural = "Archived Tasks"
 
+    @staticmethod
+    def get_archived_tasks_by_timeframe(user, start_date, end_date):
+        """
+        Returns all archived tasks for a given user within a specified time frame.
+        
+        Args:
+            user (User): The user whose archived tasks to retrieve
+            start_date (date/datetime): The start date of the time frame (inclusive)
+            end_date (date/datetime): The end date of the time frame (inclusive)
+            
+        Returns:
+            QuerySet: A queryset of ArchivedTask objects matching the criteria
+        """
+        return ArchivedTask.objects.filter(
+            user=user,
+            archived_at__date__gte=start_date,
+            archived_at__date__lte=end_date
+        ).order_by('-archived_at')
 
 @receiver(post_save, sender=User)
 def assign_public_categories_to_user(sender, instance, created, **kwargs):
